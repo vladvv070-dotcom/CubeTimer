@@ -1690,22 +1690,22 @@
         /* Version Display */
         .version-display {
             position: fixed;
-            bottom: 56.5rem;
-            right: 102rem;
+            bottom: 0.6rem;
+            left: 1rem;
             font-family: 'Manrope', sans-serif;
-            font-size: 1.3rem;
+            font-size: 0.75rem;
             color: #FFFFFF;
-            opacity: 0.5;
+            opacity: 0.35;
             user-select: none;
             pointer-events: none;
-            z-index: 10;
+            z-index: 5;
         }
 
         @media (max-width: 768px) {
             .version-display {
-                right: 0.75rem !important;
-                bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) !important;
-                font-size: 1rem !important;
+                left: 0.75rem !important;
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem) !important;
+                font-size: 0.7rem !important;
             }
         }
 
@@ -6989,6 +6989,19 @@
         @media (min-width: 1400px) {
             .main-content { grid-template-columns: 280px 1fr 280px !important; }
             .timer-display { font-size: 7rem !important; }
+        }
+
+        /* ── Medium desktop (1025px–1399px) ────────────────── */
+        @media (min-width: 1025px) and (max-width: 1399px) {
+            .main-content {
+                grid-template-columns: 240px 1fr 240px !important;
+                gap: 1.5rem !important;
+                padding: 1.5rem !important;
+            }
+            .timer-display { font-size: 6rem !important; }
+            .timer-container { padding: 3rem 4rem !important; }
+            .card { padding: 1.25rem !important; }
+            .best-value, .average-value { font-size: 1.2rem !important; }
         }
 
         /* ── Mobile commentary card (shown only on ≤768px) ──── */
