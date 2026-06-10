@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+=<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
     <!-- Version: Mobile-Optimized 2.0 - 2026-02-07 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Lato:wght@400;700&family=Source+Sans+3:wght@400;700&family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&family=Merriweather:wght@400;700&family=Ubuntu:wght@400;700&family=Ubuntu+Mono:wght@400;700&family=Fira+Sans:wght@400;700&family=Fira+Code:wght@400;700&family=Inter:wght@400;700&family=IBM+Plex+Sans:wght@400;700&family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Serif:wght@400;700&family=Noto+Sans:wght@400;700&family=Noto+Serif:wght@400;700&family=Oswald:wght@400;700&family=Exo+2:wght@400;700&family=Rubik:wght@400;700&family=Comfortaa:wght@400;700&family=Caveat:wght@400;700&family=Russo+One:wght@400&family=Stalinist+One:wght@400&family=Philosopher:wght@400;700&family=Cormorant:wght@400;700&family=Spectral:wght@400;700&family=Alegreya:wght@400;700&family=Arsenal:wght@400;700&family=Jura:wght@400;700&family=Electrolize:wght@400&family=Aldrich:wght@400&family=Audiowide:wght@400&family=Quantico:wght@400;700&family=Saira:wght@400;700&family=Barlow:wght@400;700&family=Geologica:wght@400;700&family=Golos+Text:wght@400;700&family=Commissioner:wght@400;700&family=Scada:wght@400;700&family=Podkova:wght@400;700&family=Press+Start+2P:wght@400&family=Share+Tech+Mono:wght@400&family=VT323:wght@400&family=Anonymous+Pro:wght@400;700&family=Source+Code+Pro:wght@400;700&family=Overpass+Mono:wght@400;700&family=Cousine:wght@400;700&family=Marck+Script:wght@400&family=Bad+Script:wght@400&family=Pangolin:wght@400&family=Neucha:wght@400&family=Alice:wght@400&family=Kelly+Slab:wght@400&family=Poiret+One:wght@400&family=Marmelad:wght@400&family=Yeseva+One:wght@400&family=Tenor+Sans:wght@400&family=Forum:wght@400&family=Cuprum:wght@400;700&family=Raleway:wght@400;700&family=Josefin+Sans:wght@400;700&family=Josefin+Slab:wght@400;700&family=Arimo:wght@400;700&family=Tinos:wght@400;700&family=Nova+Mono:wght@400&family=Syncopate:wght@400;700&family=Rationale:wght@400&family=Prosto+One:wght@400&family=Pattaya:wght@400&family=Viaoda+Libre:wght@400&family=Piazzolla:wght@400;700&family=Gabriela:wght@400&family=Lora:wght@400;700&family=Crimson+Pro:wght@400;700&family=Bodoni+Moda:wght@400;700&family=Roboto+Slab:wght@400;700&family=PT+Mono:wght@400&family=Roboto+Mono:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Acme:wght@400&family=Balsamiq+Sans:wght@400;700&family=Tektur:wght@400;700&family=Unbounded:wght@400;700&family=Evolventa:wght@400&family=Literata:wght@400;700&family=Cardo:wght@400;700&family=Frank+Ruhl+Libre:wght@400;700&subset=cyrillic&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -264,7 +264,40 @@
                         <!-- 3. Font -->
                         <div class="setting-group" style="margin-top: 1.25rem;">
                             <div class="slider-value" style="margin-bottom: 0.5rem;">Font</div>
-                            <div class="font-options" id="fontOptions"></div>
+                            <div class="font-options" id="fontOptions">
+                                <button class="font-btn active" data-font="default">
+                                    <div class="font-btn-name">Default</div>
+                                    <div class="font-btn-preview" style="font-family:'Anybody',sans-serif;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="mono">
+                                    <div class="font-btn-name">Mono</div>
+                                    <div class="font-btn-preview" style="font-family:'JetBrains Mono',monospace;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="rounded">
+                                    <div class="font-btn-name">Rounded</div>
+                                    <div class="font-btn-preview" style="font-family:'Nunito',sans-serif;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="tech">
+                                    <div class="font-btn-name">Tech</div>
+                                    <div class="font-btn-preview" style="font-family:'Space Grotesk',sans-serif;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="orbitron">
+                                    <div class="font-btn-name">Futuristic</div>
+                                    <div class="font-btn-preview" style="font-family:'Orbitron',sans-serif;font-size:0.82rem;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="bebas">
+                                    <div class="font-btn-name">Bold</div>
+                                    <div class="font-btn-preview" style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.06em;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="playfair">
+                                    <div class="font-btn-name">Elegant</div>
+                                    <div class="font-btn-preview" style="font-family:'Playfair Display',serif;">Aa 012</div>
+                                </button>
+                                <button class="font-btn" data-font="rajdhani">
+                                    <div class="font-btn-name">Timer</div>
+                                    <div class="font-btn-preview" style="font-family:'Rajdhani',sans-serif;letter-spacing:0.05em;">Aa 012</div>
+                                </button>
+                            </div>
                         </div>
 
                         <!-- 4. Running Timer Color -->
@@ -310,11 +343,8 @@
                         <h3 class="section-title">✨ Theme Generator</h3>
                         <div class="setting-group">
                             <div class="theme-gen-wrap">
-                                <div class="theme-gen-input-wrap">
-                                    <input type="text" id="themeGenInput" class="theme-gen-input"
-                                        placeholder="e.g. blue neon rounded...">
-                                    <span class="theme-gen-counter" id="themeGenCounter">0/5</span>
-                                </div>
+                                <input type="text" id="themeGenInput" class="theme-gen-input"
+                                    placeholder="e.g. minimalist blue futuristic gradient...">
                                 <button class="theme-gen-btn" id="themeGenBtn">Generate</button>
                             </div>
                             <div class="theme-gen-results" id="themeGenResults"></div>

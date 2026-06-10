@@ -2232,11 +2232,11 @@
                 if (editBtn) editBtn.textContent = t.edit;
                 
                 // Export buttons
-                const exportJSONBtn = document.querySelector('#exportJSONBtn');
-                const exportCSVBtn = document.querySelector('#exportCSVBtn');
+                const exportJsonBtn = document.querySelector('#exportJsonBtn');
+                const exportCsvBtn = document.querySelector('#exportCsvBtn');
                 const importBtn = document.querySelector('#importBtn');
-                if (exportJSONBtn) exportJSONBtn.textContent = t.exportJSON;
-                if (exportCSVBtn) exportCSVBtn.textContent = t.exportCSV;
+                if (exportJsonBtn) exportJsonBtn.textContent = t.exportJSON;
+                if (exportCsvBtn) exportCsvBtn.textContent = t.exportCSV;
                 if (importBtn) importBtn.textContent = t.importData;
                 
                 // Left column
@@ -2568,111 +2568,6 @@
                 ];
             }
 
-            static get FONTS() {
-                return [
-                    // ── Classic (8) ──
-                    { id:'default',        label:'Default',        family:"'Anybody',sans-serif",             weight:'700' },
-                    { id:'mono',           label:'Mono',           family:"'JetBrains Mono',monospace",        weight:'600' },
-                    { id:'rounded',        label:'Rounded',        family:"'Nunito',sans-serif",               weight:'700' },
-                    { id:'tech',           label:'Tech',           family:"'Space Grotesk',sans-serif",        weight:'600' },
-                    { id:'orbitron',       label:'Futuristic',     family:"'Orbitron',sans-serif",             weight:'700', size:'0.78rem' },
-                    { id:'bebas',          label:'Bold',           family:"'Bebas Neue',sans-serif",           weight:'400', size:'1.3rem', spacing:'0.06em' },
-                    { id:'playfair',       label:'Elegant',        family:"'Playfair Display',serif",          weight:'700' },
-                    { id:'rajdhani',       label:'Timer',          family:"'Rajdhani',sans-serif",             weight:'700', spacing:'0.05em' },
-                    // ── New (96) ──
-                    { id:'roboto',         label:'Roboto',         family:"'Roboto',sans-serif",               weight:'700' },
-                    { id:'open-sans',      label:'Open Sans',      family:"'Open Sans',sans-serif",            weight:'700' },
-                    { id:'montserrat',     label:'Montserrat',     family:"'Montserrat',sans-serif",           weight:'700' },
-                    { id:'lato',           label:'Lato',           family:"'Lato',sans-serif",                 weight:'700' },
-                    { id:'source-sans',    label:'Source Sans',    family:"'Source Sans 3',sans-serif",        weight:'700' },
-                    { id:'pt-sans',        label:'PT Sans',        family:"'PT Sans',sans-serif",              weight:'700' },
-                    { id:'pt-serif',       label:'PT Serif',       family:"'PT Serif',serif",                  weight:'700' },
-                    { id:'merriweather',   label:'Merriweather',   family:"'Merriweather',serif",              weight:'700' },
-                    { id:'ubuntu',         label:'Ubuntu',         family:"'Ubuntu',sans-serif",               weight:'700' },
-                    { id:'ubuntu-mono',    label:'Ubuntu Mono',    family:"'Ubuntu Mono',monospace",           weight:'700' },
-                    { id:'fira-sans',      label:'Fira Sans',      family:"'Fira Sans',sans-serif",            weight:'700' },
-                    { id:'fira-code',      label:'Fira Code',      family:"'Fira Code',monospace",             weight:'400' },
-                    { id:'inter',          label:'Inter',          family:"'Inter',sans-serif",                weight:'700' },
-                    { id:'ibm-plex-sans',  label:'IBM Plex Sans',  family:"'IBM Plex Sans',sans-serif",        weight:'700' },
-                    { id:'ibm-plex-mono',  label:'IBM Plex Mono',  family:"'IBM Plex Mono',monospace",         weight:'400' },
-                    { id:'ibm-plex-serif', label:'IBM Plex Serif', family:"'IBM Plex Serif',serif",            weight:'700' },
-                    { id:'noto-sans',      label:'Noto Sans',      family:"'Noto Sans',sans-serif",            weight:'700' },
-                    { id:'noto-serif',     label:'Noto Serif',     family:"'Noto Serif',serif",                weight:'700' },
-                    { id:'oswald',         label:'Oswald',         family:"'Oswald',sans-serif",               weight:'700' },
-                    { id:'exo-2',          label:'Exo 2',          family:"'Exo 2',sans-serif",                weight:'700' },
-                    { id:'rubik',          label:'Rubik',          family:"'Rubik',sans-serif",                weight:'700' },
-                    { id:'comfortaa',      label:'Comfortaa',      family:"'Comfortaa',sans-serif",            weight:'700' },
-                    { id:'caveat',         label:'Caveat',         family:"'Caveat',cursive",                  weight:'700' },
-                    { id:'russo-one',      label:'Russo One',      family:"'Russo One',sans-serif",            weight:'400' },
-                    { id:'stalinist',      label:'Stalinist',      family:"'Stalinist One',sans-serif",        weight:'400', size:'0.7rem' },
-                    { id:'philosopher',    label:'Philosopher',    family:"'Philosopher',serif",               weight:'700' },
-                    { id:'cormorant',      label:'Cormorant',      family:"'Cormorant',serif",                 weight:'700' },
-                    { id:'spectral',       label:'Spectral',       family:"'Spectral',serif",                  weight:'700' },
-                    { id:'alegreya',       label:'Alegreya',       family:"'Alegreya',serif",                  weight:'700' },
-                    { id:'arsenal',        label:'Arsenal',        family:"'Arsenal',sans-serif",              weight:'700' },
-                    { id:'jura',           label:'Jura',           family:"'Jura',sans-serif",                 weight:'700' },
-                    { id:'electrolize',    label:'Electrolize',    family:"'Electrolize',sans-serif",          weight:'400' },
-                    { id:'aldrich',        label:'Aldrich',        family:"'Aldrich',sans-serif",              weight:'400' },
-                    { id:'audiowide',      label:'Audiowide',      family:"'Audiowide',sans-serif",            weight:'400' },
-                    { id:'quantico',       label:'Quantico',       family:"'Quantico',sans-serif",             weight:'700' },
-                    { id:'saira',          label:'Saira',          family:"'Saira',sans-serif",                weight:'700' },
-                    { id:'barlow',         label:'Barlow',         family:"'Barlow',sans-serif",               weight:'700' },
-                    { id:'manrope',        label:'Manrope',        family:"'Manrope',sans-serif",              weight:'700' },
-                    { id:'geologica',      label:'Geologica',      family:"'Geologica',sans-serif",            weight:'700' },
-                    { id:'golos',          label:'Golos Text',     family:"'Golos Text',sans-serif",           weight:'700' },
-                    { id:'commissioner',   label:'Commissioner',   family:"'Commissioner',sans-serif",         weight:'700' },
-                    { id:'scada',          label:'Scada',          family:"'Scada',sans-serif",                weight:'700' },
-                    { id:'podkova',        label:'Podkova',        family:"'Podkova',serif",                   weight:'700' },
-                    { id:'press-start',    label:'Press Start',    family:"'Press Start 2P',monospace",        weight:'400', size:'0.55rem' },
-                    { id:'share-tech',     label:'Share Tech',     family:"'Share Tech Mono',monospace",       weight:'400' },
-                    { id:'vt323',          label:'VT323',          family:"'VT323',monospace",                 weight:'400', size:'1.4rem' },
-                    { id:'anonymice',      label:'Anonymous Pro',  family:"'Anonymous Pro',monospace",         weight:'700' },
-                    { id:'source-code',    label:'Source Code',    family:"'Source Code Pro',monospace",       weight:'400' },
-                    { id:'overpass-mono',  label:'Overpass Mono',  family:"'Overpass Mono',monospace",         weight:'400' },
-                    { id:'cousine',        label:'Cousine',        family:"'Cousine',monospace",               weight:'700' },
-                    { id:'marck-script',   label:'Marck Script',   family:"'Marck Script',cursive",            weight:'400' },
-                    { id:'bad-script',     label:'Bad Script',     family:"'Bad Script',cursive",              weight:'400' },
-                    { id:'pangolin',       label:'Pangolin',       family:"'Pangolin',cursive",                weight:'400' },
-                    { id:'neucha',         label:'Neucha',         family:"'Neucha',cursive",                  weight:'400' },
-                    { id:'alice',          label:'Alice',          family:"'Alice',serif",                     weight:'400' },
-                    { id:'kelly-slab',     label:'Kelly Slab',     family:"'Kelly Slab',serif",                weight:'400' },
-                    { id:'poiret',         label:'Poiret One',     family:"'Poiret One',sans-serif",           weight:'400' },
-                    { id:'marmelad',       label:'Marmelad',       family:"'Marmelad',sans-serif",             weight:'400' },
-                    { id:'yeseva',         label:'Yeseva One',     family:"'Yeseva One',serif",                weight:'400' },
-                    { id:'tenor',          label:'Tenor Sans',     family:"'Tenor Sans',sans-serif",           weight:'400' },
-                    { id:'forum',          label:'Forum',          family:"'Forum',serif",                     weight:'400' },
-                    { id:'cuprum',         label:'Cuprum',         family:"'Cuprum',sans-serif",               weight:'700' },
-                    { id:'raleway',        label:'Raleway',        family:"'Raleway',sans-serif",              weight:'700' },
-                    { id:'josefin-sans',   label:'Josefin Sans',   family:"'Josefin Sans',sans-serif",         weight:'700' },
-                    { id:'josefin-slab',   label:'Josefin Slab',   family:"'Josefin Slab',serif",              weight:'700' },
-                    { id:'arimo',          label:'Arimo',          family:"'Arimo',sans-serif",                weight:'700' },
-                    { id:'tinos',          label:'Tinos',          family:"'Tinos',serif",                     weight:'700' },
-                    { id:'nova-mono',      label:'Nova Mono',      family:"'Nova Mono',monospace",             weight:'400' },
-                    { id:'syncopate',      label:'Syncopate',      family:"'Syncopate',sans-serif",            weight:'700', size:'0.75rem' },
-                    { id:'rationale',      label:'Rationale',      family:"'Rationale',sans-serif",            weight:'400' },
-                    { id:'prosto',         label:'Prosto One',     family:"'Prosto One',sans-serif",           weight:'400' },
-                    { id:'pattaya',        label:'Pattaya',        family:"'Pattaya',sans-serif",              weight:'400' },
-                    { id:'viaoda',         label:'Viaoda Libre',   family:"'Viaoda Libre',serif",              weight:'400' },
-                    { id:'piazzolla',      label:'Piazzolla',      family:"'Piazzolla',serif",                 weight:'700' },
-                    { id:'gabriela',       label:'Gabriela',       family:"'Gabriela',serif",                  weight:'400' },
-                    { id:'lora',           label:'Lora',           family:"'Lora',serif",                      weight:'700' },
-                    { id:'crimson-pro',    label:'Crimson Pro',    family:"'Crimson Pro',serif",               weight:'700' },
-                    { id:'bodoni-moda',    label:'Bodoni Moda',    family:"'Bodoni Moda',serif",               weight:'700' },
-                    { id:'roboto-slab',    label:'Roboto Slab',    family:"'Roboto Slab',serif",               weight:'700' },
-                    { id:'pt-mono',        label:'PT Mono',        family:"'PT Mono',monospace",               weight:'400' },
-                    { id:'roboto-mono',    label:'Roboto Mono',    family:"'Roboto Mono',monospace",           weight:'700' },
-                    { id:'roboto-cond',    label:'Roboto Cond.',   family:"'Roboto Condensed',sans-serif",     weight:'700' },
-                    { id:'acme',           label:'Acme',           family:"'Acme',sans-serif",                 weight:'400' },
-                    { id:'balsamiq',       label:'Balsamiq',       family:"'Balsamiq Sans',sans-serif",        weight:'700' },
-                    { id:'tektur',         label:'Tektur',         family:"'Tektur',sans-serif",               weight:'700' },
-                    { id:'unbounded',      label:'Unbounded',      family:"'Unbounded',sans-serif",            weight:'700', size:'0.75rem' },
-                    { id:'evolventa',      label:'Evolventa',      family:"'Evolventa',sans-serif",            weight:'400' },
-                    { id:'literata',       label:'Literata',       family:"'Literata',serif",                  weight:'700' },
-                    { id:'cardo',          label:'Cardo',          family:"'Cardo',serif",                     weight:'700' },
-                    { id:'frank',          label:'Frank Ruhl',     family:"'Frank Ruhl Libre',serif",          weight:'700' },
-                ];
-            }
-
             static get DARK_BACKGROUNDS() {
                 return [
                     { id: 'none',             label: 'Default'    },
@@ -2940,35 +2835,8 @@
                     this._renderThemeVariants(variants, results);
                 });
 
-                // Word counter + limit
-                const counter = document.getElementById('themeGenCounter');
-                const MAX_WORDS = 5;
-
-                const updateCounter = () => {
-                    const words = input.value.trim().split(/\s+/).filter(Boolean);
-                    const count = words.length;
-                    if (counter) {
-                        counter.textContent = `${Math.min(count, MAX_WORDS)}/${MAX_WORDS}`;
-                        counter.classList.toggle('theme-gen-counter--full', count >= MAX_WORDS);
-                    }
-                };
-
-                input.addEventListener('input', () => {
-                    // Block input beyond 5 words
-                    const words = input.value.split(/\s+/).filter(Boolean);
-                    if (words.length > MAX_WORDS) {
-                        input.value = words.slice(0, MAX_WORDS).join(' ');
-                    }
-                    updateCounter();
-                });
-
-                // Also block spacebar when already at limit
                 input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') { btn.click(); return; }
-                    if (e.key === ' ') {
-                        const words = input.value.trim().split(/\s+/).filter(Boolean);
-                        if (words.length >= MAX_WORDS) e.preventDefault();
-                    }
+                    if (e.key === 'Enter') btn.click();
                 });
             }
 
@@ -2976,285 +2844,137 @@
                 const q = query.toLowerCase();
 
                 const colorMap = {
-                    blue:        { accent: '#4a9eff', bgs: ['dark-deep-blue','dark-cobalt','dark-ocean','dark-sapphire','light-azure','light-cobalt-l','light-navy-l','light-horizon'] },
-                    cyan:        { accent: '#06b6d4', bgs: ['dark-teal-depths','dark-aqua','dark-arctic','dark-ice','light-teal-l','light-aqua-l','light-crystal','light-riviera'] },
-                    green:       { accent: '#4ade80', bgs: ['dark-forest','dark-matrix','dark-emerald-deep','dark-jungle','light-sage','light-mint-l','light-jade','light-meadow'] },
-                    red:         { accent: '#f87171', bgs: ['dark-lava','dark-crimson','dark-volcano','dark-rust','light-rose-l','light-bloom','light-blossom'] },
-                    orange:      { accent: '#fb923c', bgs: ['dark-ember','dark-magma','dark-copper','dark-sunset','light-peach','light-apricot','light-tangerine','light-sorbet'] },
-                    yellow:      { accent: '#fbbf24', bgs: ['dark-amber-glow','dark-solar','dark-titan','light-honey','light-butter','light-sunshine','light-dandelion','light-lemon'] },
-                    purple:      { accent: '#a78bfa', bgs: ['dark-amethyst','dark-grape','dark-indigo-deep','dark-lavender','light-lilac','light-lavender-l','light-amethyst-l','light-wisteria'] },
-                    pink:        { accent: '#f472b6', bgs: ['dark-rose-dark','dark-orchid','dark-fuchsia','dark-magenta','light-blush','light-rose-l','light-cotton-candy','light-bubblegum'] },
-                    white:       { accent: '#e8edf4', bgs: ['dark-charcoal','dark-obsidian','dark-carbon','light-snow','light-paper','light-chalk','light-alabaster','light-porcelain'] },
-                    black:       { accent: '#e8edf4', bgs: ['dark-void','dark-pitch','dark-jet','dark-obsidian','dark-abyss','dark-onyx'] },
-                    teal:        { accent: '#2dd4bf', bgs: ['dark-teal-depths','dark-deep-sea','dark-seaweed','light-seafoam','light-turquoise','light-teal-l','light-tropical'] },
-                    violet:      { accent: '#8b5cf6', bgs: ['dark-ultraviolet','dark-nebula','dark-plum','dark-eclipse','light-violet-l','light-wisteria','light-plum-l'] },
-                    indigo:      { accent: '#6366f1', bgs: ['dark-indigo-deep','dark-cobalt','dark-midnight-2','light-periwinkle','light-cornflower','light-nordic'] },
-                    gray:        { accent: '#9ca3af', bgs: ['dark-graphite','dark-steel','dark-slate-glow','dark-shadow','light-steel-l','light-zen','light-chalk'] },
-                    grey:        { accent: '#9ca3af', bgs: ['dark-graphite','dark-steel','dark-slate-glow','dark-shadow','light-steel-l','light-zen','light-chalk'] },
-                    gold:        { accent: '#fbbf24', bgs: ['dark-amber-glow','dark-copper','dark-titan','light-honey','light-champagne','light-parchment'] },
-                    silver:      { accent: '#e2e8f0', bgs: ['dark-steel','dark-slate-glow','dark-graphite','light-steel-l','light-pearl','light-mist'] },
-                    синий:       { accent: '#4a9eff', bgs: ['dark-deep-blue','dark-cobalt','dark-ocean','light-azure','light-cobalt-l'] },
-                    голубой:     { accent: '#06b6d4', bgs: ['dark-teal-depths','dark-aqua','dark-arctic','light-teal-l','light-aqua-l'] },
-                    зелёный:     { accent: '#4ade80', bgs: ['dark-forest','dark-matrix','dark-emerald-deep','light-sage','light-mint-l'] },
-                    красный:     { accent: '#f87171', bgs: ['dark-lava','dark-crimson','dark-volcano','light-rose-l','light-bloom'] },
-                    оранжевый:   { accent: '#fb923c', bgs: ['dark-ember','dark-magma','dark-sunset','light-peach','light-apricot'] },
-                    жёлтый:      { accent: '#fbbf24', bgs: ['dark-amber-glow','dark-solar','light-honey','light-sunshine','light-dandelion'] },
-                    фиолетовый:  { accent: '#a78bfa', bgs: ['dark-amethyst','dark-grape','dark-lavender','light-lilac','light-lavender-l'] },
-                    розовый:     { accent: '#f472b6', bgs: ['dark-rose-dark','dark-orchid','dark-fuchsia','light-blush','light-rose-l'] },
-                    белый:       { accent: '#e8edf4', bgs: ['dark-charcoal','dark-obsidian','light-snow','light-paper','light-chalk'] },
-                    чёрный:      { accent: '#e8edf4', bgs: ['dark-void','dark-pitch','dark-jet','dark-obsidian','dark-abyss'] },
-                    серый:       { accent: '#9ca3af', bgs: ['dark-graphite','dark-steel','light-steel-l','light-zen','light-chalk'] },
+                    blue:    { accent: '#4a9eff', bgs: ['dark-deep-blue','dark-cobalt','dark-ocean','dark-sapphire','light-azure','light-cobalt-l','light-navy-l'] },
+                    cyan:    { accent: '#06b6d4', bgs: ['dark-teal-depths','dark-aqua','dark-arctic','dark-ice','light-teal-l','light-aqua-l','light-crystal'] },
+                    green:   { accent: '#4ade80', bgs: ['dark-forest','dark-matrix','dark-emerald-deep','dark-jungle','light-sage','light-mint-l','light-jade'] },
+                    red:     { accent: '#f87171', bgs: ['dark-lava','dark-crimson','dark-volcano','dark-rust','light-rose-l','light-bloom','light-blossom'] },
+                    orange:  { accent: '#fb923c', bgs: ['dark-ember','dark-magma','dark-copper','dark-sunset','light-peach','light-apricot','light-tangerine'] },
+                    yellow:  { accent: '#fbbf24', bgs: ['dark-amber-glow','dark-solar','dark-titan','light-honey','light-butter','light-sunshine','light-dandelion'] },
+                    purple:  { accent: '#a78bfa', bgs: ['dark-amethyst','dark-grape','dark-indigo-deep','dark-lavender','light-lilac','light-lavender-l','light-amethyst-l'] },
+                    pink:    { accent: '#f472b6', bgs: ['dark-rose-dark','dark-orchid','dark-fuchsia','dark-magenta','light-blush','light-rose-l','light-cotton-candy'] },
+                    white:   { accent: '#e8edf4', bgs: ['dark-charcoal','dark-obsidian','dark-carbon','light-snow','light-paper','light-chalk','light-alabaster'] },
+                    black:   { accent: '#e8edf4', bgs: ['dark-void','dark-pitch','dark-jet','dark-obsidian','dark-abyss'] },
+                    teal:    { accent: '#2dd4bf', bgs: ['dark-teal-depths','dark-deep-sea','dark-seaweed','light-seafoam','light-turquoise','light-teal-l'] },
+                    violet:  { accent: '#8b5cf6', bgs: ['dark-ultraviolet','dark-nebula','dark-plum','dark-eclipse','light-violet-l','light-wisteria','light-plum-l'] },
                 };
 
-                // bgStyles: keywords that define BACKGROUND character
-                const bgStyleMap = {
-                    neon:        { bgs: ['dark-neon','dark-electric','dark-glitch','dark-cyberpunk','dark-plasma'] },
-                    futuristic:  { bgs: ['dark-electric','dark-cyberpunk','dark-hologram','dark-circuit','dark-neon'] },
-                    future:      { bgs: ['dark-electric','dark-cyberpunk','dark-hologram','dark-circuit'] },
-                    retro:       { bgs: ['dark-retrowave','dark-synthwave','dark-vaporwave','dark-outrun'] },
-                    vintage:     { bgs: ['dark-retrowave','dark-synthwave','light-parchment','light-linen','light-sandstone'] },
-                    minimal:     { bgs: ['dark-minimal','dark-dim','dark-shade','light-zen','light-paper','light-mist','light-snow'] },
-                    minimalist:  { bgs: ['dark-minimal','dark-dim','dark-shade','light-zen','light-paper','light-mist','light-snow'] },
-                    simple:      { bgs: ['dark-minimal','dark-dim','light-snow','light-paper','light-zen'] },
-                    clean:       { bgs: ['dark-minimal','dark-slate-glow','light-snow','light-mist','light-cotton'] },
-                    dark:        { bgs: ['dark-void','dark-abyss','dark-obsidian','dark-jet','dark-pitch','dark-onyx'] },
-                    light:       { bgs: ['light-snow','light-cotton','light-pearl','light-mist','light-cloud','light-paper'] },
-                    bright:      { bgs: ['light-sunshine','light-rainbow','light-aurora-l','light-spring','light-tropical'] },
-                    cosmic:      { bgs: ['dark-galaxy','dark-nebula','dark-cosmos','dark-starfield','dark-aurora','dark-borealis'] },
-                    space:       { bgs: ['dark-cosmos','dark-galaxy','dark-nebula','dark-void','dark-starfield','dark-eclipse'] },
-                    galaxy:      { bgs: ['dark-galaxy','dark-nebula','dark-cosmos','dark-starfield','dark-aurora-2'] },
-                    aurora:      { bgs: ['dark-aurora','dark-aurora-2','dark-aurora-3','dark-borealis','dark-northern'] },
-                    nature:      { bgs: ['dark-forest','dark-jungle','dark-emerald-deep','light-sage','light-meadow','light-fern','light-jade'] },
-                    forest:      { bgs: ['dark-forest','dark-jungle','dark-cypress','dark-hunter','light-fern','light-meadow'] },
-                    ocean:       { bgs: ['dark-ocean','dark-deep-sea','dark-aqua','dark-arctic','light-lake','light-pool','light-riviera'] },
-                    warm:        { bgs: ['dark-ember','dark-sunset','dark-copper','dark-amber-glow','light-peach','light-honey','light-sunrise'] },
-                    cold:        { bgs: ['dark-arctic','dark-ice','dark-frost','dark-steel','light-glacier','light-breeze','light-cloud'] },
-                    cool:        { bgs: ['dark-arctic','dark-ice','dark-frost','light-glacier','light-crystal','light-breeze'] },
-                    gradient:    { bgs: ['dark-gradient','dark-aurora','dark-borealis','dark-prism','light-rainbow','light-aurora-l','light-opal'] },
-                    matrix:      { bgs: ['dark-matrix','dark-matrix-2','dark-bio','dark-circuit','dark-phosphor'] },
-                    grid:        { bgs: ['dark-grid','dark-mesh','dark-cross','dark-circuit','light-grid','light-cross-l','light-mesh-l'] },
-                    pattern:     { bgs: ['dark-grid','dark-circuit','dark-mesh','dark-hex','dark-weave','light-grid','light-dots','light-hex-l'] },
-                    cyberpunk:   { bgs: ['dark-cyberpunk','dark-neon','dark-electric','dark-glitch','dark-outrun'] },
-                    synthwave:   { bgs: ['dark-synthwave','dark-retrowave','dark-vaporwave','dark-outrun','dark-plasma'] },
-                    vaporwave:   { bgs: ['dark-vaporwave','dark-retrowave','dark-orchid','dark-fuchsia','dark-magenta'] },
-                    pastel:      { bgs: ['light-cotton-candy','light-lavender-l','light-peach','light-mint-l','light-blush','light-lilac'] },
-                    soft:        { bgs: ['light-mist','light-cloud','light-frosted','light-pearl','light-cotton','light-ghost'] },
-                    midnight:    { bgs: ['dark-midnight','dark-midnight-2','dark-void','dark-abyss','dark-cosmos'] },
-                    fire:        { bgs: ['dark-lava','dark-volcano','dark-ember','dark-magma','dark-crimson'] },
-                    ice:         { bgs: ['dark-arctic','dark-ice','dark-frost','light-glacier','light-crystal','light-breeze'] },
-                    sunset:      { bgs: ['dark-sunset','dark-ember','dark-infrared','light-sunrise','light-dawn','light-sherbet'] },
-                    toxic:       { bgs: ['dark-toxic','dark-phosphor','dark-bio','dark-matrix','dark-lime-glow'] },
-                    plasma:      { bgs: ['dark-plasma','dark-electric','dark-hologram','dark-ultraviolet','dark-spectrum'] },
-                    hacker:      { bgs: ['dark-matrix','dark-matrix-2','dark-bio','dark-circuit','dark-phosphor'] },
-                    elegant:     { bgs: ['dark-moonlight','dark-obsidian','light-pearl','light-champagne','light-porcelain','light-vanilla'] },
-                    luxury:      { bgs: ['dark-moonlight','dark-charcoal','light-champagne','light-pearl','light-porcelain'] },
-                    professional:{ bgs: ['dark-graphite','dark-minimal','dark-slate-glow','light-steel-l','light-zen','light-paper'] },
-                    mono:        { bgs: ['dark-graphite','dark-carbon','dark-charcoal','light-chalk','light-zen','dark-matrix'] },
-                    monochrome:  { bgs: ['dark-graphite','dark-carbon','dark-charcoal','light-chalk','light-zen','dark-slate-glow'] },
-                    // Russian
-                    минималист:  { bgs: ['dark-minimal','dark-dim','light-zen','light-paper','light-mist'] },
-                    футурист:    { bgs: ['dark-electric','dark-cyberpunk','dark-hologram','dark-neon'] },
-                    ретро:       { bgs: ['dark-retrowave','dark-synthwave','dark-vaporwave'] },
-                    тёмный:      { bgs: ['dark-void','dark-abyss','dark-obsidian','dark-jet','dark-pitch'] },
-                    светлый:     { bgs: ['light-snow','light-cotton','light-pearl','light-mist','light-cloud'] },
-                    природа:     { bgs: ['dark-forest','dark-jungle','light-sage','light-meadow','light-fern'] },
-                    космос:      { bgs: ['dark-galaxy','dark-nebula','dark-cosmos','dark-starfield','dark-aurora'] },
-                    океан:       { bgs: ['dark-ocean','dark-deep-sea','dark-aqua','light-lake','light-pool'] },
-                    огонь:       { bgs: ['dark-lava','dark-volcano','dark-ember','dark-magma'] },
-                    лёд:         { bgs: ['dark-arctic','dark-ice','dark-frost','light-glacier','light-crystal'] },
+                const styleMap = {
+                    minimal:     { fonts: ['default','tech'],      bgs: ['dark-minimal','dark-dim','dark-shade','light-zen','light-paper','light-mist'] },
+                    minimalist:  { fonts: ['default','tech'],      bgs: ['dark-minimal','dark-dim','dark-shade','light-zen','light-paper','light-mist'] },
+                    futuristic:  { fonts: ['orbitron','tech'],     bgs: ['dark-electric','dark-cyberpunk','dark-hologram','dark-circuit','dark-neon'] },
+                    retro:       { fonts: ['bebas','rajdhani'],    bgs: ['dark-retrowave','dark-synthwave','dark-vaporwave','dark-outrun'] },
+                    elegant:     { fonts: ['playfair','default'],  bgs: ['dark-moonlight','dark-obsidian','light-pearl','light-champagne','light-porcelain'] },
+                    bold:        { fonts: ['bebas','rajdhani'],    bgs: ['dark-gradient','dark-plasma','dark-electric'] },
+                    neon:        { fonts: ['orbitron','tech'],     bgs: ['dark-neon','dark-electric','dark-glitch','dark-cyberpunk','dark-plasma'] },
+                    dark:        { fonts: [],                      bgs: ['dark-void','dark-abyss','dark-obsidian','dark-jet','dark-pitch'] },
+                    light:       { fonts: [],                      bgs: ['light-snow','light-cotton','light-pearl','light-mist','light-cloud'] },
+                    cosmic:      { fonts: ['orbitron','tech'],     bgs: ['dark-galaxy','dark-nebula','dark-cosmos','dark-starfield','dark-aurora'] },
+                    nature:      { fonts: ['rounded','default'],   bgs: ['dark-forest','dark-jungle','dark-emerald-deep','light-sage','light-meadow','light-fern'] },
+                    warm:        { fonts: ['rounded','default'],   bgs: ['dark-ember','dark-sunset','dark-copper','light-peach','light-honey','light-sunrise'] },
+                    cold:        { fonts: ['tech','default'],      bgs: ['dark-arctic','dark-ice','dark-frost','light-glacier','light-breeze','light-cloud'] },
+                    gradient:    { fonts: [],                      bgs: ['dark-gradient','dark-aurora','dark-borealis','dark-prism','light-rainbow','light-aurora-l'] },
+                    mono:        { fonts: ['mono'],                bgs: ['dark-graphite','dark-carbon','dark-charcoal','light-chalk','light-zen'] },
+                    clean:       { fonts: ['default','tech'],      bgs: ['dark-minimal','dark-slate-glow','light-snow','light-mist','light-cotton'] },
+                    matrix:      { fonts: ['mono','tech'],         bgs: ['dark-matrix','dark-matrix-2','dark-bio','dark-circuit'] },
+                    ocean:       { fonts: ['default','rounded'],   bgs: ['dark-ocean','dark-deep-sea','dark-aqua','light-lake','light-pool','light-riviera'] },
+                    space:       { fonts: ['orbitron','tech'],     bgs: ['dark-cosmos','dark-galaxy','dark-nebula','dark-void','dark-starfield'] },
+                    aurora:      { fonts: ['default','orbitron'],  bgs: ['dark-aurora','dark-aurora-2','dark-aurora-3','dark-borealis','dark-northern'] },
+                    pattern:     { fonts: [],                      bgs: ['dark-grid','dark-circuit','dark-mesh','dark-hex','light-grid','light-dots','light-hex-l'] },
                 };
 
-                // fontStyles: keywords that ONLY affect font (no bg preference)
-                const fontStyleMap = {
-                    rounded:     { fonts: ['rounded'] },
-                    bold:        { fonts: ['bebas','rajdhani'] },
-                    mono:        { fonts: ['mono'] },
-                    elegant:     { fonts: ['playfair','default'] },
-                    luxury:      { fonts: ['playfair','bebas'] },
-                    futuristic:  { fonts: ['orbitron','tech'] },
-                    future:      { fonts: ['orbitron','tech'] },
-                    neon:        { fonts: ['orbitron','tech'] },
-                    retro:       { fonts: ['bebas','rajdhani'] },
-                    vintage:     { fonts: ['playfair','bebas'] },
-                    cosmic:      { fonts: ['orbitron','tech'] },
-                    space:       { fonts: ['orbitron','tech'] },
-                    galaxy:      { fonts: ['orbitron','tech'] },
-                    cyberpunk:   { fonts: ['orbitron','tech'] },
-                    synthwave:   { fonts: ['orbitron','bebas'] },
-                    vaporwave:   { fonts: ['orbitron','bebas'] },
-                    matrix:      { fonts: ['mono','tech'] },
-                    hacker:      { fonts: ['mono'] },
-                    grid:        { fonts: ['mono','tech'] },
-                    nature:      { fonts: ['rounded','default'] },
-                    forest:      { fonts: ['rounded','default'] },
-                    ocean:       { fonts: ['default','rounded'] },
-                    warm:        { fonts: ['rounded','default'] },
-                    soft:        { fonts: ['rounded','default'] },
-                    pastel:      { fonts: ['rounded','playfair'] },
-                    cold:        { fonts: ['tech','default'] },
-                    cool:        { fonts: ['tech','default'] },
-                    ice:         { fonts: ['tech','default'] },
-                    fire:        { fonts: ['bebas','rajdhani'] },
-                    minimal:     { fonts: ['default','tech'] },
-                    minimalist:  { fonts: ['default','tech'] },
-                    simple:      { fonts: ['default','tech'] },
-                    clean:       { fonts: ['default','tech'] },
-                    aurora:      { fonts: ['default','orbitron'] },
-                    midnight:    { fonts: ['orbitron','default'] },
-                    professional:{ fonts: ['default','tech'] },
-                    monochrome:  { fonts: ['mono','default'] },
-                    plasma:      { fonts: ['orbitron','tech'] },
-                    toxic:       { fonts: ['mono','tech'] },
-                    professional:{ fonts: ['default','tech'] },
-                };
+                let colorData = null, styleData = null;
+                const isDark = this.settings.darkTheme;
 
-                // ── Detect forced theme from keywords ──
-                const forceLight = /\blight\b/.test(q);
-                const forceDark  = /\bdark\b/.test(q);
-                const isDark = forceDark ? true : (forceLight ? false : this.settings.darkTheme);
+                for (const [key, val] of Object.entries(colorMap)) {
+                    if (q.includes(key)) { colorData = val; break; }
+                }
+                for (const [key, val] of Object.entries(styleMap)) {
+                    if (q.includes(key)) { styleData = val; break; }
+                }
 
-                // ── Limit to 5 meaningful words (skip light/dark as they're handled above) ──
-                const words = q.split(/\s+/).filter(w => w && w !== 'light' && w !== 'dark').slice(0, 5);
-                const qLimited = words.join(' ');
+                let bgCandidates = [];
+                if (colorData) bgCandidates.push(...colorData.bgs);
+                if (styleData) bgCandidates.push(...styleData.bgs);
 
-                // Match all colors (from limited query)
-                const matchedColors = Object.entries(colorMap)
-                    .filter(([k]) => qLimited.includes(k)).map(([,v]) => v);
+                if (isDark) {
+                    bgCandidates = bgCandidates.filter(b => !b.startsWith('light-'));
+                    if (!bgCandidates.length) bgCandidates = ['dark-gradient','dark-minimal','dark-electric','dark-aurora','dark-ocean'];
+                } else {
+                    bgCandidates = bgCandidates.filter(b => b.startsWith('light-') || b === 'none');
+                    if (!bgCandidates.length) bgCandidates = ['light-azure','light-sage','light-mist','light-frosted','light-pearl'];
+                }
 
-                // Match all bg styles (from limited query)
-                const matchedBgStyles = Object.entries(bgStyleMap)
-                    .filter(([k]) => qLimited.includes(k)).map(([,v]) => v);
+                bgCandidates = [...new Set(bgCandidates)];
+                let fontCandidates = styleData?.fonts || [];
+                if (!fontCandidates.length) fontCandidates = ['default','tech','rounded','mono','orbitron'];
+                const accent = colorData?.accent || null;
 
-                // Match all font styles (from limited query)
-                const matchedFontStyles = Object.entries(fontStyleMap)
-                    .filter(([k]) => qLimited.includes(k)).map(([,v]) => v);
-
-                // Build lists
-                const colorBgList = [...new Set(matchedColors.flatMap(c => c.bgs))];
-                const styleBgList = [...new Set(matchedBgStyles.flatMap(s => s.bgs))];
-                const allFonts    = [...new Set(matchedFontStyles.flatMap(s => s.fonts))];
-
-                // Filter strictly by forced/current theme
-                const filterTheme = list => isDark
-                    ? list.filter(b => !b.startsWith('light-'))
-                    : list.filter(b => b.startsWith('light-') || b === 'none');
-
-                // Always filter — forced theme is absolute
-                const colorBgsFiltered = filterTheme(colorBgList).length
-                    ? filterTheme(colorBgList) : filterTheme(['dark-gradient','light-azure']);
-                const styleBgsFiltered = filterTheme(styleBgList);
-
-                // Intersect: style narrows color's bgs
-                const intersection = colorBgsFiltered.filter(b => new Set(styleBgsFiltered).has(b));
-
-                let bgCandidates;
-                if (intersection.length >= 1)     bgCandidates = intersection;
-                else if (colorBgsFiltered.length)  bgCandidates = colorBgsFiltered;
-                else if (styleBgsFiltered.length)  bgCandidates = styleBgsFiltered;
-                else bgCandidates = isDark
-                    ? ['dark-gradient','dark-minimal','dark-electric','dark-aurora','dark-ocean']
-                    : ['light-azure','light-sage','light-mist','light-frosted','light-pearl'];
-
-                const fontCandidates = allFonts.length
-                    ? allFonts
-                    : ['default','tech','rounded','mono','orbitron'];
-
-                const accent = matchedColors[0]?.accent || null;
-
-                return {
-                    bgCandidates,
-                    fontCandidates,
-                    accent,
-                    isDark,
-                    colorBgList: colorBgsFiltered,
-                    styleBgList: styleBgsFiltered,
-                    matchedStyleFonts: allFonts,
-                };
+                return { bgCandidates, fontCandidates, accent, isDark };
             }
 
             _generateThemeVariants(query) {
-                const { bgCandidates, fontCandidates, accent, isDark,
-                        colorBgList, styleBgList, matchedStyleFonts } = this._parseThemeQuery(query);
+                const { bgCandidates, fontCandidates, accent, isDark } = this._parseThemeQuery(query);
                 const allAccents = ['#4a9eff','#4ade80','#f87171','#fbbf24','#fb923c','#a78bfa','#f472b6','#06b6d4','#2dd4bf','#e8edf4'];
-                const ac = accent || allAccents[0];
+                const variants = [];
+                const usedBgs = new Set();
 
-                const pickBg = (preferList, exclude = new Set()) => {
-                    return preferList.find(b => !exclude.has(b))
-                        || bgCandidates.find(b => !exclude.has(b))
-                        || bgCandidates[0]
-                        || 'none';
-                };
-                const pickFont = (exclude = new Set()) =>
-                    fontCandidates.find(f => !exclude.has(f)) || fontCandidates[0] || 'default';
-
-                // ── Option A: EXACT — style bg + style font + color accent ──
-                // If user said "neon rounded red": bg=dark-neon, font=rounded, accent=red
-                const bgA   = pickBg(styleBgList.length ? styleBgList : colorBgList);
-                const fontA = pickFont();
-                const usedA = new Set([bgA]);
-
-                // ── Option B: COLOR — color bg + second font + same accent ──
-                const bgB   = pickBg(colorBgList.length ? colorBgList : bgCandidates, usedA);
-                const fontB = pickFont(new Set([fontA]));
-                const usedB = new Set([bgA, bgB]);
-
-                // ── Option C: CREATIVE — different bg + different font ──
-                const bgC   = pickBg(bgCandidates, usedB);
-                const fontC = pickFont(new Set([fontA, fontB]));
-
-                return [
-                    { bg: bgA, font: fontA, accent: ac, isDark },
-                    { bg: bgB, font: fontB, accent: ac, isDark },
-                    { bg: bgC, font: fontC, accent: ac, isDark },
-                ];
+                for (let i = 0; i < 3; i++) {
+                    const remaining = bgCandidates.filter(b => !usedBgs.has(b));
+                    const bg = remaining.length
+                        ? remaining[Math.floor(i * remaining.length / 3)] || remaining[0]
+                        : bgCandidates[i % bgCandidates.length] || 'none';
+                    usedBgs.add(bg);
+                    const font = fontCandidates[i % fontCandidates.length] || 'default';
+                    const ac = accent || allAccents[i % allAccents.length];
+                    variants.push({ bg, font, accent: ac, isDark });
+                }
+                return variants;
             }
 
             _renderThemeVariants(variants, container) {
                 container.innerHTML = '';
-                const fontLookup = {};
-                SettingsManager.FONTS.forEach(f => { fontLookup[f.id] = f; });
+                const fontLabels = { default:'Default', mono:'Mono', rounded:'Rounded', tech:'Tech', orbitron:'Futuristic', bebas:'Bold', playfair:'Elegant', rajdhani:'Timer' };
+                const fontPreviews = {
+                    default:  { family:"'Anybody',sans-serif",        size:'1.1rem' },
+                    mono:     { family:"'JetBrains Mono',monospace",   size:'0.95rem' },
+                    rounded:  { family:"'Nunito',sans-serif",          size:'1.1rem' },
+                    tech:     { family:"'Space Grotesk',sans-serif",   size:'1.05rem' },
+                    orbitron: { family:"'Orbitron',sans-serif",        size:'0.82rem' },
+                    bebas:    { family:"'Bebas Neue',sans-serif",      size:'1.4rem', spacing:'0.06em' },
+                    playfair: { family:"'Playfair Display',serif",     size:'1.05rem' },
+                    rajdhani: { family:"'Rajdhani',sans-serif",        size:'1.15rem', spacing:'0.05em' },
+                };
 
-                variants.forEach((v, idx) => {
-                    const fp = fontLookup[v.font] || fontLookup['default'];
+                variants.forEach((v) => {
+                    const fp = fontPreviews[v.font] || fontPreviews.default;
                     const card = document.createElement('div');
                     card.className = 'theme-gen-card';
 
                     const bgStyle = this._getPreviewBgStyle(v.bg);
-                    const variantLabel = ['Option A','Option B','Option C'][idx];
 
                     card.innerHTML = `
-                        <div class="theme-gen-preview" style="${bgStyle} border: 2px solid ${v.accent}44; border-radius: 10px 10px 0 0; position:relative; overflow:hidden;">
-                            <div class="theme-gen-glow" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:${v.accent};opacity:0.08;filter:blur(20px);pointer-events:none;"></div>
-                            <div class="theme-gen-timer" style="font-family:${fp.family};font-size:${fp.size};font-weight:${fp.weight||700};letter-spacing:${fp.spacing||'normal'};color:${v.accent};text-shadow:0 0 18px ${v.accent}66;position:relative;z-index:1;">12.34</div>
-                            <div class="theme-gen-variant-label" style="position:absolute;top:6px;left:8px;font-size:0.65rem;font-weight:600;color:${v.accent};opacity:0.6;letter-spacing:0.04em;">${variantLabel}</div>
+                        <div class="theme-gen-preview" style="${bgStyle} border: 2px solid ${v.accent}55;">
+                            <div class="theme-gen-timer" style="font-family:${fp.family};font-size:${fp.size};letter-spacing:${fp.spacing||'normal'};color:${v.accent};">12.34</div>
                         </div>
                         <div class="theme-gen-info">
-                            <span class="theme-gen-tag" title="Background">${v.bg.replace(/^(dark|light)-/,'').replace(/-/g,' ')}</span>
-                            <span class="theme-gen-tag" title="Font">${fp.label||v.font}</span>
+                            <span class="theme-gen-tag">${v.bg.replace(/^(dark|light)-/,'').replace(/-/g,' ')}</span>
+                            <span class="theme-gen-tag">${fontLabels[v.font]||v.font}</span>
                             <span class="theme-gen-swatch" style="background:${v.accent};" title="${v.accent}"></span>
                         </div>
-                        <button class="theme-gen-apply" style="border-color:${v.accent}44;color:${v.accent};">✓ Apply</button>
+                        <button class="theme-gen-apply" style="border-color:${v.accent}44;color:${v.accent};">Apply</button>
                     `;
 
                     card.querySelector('.theme-gen-apply').addEventListener('click', () => {
                         this.settings.customBg   = v.bg;
                         this.settings.fontFamily  = v.font;
                         this.settings.accentColor = v.accent;
-                        // Switch dark/light if variant requires it
-                        this.settings.darkTheme = v.isDark;
-                        this.applySettings();
+                        this.applyCustomization();
                         this.saveSettings();
                         this.buildBgOptions();
-                        // Sync theme toggle buttons
-                        document.querySelectorAll('.theme-btn').forEach(b => {
-                            b.classList.toggle('active',
-                                (b.dataset.theme === 'dark' && v.isDark) ||
-                                (b.dataset.theme === 'light' && !v.isDark));
-                        });
                         document.querySelectorAll('.font-btn').forEach(b => b.classList.toggle('active', b.dataset.font === v.font));
                         document.querySelectorAll('.color-swatch').forEach(b => b.classList.toggle('active', b.dataset.color === v.accent));
-                        card.style.outline = `2px solid ${v.accent}`;
-                        setTimeout(() => { card.style.outline = ''; }, 900);
+                        card.querySelector('.theme-gen-preview').style.outline = `2px solid ${v.accent}`;
+                        setTimeout(() => { card.querySelector('.theme-gen-preview').style.outline = ''; }, 900);
                     });
 
                     container.appendChild(card);
@@ -3264,20 +2984,20 @@
             _getPreviewBgStyle(bgId) {
                 const map = {
                     'none':              'background:#111827;',
-                    'dark-gradient':     'background:linear-gradient(135deg,#0d1117 0%,#1a2035 50%,#0d1117 100%);',
+                    'dark-gradient':     'background:linear-gradient(135deg,#0a0e1a,#1a1f35);',
                     'dark-minimal':      'background:#0d1117;',
-                    'dark-neon':         'background:radial-gradient(ellipse at 50% 0%,rgba(6,182,212,0.35) 0%,#030810 55%),radial-gradient(ellipse at 100% 100%,rgba(16,185,129,0.2) 0%,transparent 45%);',
-                    'dark-graphite':     'background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);',
-                    'dark-electric':     'background:radial-gradient(ellipse at 30% 30%,rgba(99,102,241,0.4) 0%,#020810 60%);',
-                    'dark-aurora':       'background:radial-gradient(ellipse at 20% 20%,rgba(16,185,129,0.35) 0%,#030d1a 60%);',
+                    'dark-neon':         'background:linear-gradient(135deg,#0a0e1a,#1a1f35);',
+                    'dark-graphite':     'background:#1a1a2e;',
+                    'dark-electric':     'background:radial-gradient(ellipse at 30% 30%,#080020,#020810);',
+                    'dark-aurora':       'background:radial-gradient(ellipse at 20% 20%,#0a2a1a,#030d1a);',
                     'dark-aurora-2':     'background:radial-gradient(ellipse at 20% 20%,#001a18,#020c0e);',
                     'dark-aurora-3':     'background:radial-gradient(ellipse at 20% 30%,#001414,#000a0a);',
-                    'dark-nebula':       'background:radial-gradient(ellipse at 30% 30%,rgba(139,92,246,0.4) 0%,#050010 50%),radial-gradient(ellipse at 80% 70%,rgba(236,72,153,0.2) 0%,transparent 40%);',
-                    'dark-galaxy':       'background:radial-gradient(ellipse at 30% 30%,rgba(168,85,247,0.35) 0%,#04000e 60%),radial-gradient(ellipse at 80% 80%,rgba(236,72,153,0.15) 0%,transparent 50%);',
+                    'dark-nebula':       'background:radial-gradient(ellipse at 30% 30%,#1a0030,#050010);',
+                    'dark-galaxy':       'background:radial-gradient(ellipse at 30% 30%,#180028,#04000e);',
                     'dark-cosmos':       'background:linear-gradient(135deg,#000008,#040418);',
-                    'dark-void':         'background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,0.15) 0%,#000000 60%);',
+                    'dark-void':         'background:radial-gradient(ellipse at 50% 0%,#0a0820,#000000);',
                     'dark-abyss':        'background:linear-gradient(135deg,#020408,#010206);',
-                    'dark-ocean':        'background:radial-gradient(ellipse at 20% 30%,rgba(14,165,233,0.35) 0%,#000814 60%);',
+                    'dark-ocean':        'background:radial-gradient(ellipse at 20% 30%,#001428,#000814);',
                     'dark-deep-sea':     'background:radial-gradient(ellipse at 40% 40%,#001828,#000c18);',
                     'dark-aqua':         'background:radial-gradient(ellipse at 30% 30%,#001a24,#000c12);',
                     'dark-arctic':       'background:radial-gradient(ellipse at 30% 30%,#002030,#001018);',
@@ -3287,25 +3007,25 @@
                     'dark-sapphire':     'background:radial-gradient(ellipse at 30% 30%,#001428,#000814);',
                     'dark-deep-blue':    'background:radial-gradient(ellipse at 30% 30%,#000824,#000412);',
                     'dark-teal-depths':  'background:radial-gradient(ellipse at 30% 30%,#001c20,#000e10);',
-                    'dark-forest':       'background:radial-gradient(ellipse at 30% 30%,rgba(22,163,74,0.4) 0%,#000e04 60%);',
-                    'dark-matrix':       'background:radial-gradient(ellipse at 50% 0%,rgba(34,197,94,0.35) 0%,#000a02 60%);',
+                    'dark-forest':       'background:radial-gradient(ellipse at 30% 30%,#001c08,#000e04);',
+                    'dark-matrix':       'background:radial-gradient(ellipse at 50% 0%,#001400,#000a02);',
                     'dark-jungle':       'background:radial-gradient(ellipse at 30% 30%,#001a04,#000c02);',
                     'dark-emerald-deep': 'background:radial-gradient(ellipse at 30% 30%,#001e14,#00100a);',
-                    'dark-lava':         'background:radial-gradient(ellipse at 30% 30%,rgba(239,68,68,0.5) 0%,#100302 60%);',
+                    'dark-lava':         'background:radial-gradient(ellipse at 30% 30%,#2a0800,#100302);',
                     'dark-crimson':      'background:radial-gradient(ellipse at 30% 30%,#240010,#0c0005);',
                     'dark-volcano':      'background:radial-gradient(ellipse at 30% 30%,#2a0400,#0f0100);',
-                    'dark-ember':        'background:radial-gradient(ellipse at 20% 30%,rgba(249,115,22,0.45) 0%,#0e0500 60%);',
+                    'dark-ember':        'background:radial-gradient(ellipse at 20% 30%,#2a1200,#0e0500);',
                     'dark-sunset':       'background:radial-gradient(ellipse at 30% 30%,#280a10,#0e0508);',
-                    'dark-amethyst':     'background:radial-gradient(ellipse at 30% 30%,rgba(168,85,247,0.45) 0%,#08000e 60%);',
+                    'dark-amethyst':     'background:radial-gradient(ellipse at 30% 30%,#1c001e,#08000e);',
                     'dark-grape':        'background:radial-gradient(ellipse at 30% 30%,#100020,#080010);',
                     'dark-ultraviolet':  'background:radial-gradient(ellipse at 30% 30%,#080020,#030010);',
                     'dark-plum':         'background:radial-gradient(ellipse at 30% 30%,#10001a,#06000a);',
-                    'dark-cyberpunk':    'background:linear-gradient(135deg,#060210 0%,rgba(234,179,8,0.15) 50%,#0a0218 100%);',
-                    'dark-retrowave':    'background:linear-gradient(180deg,#1a0028 0%,rgba(236,72,153,0.2) 50%,#04000c 100%);',
+                    'dark-cyberpunk':    'background:linear-gradient(135deg,#060210,#0a0218);',
+                    'dark-retrowave':    'background:radial-gradient(ellipse at 50% 0%,#1a0028,#04000c);',
                     'dark-synthwave':    'background:radial-gradient(ellipse at 30% 30%,#180028,#04000e);',
                     'dark-hologram':     'background:radial-gradient(ellipse at 30% 30%,#020610,#001010);',
-                    'dark-plasma':       'background:radial-gradient(ellipse at 30% 30%,rgba(168,85,247,0.4) 0%,#060008 60%);',
-                    'dark-glitch':       'background:linear-gradient(135deg,rgba(6,182,212,0.2) 0%,#04001a 40%,rgba(236,72,153,0.15) 100%);',
+                    'dark-plasma':       'background:radial-gradient(ellipse at 30% 30%,#0c0020,#060008);',
+                    'dark-glitch':       'background:linear-gradient(135deg,#04001a,#00080e);',
                     'dark-matrix-2':     'background:radial-gradient(ellipse at 50% 0%,#001400,#000800);',
                     'dark-circuit':      'background:#040810;',
                     'dark-grid':         'background:#080c14;',
@@ -3385,60 +3105,6 @@
                     'light-sandstone':   'background:linear-gradient(135deg,#fdf5e8,#fde68a);',
                 };
                 return map[bgId] || (bgId.startsWith('light-') ? 'background:#f0f4ff;' : 'background:#0a0e1a;');
-            }
-
-            buildFontOptions() {
-                const container = document.getElementById('fontOptions');
-                if (!container) return;
-                container.innerHTML = '';
-
-                const allFonts = SettingsManager.FONTS;
-                const classicCount = 8;
-                const isExpanded = this._fontGroupExpanded === true;
-                const current = this.settings.customFont || 'default';
-
-                const makeBtn = (f) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'font-btn' + (f.id === current ? ' active' : '');
-                    btn.dataset.font = f.id;
-                    const previewStyle = [
-                        `font-family:${f.family}`,
-                        f.size ? `font-size:${f.size}` : '',
-                        f.spacing ? `letter-spacing:${f.spacing}` : '',
-                        f.weight ? `font-weight:${f.weight}` : '',
-                    ].filter(Boolean).join(';');
-                    btn.innerHTML = `
-                        <div class="font-btn-name">${f.label}</div>
-                        <div class="font-btn-preview" style="${previewStyle}">Aa 012</div>
-                    `;
-                    btn.addEventListener('click', () => {
-                        this.settings.customFont = f.id;
-                        this.applyCustomization();
-                        this.saveSettings();
-                        container.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                    });
-                    return btn;
-                };
-
-                // Classic fonts (always visible)
-                allFonts.slice(0, classicCount).forEach(f => container.appendChild(makeBtn(f)));
-
-                // Show more / less button
-                const remaining = allFonts.length - classicCount;
-                const toggleBtn = document.createElement('button');
-                toggleBtn.className = 'bg-show-more-btn';
-                toggleBtn.textContent = isExpanded ? 'Show less ▲' : `Show ${remaining} more ▼`;
-                toggleBtn.addEventListener('click', () => {
-                    this._fontGroupExpanded = !isExpanded;
-                    this.buildFontOptions();
-                });
-                container.appendChild(toggleBtn);
-
-                // New fonts (collapsible)
-                if (isExpanded) {
-                    allFonts.slice(classicCount).forEach(f => container.appendChild(makeBtn(f)));
-                }
             }
 
             buildBgOptions() {
@@ -3748,11 +3414,16 @@
                 if (document.getElementById('section-theme')?.classList.contains('active')) {
                     this.buildAccentPalette();
                     this.buildBgOptions();
-                    this.buildFontOptions();
                 }
 
-                // Font buttons — built dynamically by buildFontOptions()
-                this.buildFontOptions();
+                // Font buttons
+                document.querySelectorAll('.font-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.settings.customFont = btn.dataset.font;
+                        this.applyCustomization();
+                        this.saveSettings();
+                    });
+                });
 
                 // Background buttons
                 document.querySelectorAll('.bg-btn').forEach(btn => {
@@ -4076,9 +3747,6 @@
                 // Keyboard control with hold-to-start (desktop)
                 document.addEventListener('keydown', (e) => {
                     if (e.code === 'Space') {
-                        const tag = document.activeElement?.tagName;
-                        const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-                        if (isInput) return;
                         e.preventDefault();
                         this.handleSpaceDown();
                     }
@@ -4086,9 +3754,6 @@
 
                 document.addEventListener('keyup', (e) => {
                     if (e.code === 'Space') {
-                        const tag = document.activeElement?.tagName;
-                        const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
-                        if (isInput) return;
                         e.preventDefault();
                         this.handleSpaceUp();
                     }
