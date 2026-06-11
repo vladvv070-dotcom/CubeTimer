@@ -2426,12 +2426,11 @@
                 // Statistics modal
                 const statisticsTitle = document.querySelector('#statisticsOverlay .statistics-title');
                 if (statisticsTitle) statisticsTitle.textContent = t.statisticsTitle;
-                
-                const statsBlockTitles = document.querySelectorAll('.stats-block-title');
-                if (statsBlockTitles[0]) statsBlockTitles[0].textContent = t.summary;
-                if (statsBlockTitles[1]) statsBlockTitles[1].textContent = t.progressChart;
-                if (statsBlockTitles[2]) statsBlockTitles[2].textContent = t.timeDistribution;
-                if (statsBlockTitles[3]) statsBlockTitles[3].textContent = t.sessionDetails;
+
+                _st('st-stat-distribution', t.timeDistribution);
+                _st('st-stat-details',      t.sessionDetails);
+                _st('st-stat-trend',        t.trendTitle);
+                _st('st-stat-heatmap',      t.heatmapTitle);
                 
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
