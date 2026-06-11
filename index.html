@@ -208,6 +208,7 @@
                     <button class="settings-nav-item" data-section="language">Language</button>
                     <button class="settings-nav-item" data-section="display">Display Options</button>
                     <button class="settings-nav-item" data-section="mood">Timer Mood</button>
+                    <button class="settings-nav-item" data-section="analytics">Heatmap</button>
                     <button class="settings-nav-item" data-section="data">Data</button>
                 </div>
 
@@ -463,6 +464,47 @@
                     </div>
 
                     <!-- Data Section -->
+                    <!-- Analytics Section -->
+                    <div class="settings-section-content" id="section-analytics">
+                        <h3 class="section-title">Analytics</h3>
+
+                        <!-- Time format -->
+                        <div class="setting-group">
+                            <div class="setting-row">
+                                <span class="setting-label-new" id="st-analytics-clockformat">Clock Format</span>
+                            </div>
+                            <div class="segmented-control" style="margin-top: 0.5rem;">
+                                <button class="segmented-btn active" id="clockFormat24" data-clockfmt="24">
+                                    <span class="seg-dot"></span>
+                                    <span class="seg-title">24h</span>
+                                    <span class="seg-desc">13:00</span>
+                                </button>
+                                <button class="segmented-btn" id="clockFormat12" data-clockfmt="12">
+                                    <span class="seg-dot"></span>
+                                    <span class="seg-title">12h</span>
+                                    <span class="seg-desc">1:00 PM</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="custom-divider" style="margin-top: 1.5rem;"></div>
+
+                        <!-- Manual time offset -->
+                        <h3 class="section-title" id="st-analytics-currenttime" style="margin-top: 1rem;">Current Time</h3>
+                        <div class="setting-group">
+                            <p class="setting-hint" id="st-analytics-hint">If your device clock is correct, leave this as-is. The heatmap uses your system time automatically.</p>
+                            <div class="setting-row" style="margin-top: 0.75rem; align-items: center; gap: 0.75rem;">
+                                <span class="setting-label-new" id="st-analytics-offset-label">Time offset (hours)</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <button class="analytics-offset-btn" id="offsetMinus">−</button>
+                                    <span class="analytics-offset-value" id="analyticsOffsetValue">0</span>
+                                    <button class="analytics-offset-btn" id="offsetPlus">+</button>
+                                </div>
+                            </div>
+                            <div class="analytics-time-preview" id="analyticsTimePreview">Current: 00:00</div>
+                        </div>
+                    </div>
+
                     <div class="settings-section-content" id="section-data">
                         <h3 class="section-title" id="st-data">Data Management</h3>
                         <div class="setting-group">
@@ -588,11 +630,44 @@
                         </div>
                     </div>
                 </div>
+                <!-- Trend & Heatmap blocks -->
+                <div class="additional-stats" style="margin-top: 1.5rem;">
+                    <!-- Trend block -->
+                    <div class="stats-block" id="trendBlock">
+                        <div class="stats-block-title" id="st-stat-trend">Progress Trend</div>
+                        <div class="trend-container" id="trendContainer">
+                            <div class="trend-arrow-wrap" id="trendArrowWrap">
+                                <span class="trend-arrow" id="trendArrow">→</span>
+                            </div>
+                            <div class="trend-info">
+                                <div class="trend-percent" id="trendPercent">—</div>
+                                <div class="trend-label" id="trendLabel">Not enough data</div>
+                            </div>
+                            <div class="trend-comparison">
+                                <div class="trend-compare-item">
+                                    <span class="trend-compare-label">First 10 avg</span>
+                                    <span class="trend-compare-value" id="trendFirst">—</span>
+                                </div>
+                                <div class="trend-compare-item">
+                                    <span class="trend-compare-label">Last 10 avg</span>
+                                    <span class="trend-compare-value" id="trendLast">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap block -->
+                    <div class="stats-block" id="heatmapBlock">
+                        <div class="stats-block-title" id="st-stat-heatmap">Time of Day Heatmap</div>
+                        <div class="heatmap-container" id="heatmapContainer">
+                            <canvas id="heatmapCanvas"></canvas>
+                        </div>
+                        <div class="heatmap-hint" id="heatmapHint">Shows your average solve time by hour of day</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Sessions Modal -->
     <div class="sessions-overlay" id="sessionsOverlay">
         <div class="sessions-modal">
             <div class="sessions-header">
@@ -722,7 +797,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.2.1</div>
+    <div class="version-display">1.3.0</div>
 
     <script defer src="script.js"></script>
 </body>

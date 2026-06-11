@@ -1,5 +1,5 @@
 /* ============================================================
-   CubeTimer 1.2.1 — script.js
+   CubeTimer 1.3.0 — script.js
    All application logic
    ============================================================ */
 
@@ -1948,7 +1948,7 @@
         }
 
         // Translations
-        const translations = {
+        const translations = window.translations = {
             en: {
                 // Header
                 statistics: 'Statistics',
@@ -1989,6 +1989,7 @@
                 sidebarDisplay: 'Display Options',
                 sidebarMood: 'Timer Mood',
                 sidebarData: 'Data',
+                sidebarAnalytics: 'Analytics',
                 timerSettingsDelay: 'Timer Settings & Delay',
                 interfaceTheme: 'Interface Theme',
                 advancedCustomization: 'Advanced Customization',
@@ -2060,7 +2061,31 @@
                 solves: 'solves',
                 deleteSession: 'Delete Session',
                 deleteConfirm: 'Delete',
-                exportSession: 'Export CSV'
+                exportSession: 'Export CSV',
+
+                // Analytics settings
+                sidebarAnalyticsLabel: 'Heatmap',
+                analyticsTitle: 'Analytics',
+                clockFormat: 'Clock Format',
+                clockFormat24desc: '13:00',
+                clockFormat12desc: '1:00 PM',
+                currentTime: 'Current Time',
+                timeOffsetHint: 'If your device clock is correct, leave this as-is. The heatmap uses your system time automatically.',
+                timeOffsetLabel: 'Time offset (hours)',
+
+                // Statistics — Trend
+                trendTitle: 'Progress Trend',
+                trendStable: 'Stable pace',
+                trendFaster: 'faster vs earlier',
+                trendSlower: 'slower vs earlier',
+                trendNeedMore: 'Need {n} more solves',
+                trendFirst: 'First {n} avg',
+                trendLast: 'Last {n} avg',
+
+                // Statistics — Heatmap
+                heatmapTitle: 'Time of Day Heatmap',
+                heatmapHint: 'Shows your average solve time by hour of day',
+                heatmapBestHour: 'Best hour'
             },
             ru: {
                 // Header
@@ -2102,6 +2127,7 @@
                 sidebarDisplay: 'Отображение',
                 sidebarMood: 'Настроение',
                 sidebarData: 'Данные',
+                sidebarAnalytics: 'Аналитика',
                 timerSettingsDelay: 'Настройки таймера и задержка',
                 interfaceTheme: 'Тема интерфейса',
                 advancedCustomization: 'Расширенная кастомизация',
@@ -2172,7 +2198,31 @@
                 solves: 'сборок',
                 deleteSession: 'Удалить сессию',
                 deleteConfirm: 'Удалить',
-                exportSession: 'Экспорт CSV'
+                exportSession: 'Экспорт CSV',
+
+                // Analytics settings
+                sidebarAnalyticsLabel: 'Тепловая карта',
+                analyticsTitle: 'Аналитика',
+                clockFormat: 'Формат времени',
+                clockFormat24desc: '13:00',
+                clockFormat12desc: '1:00 PM',
+                currentTime: 'Текущее время',
+                timeOffsetHint: 'Если часы устройства правильные, оставьте как есть. Тепловая карта использует системное время автоматически.',
+                timeOffsetLabel: 'Смещение времени (часы)',
+
+                // Statistics — Trend
+                trendTitle: 'Прогресс',
+                trendStable: 'Стабильный темп',
+                trendFaster: 'быстрее чем первые',
+                trendSlower: 'медленнее чем первые',
+                trendNeedMore: 'Ещё {n} сборок',
+                trendFirst: 'Первые {n} avg',
+                trendLast: 'Последние {n} avg',
+
+                // Statistics — Heatmap
+                heatmapTitle: 'Тепловая карта по часам',
+                heatmapHint: 'Среднее время сборки по часам суток',
+                heatmapBestHour: 'Лучший час'
             }
         };
 
@@ -2196,7 +2246,9 @@
                     accentColor: null,      // null = use theme default
                     customFont: 'default',
                     customBg: 'none',
-                    timeFormat: 'seconds'   // 'seconds' | 'minutes'
+                    timeFormat: 'seconds',   // 'seconds' | 'minutes'
+                    clockFormat: '24',        // '24' | '12'
+                    timeOffset: 0             // hours offset (-12..+14)
                 };
                 
                 this.loadSettings();
@@ -2296,7 +2348,8 @@
                 if (settingsNavItems[3]) settingsNavItems[3].textContent = t.sidebarLanguage;
                 if (settingsNavItems[4]) settingsNavItems[4].textContent = t.sidebarDisplay;
                 if (settingsNavItems[5]) settingsNavItems[5].textContent = t.sidebarMood;
-                if (settingsNavItems[6]) settingsNavItems[6].textContent = t.sidebarData;
+                if (settingsNavItems[6]) settingsNavItems[6].textContent = t.sidebarAnalytics;
+                if (settingsNavItems[7]) settingsNavItems[7].textContent = t.sidebarData;
                 
                 // NEW SETTINGS MODAL - Title
                 const settingsTitleNew = document.querySelector('.settings-title-new');
@@ -2314,6 +2367,16 @@
                 _st('st-display',          t.displayOptions);
                 _st('st-mood',             t.timerMood);
                 _st('st-data',             t.dataManagement);
+
+                // Analytics section
+                _st('st-analytics-clockformat', t.clockFormat);
+                _st('st-analytics-currenttime', t.currentTime);
+                _st('st-analytics-offset-label', t.timeOffsetLabel);
+                _st('st-analytics-hint', t.timeOffsetHint);
+
+                // Statistics — Trend & Heatmap titles
+                _st('st-stat-trend',   t.trendTitle);
+                _st('st-stat-heatmap', t.heatmapTitle);
                 
                 // NEW SETTINGS MODAL - Labels
                 const settingLabelNew = document.querySelector('.setting-label-new');
@@ -3238,6 +3301,12 @@
                 if (preview) {
                     preview.textContent = fmt === 'minutes' ? '1:05.89' : '65.89';
                 }
+
+                // Sync clock format buttons
+                const clockFmt = this.settings.clockFormat || '24';
+                document.querySelectorAll('[data-clockfmt]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.clockfmt === clockFmt);
+                });
             }
 
             resetCustomization() {
@@ -3616,6 +3685,56 @@
                         }
                     }
                 });
+
+                // ── Analytics Section ──
+                const updateOffsetPreview = () => {
+                    const offset = this.settings.timeOffset || 0;
+                    const fmt = this.settings.clockFormat || '24';
+                    const now = new Date(Date.now() + offset * 3600000);
+                    const h = now.getHours();
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    let display;
+                    if (fmt === '12') {
+                        const h12 = h % 12 || 12;
+                        const ampm = h < 12 ? 'AM' : 'PM';
+                        display = `${h12}:${m} ${ampm}`;
+                    } else {
+                        display = `${String(h).padStart(2, '0')}:${m}`;
+                    }
+                    const el = document.getElementById('analyticsTimePreview');
+                    if (el) el.textContent = `Current: ${display}`;
+                    const valEl = document.getElementById('analyticsOffsetValue');
+                    if (valEl) valEl.textContent = offset >= 0 ? `+${offset}` : `${offset}`;
+                };
+
+                // Clock format buttons
+                document.querySelectorAll('[data-clockfmt]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-clockfmt]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.settings.clockFormat = btn.dataset.clockfmt;
+                        this.saveSettings();
+                        updateOffsetPreview();
+                    });
+                });
+
+                // Offset buttons
+                const offsetMinus = document.getElementById('offsetMinus');
+                const offsetPlus  = document.getElementById('offsetPlus');
+                if (offsetMinus) offsetMinus.addEventListener('click', () => {
+                    this.settings.timeOffset = Math.max(-12, (this.settings.timeOffset || 0) - 1);
+                    this.saveSettings();
+                    updateOffsetPreview();
+                });
+                if (offsetPlus) offsetPlus.addEventListener('click', () => {
+                    this.settings.timeOffset = Math.min(14, (this.settings.timeOffset || 0) + 1);
+                    this.saveSettings();
+                    updateOffsetPreview();
+                });
+
+                // Init preview on page load
+                updateOffsetPreview();
+                setInterval(updateOffsetPreview, 30000); // update every 30s
             }
 
             playSound(type) {
@@ -4301,6 +4420,8 @@
                 window.chartZoomState = null;
                 this.renderProgressChart();
                 this.renderHistogram();
+                this.renderTrend();
+                this.renderHeatmap();
 
                 // Show modal
                 document.getElementById('statisticsOverlay').classList.add('visible');
@@ -4791,6 +4912,196 @@
                         }
                     }
                 });
+            }
+
+            renderTrend() {
+                const validSolves = this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0));
+                const arrowEl   = document.getElementById('trendArrow');
+                const percentEl = document.getElementById('trendPercent');
+                const labelEl   = document.getElementById('trendLabel');
+                const firstEl   = document.getElementById('trendFirst');
+                const lastEl    = document.getElementById('trendLast');
+                const firstLblEl = document.querySelector('.trend-compare-item:first-child .trend-compare-label');
+                const lastLblEl  = document.querySelector('.trend-compare-item:last-child .trend-compare-label');
+
+                const t = (window.settingsManager?.settings?.language === 'ru')
+                    ? window.translations?.ru : window.translations?.en;
+
+                if (!arrowEl) return;
+
+                if (validSolves.length < 20) {
+                    arrowEl.textContent = '→';
+                    arrowEl.className = 'trend-arrow flat';
+                    percentEl.textContent = '—';
+                    percentEl.className = 'trend-percent flat';
+                    const need = 20 - validSolves.length;
+                    labelEl.textContent = t?.trendNeedMore?.replace('{n}', need) || `Need ${need} more solves`;
+                    firstEl.textContent = '—';
+                    lastEl.textContent  = '—';
+                    return;
+                }
+
+                const n = Math.min(50, Math.floor(validSolves.length / 2));
+                const recentTimes = validSolves.slice(0, n);
+                const olderTimes  = validSolves.slice(validSolves.length - n);
+
+                const avgRecent = recentTimes.reduce((a, b) => a + b, 0) / recentTimes.length;
+                const avgOlder  = olderTimes.reduce((a, b) => a + b, 0) / olderTimes.length;
+
+                const diff   = avgOlder - avgRecent;
+                const pct    = Math.abs(diff / avgOlder * 100);
+                const pctStr = pct.toFixed(1) + '%';
+
+                if (firstLblEl) firstLblEl.textContent = t?.trendFirst?.replace('{n}', n) || `First ${n} avg`;
+                if (lastLblEl)  lastLblEl.textContent  = t?.trendLast?.replace('{n}', n)  || `Last ${n} avg`;
+
+                firstEl.textContent = this.formatTime(avgOlder);
+                lastEl.textContent  = this.formatTime(avgRecent);
+
+                if (pct < 0.5) {
+                    arrowEl.textContent = '→';
+                    arrowEl.className = 'trend-arrow flat';
+                    percentEl.textContent = '~0%';
+                    percentEl.className = 'trend-percent flat';
+                    labelEl.textContent = t?.trendStable || 'Stable pace';
+                } else if (diff > 0) {
+                    arrowEl.textContent = '↑';
+                    arrowEl.className = 'trend-arrow up';
+                    percentEl.textContent = `−${pctStr}`;
+                    percentEl.className = 'trend-percent up';
+                    labelEl.textContent = `${pctStr} ${t?.trendFaster || 'faster vs earlier'} ${n}`;
+                } else {
+                    arrowEl.textContent = '↓';
+                    arrowEl.className = 'trend-arrow down';
+                    percentEl.textContent = `+${pctStr}`;
+                    percentEl.className = 'trend-percent down';
+                    labelEl.textContent = `${pctStr} ${t?.trendSlower || 'slower vs earlier'} ${n}`;
+                }
+            }
+
+            renderHeatmap() {
+                const ctx = document.getElementById('heatmapCanvas');
+                if (!ctx) return;
+
+                if (window.heatmapChart && typeof window.heatmapChart.destroy === 'function') {
+                    window.heatmapChart.destroy();
+                }
+
+                const settings = window.settingsManager ? window.settingsManager.settings : {};
+                const offset   = settings.timeOffset || 0;
+                const clockFmt = settings.clockFormat || '24';
+
+                // Build hourly buckets
+                const hourBuckets = Array.from({ length: 24 }, () => ({ sum: 0, count: 0 }));
+
+                this.solves.forEach(s => {
+                    if (s.dnf || !s.timestamp) return;
+                    const d = new Date(s.timestamp + offset * 3600000);
+                    const h = d.getHours();
+                    hourBuckets[h].sum   += s.time + (s.penalty || 0);
+                    hourBuckets[h].count += 1;
+                });
+
+                const avgs   = hourBuckets.map(b => b.count >= 1 ? b.sum / b.count : null);
+                const counts = hourBuckets.map(b => b.count);
+
+                // Only show hours that have data, min 0..23 range labels
+                const labels = Array.from({ length: 24 }, (_, h) => {
+                    if (clockFmt === '12') {
+                        const h12 = h % 12 || 12;
+                        return h === 0 ? '12 AM' : h === 12 ? '12 PM' : h < 12 ? `${h12} AM` : `${h12} PM`;
+                    }
+                    return String(h).padStart(2, '0') + ':00';
+                });
+
+                // Colour bars by avg time: green = fastest, red = slowest
+                const validAvgs = avgs.filter(v => v !== null);
+                const minAvg = validAvgs.length ? Math.min(...validAvgs) : 1;
+                const maxAvg = validAvgs.length ? Math.max(...validAvgs) : 1;
+
+                const barColors = avgs.map(v => {
+                    if (v === null) return 'rgba(255,255,255,0.04)';
+                    const t = maxAvg === minAvg ? 0.5 : (v - minAvg) / (maxAvg - minAvg);
+                    // green (#4ade80) → yellow (#fbbf24) → red (#f87171)
+                    const r = t < 0.5 ? Math.round(74 + (251 - 74) * t * 2)   : Math.round(251 + (248 - 251) * (t - 0.5) * 2);
+                    const g = t < 0.5 ? Math.round(222 + (191 - 222) * t * 2) : Math.round(191 + (113 - 191) * (t - 0.5) * 2);
+                    const b = t < 0.5 ? Math.round(128 + (36 - 128) * t * 2)  : Math.round(36 + (113 - 36) * (t - 0.5) * 2);
+                    return `rgba(${r},${g},${b},0.85)`;
+                });
+
+                const isLight  = document.body.classList.contains('light-theme');
+                const tickClr  = isLight ? '#6b7280' : '#a8b4c8';
+                const gridClr  = isLight ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)';
+                const fmt      = this; // for formatTime in tooltip
+
+                window.heatmapChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Avg time',
+                            data: avgs,
+                            backgroundColor: barColors,
+                            borderColor: barColors,
+                            borderWidth: 0,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                titleFont: { family: 'Manrope', size: 12 },
+                                bodyFont:  { family: 'Manrope', size: 12 },
+                                callbacks: {
+                                    title: (items) => labels[items[0].dataIndex],
+                                    label: (item) => {
+                                        const idx = item.dataIndex;
+                                        if (avgs[idx] === null) return 'No solves';
+                                        return `Avg: ${fmt.formatTime(avgs[idx])}  ·  ${counts[idx]} solve${counts[idx] !== 1 ? 's' : ''}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    font: { family: 'Manrope', size: 9 },
+                                    color: tickClr,
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 12
+                                },
+                                grid: { display: false }
+                            },
+                            y: {
+                                ticks: {
+                                    font: { family: 'Manrope', size: 10 },
+                                    color: tickClr,
+                                    callback: (v) => fmt.formatTime(v)
+                                },
+                                grid: { color: gridClr }
+                            }
+                        }
+                    }
+                });
+
+                // Update hint
+                const hint = document.getElementById('heatmapHint');
+                if (hint) {
+                    const t = (window.settingsManager?.settings?.language === 'ru')
+                        ? window.translations?.ru : window.translations?.en;
+                    const best = avgs.reduce((bestH, v, h) => v !== null && (bestH === -1 || v < avgs[bestH]) ? h : bestH, -1);
+                    if (best !== -1) {
+                        const bestLabel = t?.heatmapBestHour || 'Best hour';
+                        hint.textContent = `${bestLabel}: ${labels[best]} (avg ${fmt.formatTime(avgs[best])})`;
+                    } else {
+                        hint.textContent = t?.heatmapHint || 'Shows your average solve time by hour of day';
+                    }
+                }
             }
 
             openSessions() {
