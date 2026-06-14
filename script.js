@@ -2085,7 +2085,20 @@
                 // Statistics — Heatmap
                 heatmapTitle: 'Time of Day Heatmap',
                 heatmapHint: 'Shows your average solve time by hour of day',
-                heatmapBestHour: 'Best hour'
+                heatmapBestHour: 'Best hour',
+
+                // Subsessions
+                subsessionsTitle: 'Subsessions',
+                subsessionModalTitle: 'New Subsession',
+                subsessionNamePlaceholder: 'e.g. Morning practice',
+                subsessionColorLabel: 'Color',
+                subsessionExcludeLabel: 'Exclude from session average',
+                subsessionExcludeHint: "These solves won't affect Ao5, Ao12 and Session Avg",
+                subsessionCancel: 'Cancel',
+                subsessionCreate: 'Create',
+                subsessionExcludedBadge: 'excluded',
+                subsessionContextBtn: '＋ Add as Subsession',
+                subsessionSolvesSelected: '{n} solves selected'
             },
             ru: {
                 // Header
@@ -2222,7 +2235,20 @@
                 // Statistics — Heatmap
                 heatmapTitle: 'Тепловая карта по часам',
                 heatmapHint: 'Среднее время сборки по часам суток',
-                heatmapBestHour: 'Лучший час'
+                heatmapBestHour: 'Лучший час',
+
+                // Subsessions
+                subsessionsTitle: 'Под-сессии',
+                subsessionModalTitle: 'Новая под-сессия',
+                subsessionNamePlaceholder: 'Например: Утренняя тренировка',
+                subsessionColorLabel: 'Цвет',
+                subsessionExcludeLabel: 'Исключить из среднего сессии',
+                subsessionExcludeHint: 'Эти сборки не повлияют на Ao5, Ao12 и общее среднее',
+                subsessionCancel: 'Отмена',
+                subsessionCreate: 'Создать',
+                subsessionExcludedBadge: 'исключено',
+                subsessionContextBtn: '＋ Добавить как под-сессию',
+                subsessionSolvesSelected: 'Выбрано {n} сборок'
             }
         };
 
@@ -2431,6 +2457,19 @@
                 _st('st-stat-details',      t.sessionDetails);
                 _st('st-stat-trend',        t.trendTitle);
                 _st('st-stat-heatmap',      t.heatmapTitle);
+                _st('st-stat-subsessions',  t.subsessionsTitle);
+
+                // Subsession modal
+                _st('subsessionModalTitleEl',  t.subsessionModalTitle);
+                _st('subsessionColorLabelEl',  t.subsessionColorLabel);
+                _st('subsessionExcludeLabelEl', t.subsessionExcludeLabel);
+                _st('subsessionExcludeHintEl',  t.subsessionExcludeHint);
+                _st('subsessionCancelBtn',  t.subsessionCancel);
+                _st('subsessionCreateBtn',  t.subsessionCreate);
+                _st('shContextAddSubsession', t.subsessionContextBtn);
+
+                const nameInput = document.getElementById('subsessionNameInput');
+                if (nameInput) nameInput.placeholder = t.subsessionNamePlaceholder || 'e.g. Morning practice';
                 
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
@@ -3814,6 +3853,37 @@
                             s.discipline = '3x3';
                             needsSave = true;
                         }
+                        if (!s.subsessions) {
+                            s.subsessions = [];
+                            needsSave = true;
+                        }
+                        // Assign stable IDs to any solves that don't have one
+                        (s.solves || []).forEach((solve, i) => {
+                            if (!solve.id) {
+                                // Deterministic: same input → same id every reload
+                                solve.id = `s_${solve.timestamp || i}_${i}`;
+                                needsSave = true;
+                            }
+                        });
+
+                        // Re-index subsession solveIds if they used the old format (solve_...)
+                        // Build a map from old-style position-based ids to current solve ids
+                        if ((s.subsessions || []).some(ss =>
+                            ss.solveIds.some(id => id.startsWith('solve_'))
+                        )) {
+                            // Old ids were: `solve_${Date.now()}_${i}` — we can't recover them.
+                            // But we know the selected indices were stored implicitly via solveIds order.
+                            // Best we can do: clear broken solveIds so subsession still exists visually
+                            // with 0 solves rather than crashing silently.
+                            // User will need to recreate; we warn via subsession name suffix.
+                            s.subsessions.forEach(ss => {
+                                if (ss.solveIds.some(id => id.startsWith('solve_'))) {
+                                    ss.solveIds = [];
+                                    ss.name = ss.name + ' ⚠ (re-create)';
+                                    needsSave = true;
+                                }
+                            });
+                        }
                     });
                     if (needsSave) {
                         localStorage.setItem('cubeTimerSessions', JSON.stringify(sessions));
@@ -3826,6 +3896,7 @@
                         id: 'no-session',
                         name: 'No Session',
                         solves: [],
+                        subsessions: [],
                         isDefault: true,
                         discipline: '3x3'
                     }
@@ -4192,6 +4263,7 @@
 
             saveSolve(time) {
                 const solve = {
+                    id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                     time: time,
                     timestamp: Date.now(),
                     scramble: document.getElementById('scrambleText').textContent,
@@ -4421,6 +4493,7 @@
                 this.renderHistogram();
                 this.renderTrend();
                 this.renderHeatmap();
+                this.renderSubsessionStats();
 
                 // Show modal
                 document.getElementById('statisticsOverlay').classList.add('visible');
@@ -5165,29 +5238,49 @@
                 const tbody = document.getElementById('solveHistoryTableBody');
                 tbody.innerHTML = '';
 
-                // session.solves: [0] = newest, [length-1] = oldest (because of unshift)
-                // Display: newest first (top to bottom)
-                
-                session.solves.forEach((solve, index) => {
-                    const row = document.createElement('tr');
-                    const solveNumber = session.solves.length - index; // Display number: newest = highest
-                    
-                    // Calculate rolling averages: 
-                    // For Ao5 at position index, we need 5 consecutive solves STARTING from index
-                    // Example: index 0 (newest) needs solves [0,1,2,3,4] = last 5 solves
-                    // Example: index 5 (6th newest) needs solves [5,6,7,8,9] = solves #225-#221 if total is 230
-                    
-                    const ao5 = (index + 5 <= session.solves.length) 
-                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 5)) 
-                        : null;
-                    const ao12 = (index + 12 <= session.solves.length) 
-                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 12)) 
-                        : null;
-                    const ao100 = (index + 100 <= session.solves.length) 
-                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 100)) 
-                        : null;
+                const subsessions = session.subsessions || [];
 
-                    // Format time with penalties
+                // Build lookup: solveId → subsession
+                const solveSubMap = new Map();
+                subsessions.forEach(ss => {
+                    ss.solveIds.forEach(sid => solveSubMap.set(sid, ss));
+                });
+
+                // Track which subsession labels we've already inserted
+                const insertedLabels = new Set();
+
+                session.solves.forEach((solve, index) => {
+                    const ss = solveSubMap.get(solve.id);
+
+                    // Insert subsession label row (once per subsession, at first occurrence)
+                    if (ss && !insertedLabels.has(ss.id)) {
+                        insertedLabels.add(ss.id);
+                        const labelRow = document.createElement('tr');
+                        labelRow.classList.add('sh-subsession-label-row');
+                        labelRow.style.setProperty('--ss-color', ss.color);
+                        labelRow.innerHTML = `<td colspan="6">${ss.name}${ss.excludeFromAvg ? ' · excluded' : ''}</td>`;
+                        tbody.appendChild(labelRow);
+                    }
+
+                    const row = document.createElement('tr');
+                    row.dataset.index = index;
+                    row.dataset.solveId = solve.id || index;
+
+                    if (ss) {
+                        row.classList.add('sh-in-subsession');
+                        row.style.setProperty('--ss-color', ss.color);
+                        if (ss.excludeFromAvg) row.classList.add('sh-excluded');
+                    }
+
+                    const solveNumber = session.solves.length - index;
+
+                    const ao5 = (index + 5 <= session.solves.length)
+                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 5)) : null;
+                    const ao12 = (index + 12 <= session.solves.length)
+                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 12)) : null;
+                    const ao100 = (index + 100 <= session.solves.length)
+                        ? this.calculateAverageForSubset(session.solves.slice(index, index + 100)) : null;
+
                     let timeDisplay = this.formatTime(solve.time);
                     if (solve.dnf) {
                         timeDisplay = 'DNF(' + timeDisplay + ')';
@@ -5214,19 +5307,217 @@
                     tbody.appendChild(row);
                 });
 
-                // Add event listeners to all action buttons
+                // ── Selection logic ──
+                let lastSelectedIndex = null;
+                this._selectedSolveIndices = new Set();
+
+                tbody.querySelectorAll('tr[data-index]').forEach(row => {
+                    row.addEventListener('click', (e) => {
+                        if (e.target.closest('.solve-action-btn')) return;
+                        const idx = parseInt(row.dataset.index);
+                        if (e.shiftKey && lastSelectedIndex !== null) {
+                            // Range select — add to existing selection
+                            const min = Math.min(idx, lastSelectedIndex);
+                            const max = Math.max(idx, lastSelectedIndex);
+                            tbody.querySelectorAll('tr[data-index]').forEach(r => {
+                                const i = parseInt(r.dataset.index);
+                                if (i >= min && i <= max) {
+                                    r.classList.add('sh-selected');
+                                    this._selectedSolveIndices.add(i);
+                                }
+                            });
+                            lastSelectedIndex = idx;
+                        } else {
+                            // Single click — toggle only this row, keep others
+                            if (row.classList.contains('sh-selected')) {
+                                row.classList.remove('sh-selected');
+                                this._selectedSolveIndices.delete(idx);
+                            } else {
+                                row.classList.add('sh-selected');
+                                this._selectedSolveIndices.add(idx);
+                                lastSelectedIndex = idx;
+                            }
+                        }
+                    });
+                });
+
+                // ── Context menu ──
+                tbody.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    if (this._selectedSolveIndices.size < 2) return;
+                    const menu = document.getElementById('shContextMenu');
+                    menu.style.display = 'block';
+                    menu.style.left = e.pageX + 'px';
+                    menu.style.top  = e.pageY + 'px';
+                });
+
+                // ── Action buttons ──
                 tbody.querySelectorAll('.solve-action-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
                         const index = parseInt(e.target.dataset.index);
                         const action = e.target.dataset.action;
-                        
-                        if (action === 'delete') {
-                            this.deleteSolveFromHistory(index);
-                        } else if (action === 'penalty') {
-                            this.togglePenaltyFromHistory(index);
-                        } else if (action === 'dnf') {
-                            this.toggleDNFFromHistory(index);
+                        if (action === 'delete') this.deleteSolveFromHistory(index);
+                        else if (action === 'penalty') this.togglePenaltyFromHistory(index);
+                        else if (action === 'dnf')     this.toggleDNFFromHistory(index);
+                    });
+                });
+            }
+
+            initSubsessionUI() {
+                // Close context menu on outside click
+                document.addEventListener('click', (e) => {
+                    const menu = document.getElementById('shContextMenu');
+                    if (menu && !menu.contains(e.target)) menu.style.display = 'none';
+                });
+
+                // Context menu → open modal
+                document.getElementById('shContextAddSubsession')?.addEventListener('click', () => {
+                    document.getElementById('shContextMenu').style.display = 'none';
+                    this._openSubsessionModal();
+                });
+
+                // Color picker
+                document.getElementById('subsessionColors')?.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.subsession-color-btn');
+                    if (!btn) return;
+                    document.querySelectorAll('.subsession-color-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+
+                // Close / Cancel
+                const closeModal = () => {
+                    document.getElementById('subsessionOverlay').style.display = 'none';
+                };
+                document.getElementById('subsessionModalClose')?.addEventListener('click', closeModal);
+                document.getElementById('subsessionCancelBtn')?.addEventListener('click', closeModal);
+                document.getElementById('subsessionOverlay')?.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('subsessionOverlay')) closeModal();
+                });
+
+                // Create
+                document.getElementById('subsessionCreateBtn')?.addEventListener('click', () => {
+                    this._createSubsession();
+                });
+
+                // Enter key in name input
+                document.getElementById('subsessionNameInput')?.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') this._createSubsession();
+                });
+            }
+
+            _openSubsessionModal() {
+                const count = this._selectedSolveIndices?.size || 0;
+                if (count < 2) return;
+
+                // Reset modal state
+                document.getElementById('subsessionNameInput').value = '';
+                document.getElementById('subsessionExcludeToggle').checked = false;
+                document.querySelectorAll('.subsession-color-btn').forEach((b, i) => {
+                    b.classList.toggle('active', i === 0);
+                });
+                document.getElementById('subsessionSelectedInfo').textContent =
+                    `${count} solve${count !== 1 ? 's' : ''} selected`;
+
+                document.getElementById('subsessionOverlay').style.display = 'flex';
+                setTimeout(() => document.getElementById('subsessionNameInput').focus(), 50);
+            }
+
+            _createSubsession() {
+                const session = this.sessions[this.currentSessionId];
+                if (!session) return;
+
+                const name = document.getElementById('subsessionNameInput').value.trim()
+                    || `Subsession ${(session.subsessions?.length || 0) + 1}`;
+                const color = document.querySelector('.subsession-color-btn.active')?.dataset.color || '#4a9eff';
+                const excludeFromAvg = document.getElementById('subsessionExcludeToggle').checked;
+
+                // Ensure solves have stable IDs (same formula as migration in loadSessions)
+                session.solves.forEach((s, i) => {
+                    if (!s.id) s.id = `s_${s.timestamp || i}_${i}`;
+                });
+                const selectedIndices = Array.from(this._selectedSolveIndices || []);
+                const solveIds = selectedIndices.map(i => session.solves[i].id);
+
+                if (!session.subsessions) session.subsessions = [];
+                session.subsessions.push({
+                    id: `ss_${Date.now()}`,
+                    name,
+                    color,
+                    excludeFromAvg,
+                    solveIds
+                });
+
+                this.saveSessions();
+                document.getElementById('subsessionOverlay').style.display = 'none';
+                this._selectedSolveIndices = new Set();
+                this.populateSolveHistory();
+                this.renderSubsessionStats();
+                // Recalculate averages immediately (exclude takes effect right away)
+                this.updateUI();
+            }
+
+            renderSubsessionStats() {
+                const session = this.sessions[this.currentSessionId];
+                const subsessions = session?.subsessions || [];
+                const block = document.getElementById('subsessionsBlock');
+                const list  = document.getElementById('subsessionsList');
+                if (!block || !list) return;
+
+                if (subsessions.length === 0) {
+                    block.style.display = 'none';
+                    return;
+                }
+
+                const t = (window.settingsManager?.settings?.language === 'ru')
+                    ? window.translations?.ru : window.translations?.en;
+
+                block.style.display = '';
+                const solveMap = new Map((session.solves || []).map(s => [s.id, s]));
+
+                list.innerHTML = subsessions.map(ss => {
+                    const solves = ss.solveIds.map(id => solveMap.get(id)).filter(Boolean);
+                    const valid  = solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0));
+                    const best   = valid.length ? Math.min(...valid) : null;
+                    const avg    = valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
+                    const excludedBadge = t?.subsessionExcludedBadge || 'excluded';
+
+                    return `
+                        <div class="subsession-stat-card" style="--ss-color:${ss.color}" data-ssid="${ss.id}">
+                            <span class="ss-name">${ss.name}</span>
+                            <div class="ss-meta">
+                                <div class="ss-meta-item">
+                                    <span class="ss-meta-label">Solves</span>
+                                    <span class="ss-meta-value">${solves.length}</span>
+                                </div>
+                                <div class="ss-meta-item">
+                                    <span class="ss-meta-label">Best</span>
+                                    <span class="ss-meta-value">${best !== null ? this.formatTime(best) : '—'}</span>
+                                </div>
+                                <div class="ss-meta-item">
+                                    <span class="ss-meta-label">Avg</span>
+                                    <span class="ss-meta-value">${avg !== null ? this.formatTime(avg) : '—'}</span>
+                                </div>
+                            </div>
+                            ${ss.excludeFromAvg ? `<span class="ss-excluded-badge">${excludedBadge}</span>` : ''}
+                            <button class="ss-delete-btn" data-ssid="${ss.id}" title="Delete subsession">×</button>
+                        </div>
+                    `;
+                }).join('');
+
+                // Wire delete buttons
+                list.querySelectorAll('.ss-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const ssid = btn.dataset.ssid;
+                        session.subsessions = session.subsessions.filter(ss => ss.id !== ssid);
+                        this.saveSessions();
+                        this.renderSubsessionStats();
+                        const historySection = document.getElementById('solveHistorySection');
+                        if (historySection && historySection.style.display !== 'none') {
+                            this.populateSolveHistory();
                         }
+                        if (window.timer) window.timer.updateUI();
                     });
                 });
             }
@@ -5623,11 +5914,15 @@
             }
 
             getBestAverage(count) {
-                if (this.solves.length < count) return null;
+                const excluded = this._getExcludedSolveIds();
+                const eligible = excluded.size > 0
+                    ? this.solves.filter(s => !excluded.has(s.id))
+                    : this.solves;
+                if (eligible.length < count) return null;
 
                 let bestAvg = null;
-                for (let i = 0; i <= this.solves.length - count; i++) {
-                    const subset = this.solves.slice(i, i + count);
+                for (let i = 0; i <= eligible.length - count; i++) {
+                    const subset = eligible.slice(i, i + count);
                     const avg = this.calculateAverageForSubset(subset);
                     if (avg !== null && (bestAvg === null || avg < bestAvg)) {
                         bestAvg = avg;
@@ -5636,9 +5931,23 @@
                 return bestAvg;
             }
 
+            // Returns Set of solve IDs that are excluded from session averages
+            _getExcludedSolveIds() {
+                const session = this.sessions[this.currentSessionId];
+                const excluded = new Set();
+                (session?.subsessions || []).forEach(ss => {
+                    if (ss.excludeFromAvg) ss.solveIds.forEach(id => excluded.add(id));
+                });
+                return excluded;
+            }
+
             calculateAverage(count) {
-                if (this.solves.length < count) return null;
-                return this.calculateAverageForSubset(this.solves.slice(0, count));
+                const excluded = this._getExcludedSolveIds();
+                const eligible = excluded.size > 0
+                    ? this.solves.filter(s => !excluded.has(s.id))
+                    : this.solves;
+                if (eligible.length < count) return null;
+                return this.calculateAverageForSubset(eligible.slice(0, count));
             }
 
             calculateAverageForSubset(solves) {
@@ -5667,7 +5976,8 @@
             }
 
             calculateSessionAverage() {
-                const validSolves = this.solves.filter(s => !s.dnf);
+                const excluded = this._getExcludedSolveIds();
+                const validSolves = this.solves.filter(s => !s.dnf && !excluded.has(s.id));
                 if (validSolves.length === 0) return null;
 
                 const sum = validSolves.reduce((acc, s) => acc + s.time + (s.penalty || 0), 0);
@@ -6742,4 +7052,7 @@
             window.timer = timer;
             window.sessionsManager = timer; // Alias for solve history
             window.hotkeyManager = hotkeyManager;
+
+            // Init subsession UI (context menu, modal handlers)
+            timer.initSubsessionUI();
         });

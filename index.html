@@ -632,6 +632,12 @@
                 </div>
                 <!-- Trend & Heatmap blocks -->
                 <div class="additional-stats" style="margin-top: 1.5rem;">
+                    <!-- Subsessions stats block -->
+                    <div class="stats-block" id="subsessionsBlock" style="display:none;">
+                        <div class="stats-block-title" id="st-stat-subsessions">Subsessions</div>
+                        <div id="subsessionsList" class="subsessions-stats-list"></div>
+                    </div>
+
                     <!-- Trend block -->
                     <div class="stats-block" id="trendBlock">
                         <div class="stats-block-title" id="st-stat-trend">Progress Trend</div>
@@ -797,7 +803,56 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.3.0</div>
+    <div class="version-display">1.4.4</div>
+
+    <!-- Solve History Context Menu -->
+    <div class="sh-context-menu" id="shContextMenu" style="display:none;">
+        <button class="sh-context-btn" id="shContextAddSubsession">＋ Add as Subsession</button>
+    </div>
+
+    <!-- Add Subsession Modal -->
+    <div class="subsession-overlay" id="subsessionOverlay" style="display:none;">
+        <div class="subsession-modal">
+            <div class="subsession-modal-header">
+                <h3 class="subsession-modal-title" id="subsessionModalTitleEl">New Subsession</h3>
+                <button class="subsession-modal-close" id="subsessionModalClose">×</button>
+            </div>
+            <div class="subsession-modal-body">
+                <div class="subsession-field">
+                    <label class="subsession-label">Name</label>
+                    <input class="subsession-input" id="subsessionNameInput" type="text" placeholder="e.g. Morning practice" maxlength="40" autocomplete="off">
+                </div>
+                <div class="subsession-field">
+                    <label class="subsession-label" id="subsessionColorLabelEl">Color</label>
+                    <div class="subsession-colors" id="subsessionColors">
+                        <button class="subsession-color-btn active" data-color="#4a9eff" style="background:#4a9eff;"></button>
+                        <button class="subsession-color-btn" data-color="#4ade80" style="background:#4ade80;"></button>
+                        <button class="subsession-color-btn" data-color="#f87171" style="background:#f87171;"></button>
+                        <button class="subsession-color-btn" data-color="#fbbf24" style="background:#fbbf24;"></button>
+                        <button class="subsession-color-btn" data-color="#c084fc" style="background:#c084fc;"></button>
+                        <button class="subsession-color-btn" data-color="#fb923c" style="background:#fb923c;"></button>
+                        <button class="subsession-color-btn" data-color="#34d399" style="background:#34d399;"></button>
+                        <button class="subsession-color-btn" data-color="#f472b6" style="background:#f472b6;"></button>
+                    </div>
+                </div>
+                <div class="subsession-field subsession-toggle-row">
+                    <div>
+                        <span class="subsession-label" id="subsessionExcludeLabelEl">Exclude from session average</span>
+                            <p class="subsession-hint" id="subsessionExcludeHintEl">These solves won't affect Ao5, Ao12 and Session Avg</p>
+                    </div>
+                    <label class="subsession-toggle">
+                        <input type="checkbox" id="subsessionExcludeToggle">
+                        <span class="subsession-toggle-track"></span>
+                    </label>
+                </div>
+                <div class="subsession-selected-info" id="subsessionSelectedInfo">0 solves selected</div>
+            </div>
+            <div class="subsession-modal-footer">
+                <button class="subsession-btn cancel" id="subsessionCancelBtn">Cancel</button>
+                <button class="subsession-btn primary" id="subsessionCreateBtn">Create</button>
+            </div>
+        </div>
+    </div>
 
     <script defer src="script.js"></script>
 </body>
