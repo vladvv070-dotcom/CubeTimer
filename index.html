@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google-site-verification" content="_Y6OSl5EY9Ym_5p1YvXY4qH5Q0gwGWQWGid2E5WpXlM" />
     <title>Cube Timer - Professional Speedcubing Timer</title>
     <!-- Version: Mobile-Optimized 2.0 - 2026-02-07 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -525,7 +526,10 @@
         <div class="statistics-modal">
             <div class="statistics-header">
                 <h2 class="statistics-title">Statistics</h2>
-                <button class="statistics-close" id="closeStatistics">×</button>
+                <div class="statistics-header-actions">
+                    <button class="stats-export-img-btn" id="exportImageBtn">🖼 Export Image</button>
+                    <button class="statistics-close" id="closeStatistics">×</button>
+                </div>
             </div>
             
             <div class="statistics-content">
@@ -803,7 +807,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.4.4</div>
+    <div class="version-display">1.3.0</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu" style="display:none;">
@@ -850,6 +854,67 @@
             <div class="subsession-modal-footer">
                 <button class="subsession-btn cancel" id="subsessionCancelBtn">Cancel</button>
                 <button class="subsession-btn primary" id="subsessionCreateBtn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Image Modal -->
+    <div class="export-img-overlay" id="exportImgOverlay" style="display:none;">
+        <div class="export-img-modal">
+            <div class="export-img-header">
+                <h3 class="export-img-title" id="exportImgTitleEl">Export Image</h3>
+                <button class="export-img-close" id="exportImgClose">×</button>
+            </div>
+
+            <div class="export-img-body">
+                <div class="export-img-preview-wrap">
+                    <canvas id="exportImgCanvas"></canvas>
+                </div>
+
+                <div class="export-img-options">
+                    <div class="export-opt-group">
+                        <span class="export-opt-label" id="exportFormatLabelEl">Format</span>
+                        <div class="export-format-control">
+                            <button class="export-format-btn active" data-format="story">
+                                <span class="export-format-icon">▯</span>
+                                <span id="exportFormatStoryEl">Story</span>
+                            </button>
+                            <button class="export-format-btn" data-format="post">
+                                <span class="export-format-icon">▢</span>
+                                <span id="exportFormatPostEl">Post</span>
+                            </button>
+                            <button class="export-format-btn" data-format="banner">
+                                <span class="export-format-icon">▭</span>
+                                <span id="exportFormatBannerEl">Banner</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="export-opt-group">
+                        <span class="export-opt-label" id="exportIncludeLabelEl">Include</span>
+                        <label class="export-checkbox-row">
+                            <input type="checkbox" id="exportOptBest" checked>
+                            <span id="exportOptBestEl">Best Times</span>
+                        </label>
+                        <label class="export-checkbox-row">
+                            <input type="checkbox" id="exportOptTrend" checked>
+                            <span id="exportOptTrendEl">Progress Trend</span>
+                        </label>
+                        <label class="export-checkbox-row">
+                            <input type="checkbox" id="exportOptCount" checked>
+                            <span id="exportOptCountEl">Solve Count</span>
+                        </label>
+                        <label class="export-checkbox-row">
+                            <input type="checkbox" id="exportOptDiscipline" checked>
+                            <span id="exportOptDisciplineEl">Discipline</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-img-footer">
+                <button class="subsession-btn cancel" id="exportImgCancelBtn">Cancel</button>
+                <button class="subsession-btn primary" id="exportImgDownloadBtn">⬇ Download PNG</button>
             </div>
         </div>
     </div>

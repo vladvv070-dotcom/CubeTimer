@@ -2098,7 +2098,21 @@
                 subsessionCreate: 'Create',
                 subsessionExcludedBadge: 'excluded',
                 subsessionContextBtn: '＋ Add as Subsession',
-                subsessionSolvesSelected: '{n} solves selected'
+                subsessionSolvesSelected: '{n} solves selected',
+
+                // Export Image
+                exportImageBtn: '🖼 Export Image',
+                exportImageTitle: 'Export Image',
+                exportFormatLabel: 'Format',
+                exportFormatStory: 'Story',
+                exportFormatPost: 'Post',
+                exportFormatBanner: 'Banner',
+                exportIncludeLabel: 'Include',
+                exportOptBest: 'Best Times',
+                exportOptTrend: 'Progress Trend',
+                exportOptCount: 'Solve Count',
+                exportOptDiscipline: 'Discipline',
+                exportDownloadBtn: '⬇ Download PNG'
             },
             ru: {
                 // Header
@@ -2248,7 +2262,21 @@
                 subsessionCreate: 'Создать',
                 subsessionExcludedBadge: 'исключено',
                 subsessionContextBtn: '＋ Добавить как под-сессию',
-                subsessionSolvesSelected: 'Выбрано {n} сборок'
+                subsessionSolvesSelected: 'Выбрано {n} сборок',
+
+                // Export Image
+                exportImageBtn: '🖼 Экспорт изображения',
+                exportImageTitle: 'Экспорт изображения',
+                exportFormatLabel: 'Формат',
+                exportFormatStory: 'История',
+                exportFormatPost: 'Пост',
+                exportFormatBanner: 'Баннер',
+                exportIncludeLabel: 'Включить',
+                exportOptBest: 'Лучшие результаты',
+                exportOptTrend: 'Прогресс',
+                exportOptCount: 'Кол-во сборок',
+                exportOptDiscipline: 'Дисциплина',
+                exportDownloadBtn: '⬇ Скачать PNG'
             }
         };
 
@@ -2470,6 +2498,22 @@
 
                 const nameInput = document.getElementById('subsessionNameInput');
                 if (nameInput) nameInput.placeholder = t.subsessionNamePlaceholder || 'e.g. Morning practice';
+
+                // Export Image
+                const exportBtn = document.getElementById('exportImageBtn');
+                if (exportBtn) exportBtn.textContent = t.exportImageBtn;
+                _st('exportImgTitleEl',        t.exportImageTitle);
+                _st('exportFormatLabelEl',     t.exportFormatLabel);
+                _st('exportFormatStoryEl',     t.exportFormatStory);
+                _st('exportFormatPostEl',      t.exportFormatPost);
+                _st('exportFormatBannerEl',    t.exportFormatBanner);
+                _st('exportIncludeLabelEl',    t.exportIncludeLabel);
+                _st('exportOptBestEl',         t.exportOptBest);
+                _st('exportOptTrendEl',        t.exportOptTrend);
+                _st('exportOptCountEl',        t.exportOptCount);
+                _st('exportOptDisciplineEl',   t.exportOptDiscipline);
+                const dlBtn = document.getElementById('exportImgDownloadBtn');
+                if (dlBtn) dlBtn.textContent = t.exportDownloadBtn;
                 
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
@@ -5457,6 +5501,303 @@
                 this.updateUI();
             }
 
+            // ════════════════════════════════════════
+            //  EXPORT IMAGE
+            // ════════════════════════════════════════
+
+            initExportImageUI() {
+                this._exportFormat = 'story'; // story | post | banner
+
+                document.getElementById('exportImageBtn')?.addEventListener('click', () => {
+                    this._openExportImageModal();
+                });
+
+                const closeModal = () => {
+                    document.getElementById('exportImgOverlay').style.display = 'none';
+                };
+                document.getElementById('exportImgClose')?.addEventListener('click', closeModal);
+                document.getElementById('exportImgCancelBtn')?.addEventListener('click', closeModal);
+                document.getElementById('exportImgOverlay')?.addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('exportImgOverlay')) closeModal();
+                });
+
+                document.querySelectorAll('.export-format-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.export-format-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this._exportFormat = btn.dataset.format;
+                        this._drawExportCard();
+                    });
+                });
+
+                ['exportOptBest', 'exportOptTrend', 'exportOptCount', 'exportOptDiscipline'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('change', () => this._drawExportCard());
+                });
+
+                document.getElementById('exportImgDownloadBtn')?.addEventListener('click', () => {
+                    this._downloadExportCard();
+                });
+            }
+
+            _openExportImageModal() {
+                document.getElementById('exportImgOverlay').style.display = 'flex';
+                this._drawExportCard();
+            }
+
+            _computeTrendData() {
+                const validSolves = this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0));
+                if (validSolves.length < 20) return null;
+
+                const n = Math.min(50, Math.floor(validSolves.length / 2));
+                const recentTimes = validSolves.slice(0, n);
+                const olderTimes  = validSolves.slice(validSolves.length - n);
+                const avgRecent = recentTimes.reduce((a, b) => a + b, 0) / recentTimes.length;
+                const avgOlder  = olderTimes.reduce((a, b) => a + b, 0) / olderTimes.length;
+                const diff = avgOlder - avgRecent;
+                const pct  = Math.abs(diff / avgOlder * 100);
+
+                return {
+                    pct: pct.toFixed(1),
+                    direction: pct < 0.5 ? 'flat' : (diff > 0 ? 'up' : 'down'),
+                    n
+                };
+            }
+
+            _drawExportCard() {
+                const canvas = document.getElementById('exportImgCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                // Dimensions by format
+                const dims = {
+                    story:  { w: 1080, h: 1920 },
+                    post:   { w: 1080, h: 1080 },
+                    banner: { w: 1500, h: 500  }
+                };
+                const { w, h } = dims[this._exportFormat] || dims.story;
+                canvas.width = w;
+                canvas.height = h;
+
+                const includeBest       = document.getElementById('exportOptBest')?.checked ?? true;
+                const includeTrend      = document.getElementById('exportOptTrend')?.checked ?? true;
+                const includeCount      = document.getElementById('exportOptCount')?.checked ?? true;
+                const includeDiscipline = document.getElementById('exportOptDiscipline')?.checked ?? true;
+
+                const session = this.sessions[this.currentSessionId];
+                const disciplineLabel = ScrambleGenerator.getLabel(session?.discipline || '3x3');
+                const totalSolves = this.solves.length;
+                const best = this.getBestAverage(1) ?? (this.solves.find(s => !s.dnf) ?
+                    Math.min(...this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0))) : null);
+                const ao5 = this.getBestAverage(5);
+                const ao12 = this.getBestAverage(12);
+                const trend = this._computeTrendData();
+
+                // ── Paper background ──
+                const paperGrad = ctx.createLinearGradient(0, 0, w, h);
+                paperGrad.addColorStop(0, '#f7f1e3');
+                paperGrad.addColorStop(1, '#efe6d3');
+                ctx.fillStyle = paperGrad;
+                ctx.fillRect(0, 0, w, h);
+
+                // Subtle paper texture (grain dots)
+                ctx.save();
+                ctx.globalAlpha = 0.035;
+                for (let i = 0; i < 2200; i++) {
+                    ctx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
+                    ctx.fillRect(Math.random() * w, Math.random() * h, 1.4, 1.4);
+                }
+                ctx.restore();
+
+                const pad = w * 0.06;
+                let y = pad;
+
+                // ── Header: logo + title ──
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillStyle = '#2d2a24';
+                ctx.font = `700 ${w * 0.052}px Manrope, sans-serif`;
+                ctx.fillText('CUBE TIMER', pad, y + w * 0.05);
+
+                ctx.font = `600 ${w * 0.024}px Manrope, sans-serif`;
+                ctx.fillStyle = '#9a8f78';
+                const dateStr = new Date().toLocaleDateString(
+                    (window.settingsManager?.settings?.language === 'ru') ? 'ru-RU' : 'en-US',
+                    { year: 'numeric', month: 'long', day: 'numeric' }
+                );
+                ctx.fillText(dateStr, pad, y + w * 0.05 + w * 0.034);
+
+                y += w * 0.12;
+
+                // Discipline badge
+                if (includeDiscipline) {
+                    ctx.font = `700 ${w * 0.026}px Manrope, sans-serif`;
+                    const badgeText = disciplineLabel.toUpperCase();
+                    const badgeW = ctx.measureText(badgeText).width + w * 0.05;
+                    const badgeH = w * 0.05;
+                    this._roundRect(ctx, pad, y, badgeW, badgeH, badgeH / 2);
+                    ctx.fillStyle = '#3d3527';
+                    ctx.fill();
+                    ctx.fillStyle = '#f7f1e3';
+                    ctx.fillText(badgeText, pad + w * 0.025, y + badgeH * 0.66);
+                    y += badgeH + w * 0.04;
+                }
+
+                // ── Trend sparkline chart ──
+                if (includeTrend) {
+                    const chartH = h * (this._exportFormat === 'banner' ? 0.18 : 0.16);
+                    const chartY = y;
+                    this._roundRect(ctx, pad, chartY, w - pad * 2, chartH, w * 0.02);
+                    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    const valid = this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0)).reverse();
+                    if (valid.length >= 2) {
+                        const sample = valid.length > 60
+                            ? valid.filter((_, i) => i % Math.ceil(valid.length / 60) === 0)
+                            : valid;
+                        const min = Math.min(...sample), max = Math.max(...sample);
+                        const range = (max - min) || 1;
+                        const chartPad = w * 0.025;
+                        const plotW = w - pad * 2 - chartPad * 2;
+                        const plotH = chartH - chartPad * 2;
+
+                        ctx.beginPath();
+                        sample.forEach((v, i) => {
+                            const px = pad + chartPad + (i / (sample.length - 1)) * plotW;
+                            const py = chartY + chartPad + (1 - (v - min) / range) * plotH;
+                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                        });
+                        ctx.strokeStyle = '#3b6ea5';
+                        ctx.lineWidth = w * 0.0045;
+                        ctx.lineJoin = 'round';
+                        ctx.lineCap = 'round';
+                        ctx.stroke();
+
+                        // Fill under line
+                        ctx.lineTo(pad + chartPad + plotW, chartY + chartH - chartPad);
+                        ctx.lineTo(pad + chartPad, chartY + chartH - chartPad);
+                        ctx.closePath();
+                        ctx.fillStyle = 'rgba(59,110,165,0.12)';
+                        ctx.fill();
+                    }
+
+                    y = chartY + chartH + w * 0.045;
+                }
+
+                // ── 4 stat cards grid (2x2) ──
+                const cardGap = w * 0.03;
+                const cardW = (w - pad * 2 - cardGap) / 2;
+                const cardH = w * (this._exportFormat === 'banner' ? 0.16 : 0.21);
+
+                const cards = [];
+                if (includeBest) {
+                    cards.push({ icon: '⏱', label: 'BEST', value: best !== null ? this.formatTime(best) : '—', color: '#3b6ea5' });
+                    cards.push({ icon: '👑', label: 'BEST AO5', value: ao5 !== null ? this.formatTime(ao5) : '—', color: '#c8932f' });
+                }
+                if (includeTrend && trend) {
+                    const arrow = trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→';
+                    const sign  = trend.direction === 'up' ? '−' : trend.direction === 'down' ? '+' : '~';
+                    cards.push({ icon: arrow, label: 'TREND', value: `${sign}${trend.pct}%`, color: trend.direction === 'up' ? '#4c8c5c' : trend.direction === 'down' ? '#b65454' : '#8a8170' });
+                } else if (includeBest && ao12 !== null) {
+                    cards.push({ icon: 'Σ', label: 'BEST AO12', value: this.formatTime(ao12), color: '#5a8c5e' });
+                }
+                if (includeCount) {
+                    cards.push({ icon: '#', label: 'SOLVES', value: String(totalSolves), color: '#7c5ca5' });
+                }
+
+                // Trim/pad to exactly 4 slots for clean grid
+                const finalCards = cards.slice(0, 4);
+
+                finalCards.forEach((card, i) => {
+                    const col = i % 2, row = Math.floor(i / 2);
+                    const cx = pad + col * (cardW + cardGap);
+                    const cy = y + row * (cardH + cardGap);
+
+                    this._roundRect(ctx, cx, cy, cardW, cardH, w * 0.018);
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+
+                    // Icon
+                    ctx.font = `700 ${cardW * 0.16}px Manrope, sans-serif`;
+                    ctx.fillStyle = card.color;
+                    ctx.fillText(card.icon, cx + cardW * 0.08, cy + cardH * 0.32);
+
+                    // Label
+                    ctx.font = `700 ${cardW * 0.075}px Manrope, sans-serif`;
+                    ctx.fillStyle = '#9a8f78';
+                    ctx.fillText(card.label, cx + cardW * 0.08, cy + cardH * 0.58);
+
+                    // Value
+                    ctx.font = `800 ${cardW * 0.16}px Manrope, sans-serif`;
+                    ctx.fillStyle = '#2d2a24';
+                    ctx.fillText(card.value, cx + cardW * 0.08, cy + cardH * 0.86);
+                });
+
+                const gridRows = Math.ceil(finalCards.length / 2);
+                y += gridRows * cardH + (gridRows - 1) * cardGap + w * 0.05;
+
+                // ── Footer stamp (bottom right) ──
+                const stampR = w * 0.075;
+                const stampCx = w - pad - stampR;
+                const stampCy = h - pad - stampR * (this._exportFormat === 'banner' ? 0.6 : 1);
+
+                ctx.save();
+                ctx.globalAlpha = 0.5;
+                ctx.strokeStyle = '#b5462f';
+                ctx.lineWidth = w * 0.0035;
+                ctx.beginPath();
+                ctx.arc(stampCx, stampCy, stampR, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(stampCx, stampCy, stampR * 0.78, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Mini cube icon inside stamp
+                ctx.fillStyle = '#b5462f';
+                ctx.font = `700 ${stampR * 0.7}px Manrope, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText('◆', stampCx, stampCy + stampR * 0.25);
+                ctx.textAlign = 'left';
+                ctx.restore();
+
+                // ── Footer text (bottom left) ──
+                ctx.font = `600 ${w * 0.02}px Manrope, sans-serif`;
+                ctx.fillStyle = '#9a8f78';
+                ctx.fillText('Made with Cube Timer', pad, h - pad * 0.5);
+            }
+
+            _roundRect(ctx, x, y, w, h, r) {
+                ctx.beginPath();
+                ctx.moveTo(x + r, y);
+                ctx.arcTo(x + w, y, x + w, y + h, r);
+                ctx.arcTo(x + w, y + h, x, y + h, r);
+                ctx.arcTo(x, y + h, x, y, r);
+                ctx.arcTo(x, y, x + w, y, r);
+                ctx.closePath();
+            }
+
+            _downloadExportCard() {
+                const canvas = document.getElementById('exportImgCanvas');
+                if (!canvas) return;
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const session = this.sessions[this.currentSessionId];
+                    const name = (session?.name || 'session').replace(/[^a-z0-9а-яё]+/gi, '_');
+                    a.href = url;
+                    a.download = `cubetimer_${name}_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                }, 'image/png');
+            }
+
             renderSubsessionStats() {
                 const session = this.sessions[this.currentSessionId];
                 const subsessions = session?.subsessions || [];
@@ -7055,4 +7396,6 @@
 
             // Init subsession UI (context menu, modal handlers)
             timer.initSubsessionUI();
+            // Init export image UI
+            timer.initExportImageUI();
         });
