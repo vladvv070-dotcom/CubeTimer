@@ -236,13 +236,8 @@
                                     <div class="slider-value" id="st-hideUiLabel">Hide UI During Solve</div>
                                     <div class="setting-description" id="st-hideUiDesc">Hides everything except the timer while solving</div>
                                 </div>
-                                <div class="segmented-control" style="margin-top:0; flex-shrink:0;">
-                                    <button class="segmented-btn active" id="hideUiOff" data-hideui="off">
-                                        <span class="seg-title">Off</span>
-                                    </button>
-                                    <button class="segmented-btn" id="hideUiOn" data-hideui="on">
-                                        <span class="seg-title">On</span>
-                                    </button>
+                                <div class="toggle-switch" id="hideUiToggle" style="flex-shrink:0;">
+                                    <div class="toggle-slider"></div>
                                 </div>
                             </div>
                         </div>
@@ -256,13 +251,8 @@
                                     <div class="slider-value" id="st-mouseStartLabel">Mouse Start</div>
                                     <div class="setting-description" id="st-mouseStartDesc">Start and stop the timer with mouse click instead of spacebar</div>
                                 </div>
-                                <div class="segmented-control" style="margin-top:0; flex-shrink:0;">
-                                    <button class="segmented-btn active" id="mouseStartOff" data-mousestart="off">
-                                        <span class="seg-title">Off</span>
-                                    </button>
-                                    <button class="segmented-btn" id="mouseStartOn" data-mousestart="on">
-                                        <span class="seg-title">On</span>
-                                    </button>
+                                <div class="toggle-switch" id="mouseStartToggle" style="flex-shrink:0;">
+                                    <div class="toggle-slider"></div>
                                 </div>
                             </div>
                         </div>
@@ -848,7 +838,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.6.0</div>
+    <div class="version-display">1.6.2</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu" style="display:none;">

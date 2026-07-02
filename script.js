@@ -1957,6 +1957,7 @@
                 
                 // Timer
                 timerHint: 'Space to start/stop',
+                timerHintMouse: 'Click to start/stop',
                 newBest: 'New',
                 
                 // Controls
@@ -2128,6 +2129,7 @@
                 
                 // Timer
                 timerHint: 'Пробел для старта/стопа',
+                timerHintMouse: 'Клик для старта/стопа',
                 newBest: 'Новый',
                 
                 // Controls
@@ -2337,9 +2339,9 @@
                 if (sessionsBtn) sessionsBtn.textContent = t.sessions;
                 if (settingsBtn) settingsBtn.textContent = t.settings;
                 
-                // Timer hint
+                // Timer hint (reflects Mouse Start setting)
                 const timerHint = document.querySelector('.timer-hint');
-                if (timerHint) timerHint.textContent = t.timerHint;
+                if (timerHint) timerHint.textContent = this.settings.mouseStart ? t.timerHintMouse : t.timerHint;
                 
                 // Control buttons
                 const dnfBtn = document.querySelector('#dnfBtn');
@@ -3406,17 +3408,13 @@
                     btn.classList.toggle('active', btn.dataset.clockfmt === clockFmt);
                 });
 
-                // Sync hideUi buttons
-                const hideUi = this.settings.hideUiDuringSolve ? 'on' : 'off';
-                document.querySelectorAll('[data-hideui]').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.hideui === hideUi);
-                });
+                // Sync hideUi toggle switch
+                const hideUiToggle = document.getElementById('hideUiToggle');
+                if (hideUiToggle) hideUiToggle.classList.toggle('active', !!this.settings.hideUiDuringSolve);
 
-                // Sync mouseStart buttons
-                const ms = this.settings.mouseStart ? 'on' : 'off';
-                document.querySelectorAll('[data-mousestart]').forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.mousestart === ms);
-                });
+                // Sync mouseStart toggle switch
+                const mouseStartToggle = document.getElementById('mouseStartToggle');
+                if (mouseStartToggle) mouseStartToggle.classList.toggle('active', !!this.settings.mouseStart);
             }
 
             resetCustomization() {
@@ -3847,27 +3845,27 @@
                 setInterval(updateOffsetPreview, 30000); // update every 30s
 
                 // ── Hide UI During Solve ──
-                document.querySelectorAll('[data-hideui]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('[data-hideui]').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.settings.hideUiDuringSolve = btn.dataset.hideui === 'on';
+                const hideUiToggle = document.getElementById('hideUiToggle');
+                if (hideUiToggle) {
+                    hideUiToggle.addEventListener('click', () => {
+                        this.settings.hideUiDuringSolve = !this.settings.hideUiDuringSolve;
+                        hideUiToggle.classList.toggle('active', this.settings.hideUiDuringSolve);
                         this.saveSettings();
                         // Notify timer of change
                         if (window.timer) window.timer._applyMouseStartMode();
                     });
-                });
+                }
 
                 // ── Mouse Start ──
-                document.querySelectorAll('[data-mousestart]').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('[data-mousestart]').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.settings.mouseStart = btn.dataset.mousestart === 'on';
+                const mouseStartToggle = document.getElementById('mouseStartToggle');
+                if (mouseStartToggle) {
+                    mouseStartToggle.addEventListener('click', () => {
+                        this.settings.mouseStart = !this.settings.mouseStart;
+                        mouseStartToggle.classList.toggle('active', this.settings.mouseStart);
                         this.saveSettings();
                         if (window.timer) window.timer._applyMouseStartMode();
                     });
-                });
+                }
             }
 
             playSound(type) {
@@ -5473,48 +5471,61 @@
                 const s = window.settingsManager?.settings;
                 const mouseStart = s?.mouseStart || false;
 
-                // Remove any previously bound mouse handler
-                if (this._mouseStartHandler) {
-                    document.getElementById('timerContainer')?.removeEventListener('mousedown', this._mouseStartHandler);
-                    this._mouseStartHandler = null;
+                // NOTE: the clickable area is `.center-column` (same element used for
+                // touch start/stop below) — there is no #timerContainer in the DOM,
+                // which was the reason this never fired before.
+                const tc = document.querySelector('.center-column');
+                if (!tc) return;
+
+                // Remove any previously bound mouse handlers
+                if (this._mouseStartDownHandler) {
+                    tc.removeEventListener('mousedown', this._mouseStartDownHandler);
+                    tc.removeEventListener('mouseup', this._mouseStartUpHandler);
+                    tc.removeEventListener('mouseleave', this._mouseStartLeaveHandler);
+                    this._mouseStartDownHandler = null;
+                    this._mouseStartUpHandler = null;
+                    this._mouseStartLeaveHandler = null;
                 }
 
                 if (mouseStart) {
-                    this._mouseStartHandler = (e) => {
+                    // Reuse the exact same state machine as spacebar/touch so hold delay,
+                    // "ready" color, inspection and hide-UI all behave identically.
+                    this._mouseHolding = false;
+
+                    this._mouseStartDownHandler = (e) => {
                         if (e.button !== 0) return; // left click only
                         e.preventDefault();
-                        // Simulate spacebar logic: use existing handleSpaceDown/Up flow
-                        if (!this.isRunning) {
-                            this._mouseHolding = true;
-                            this._mouseHoldStart = Date.now();
-                            document.getElementById('timerContainer')?.classList.add('holding');
-                            // Wait for hold delay then start
-                            this._mouseHoldTimer = setTimeout(() => {
-                                if (this._mouseHolding) {
-                                    this.startTimer();
-                                    document.getElementById('timerContainer')?.classList.remove('holding');
-                                }
-                            }, s?.holdDelay || 600);
-                        } else {
-                            this.stopTimer();
-                        }
+                        this._mouseHolding = true;
+                        this.handleSpaceDown();
                     };
-                    const cancelMouse = () => {
+
+                    this._mouseStartUpHandler = (e) => {
+                        if (!this._mouseHolding) return;
+                        e.preventDefault();
+                        this._mouseHolding = false;
+                        this.handleSpaceUp();
+                    };
+
+                    this._mouseStartLeaveHandler = () => {
+                        // Mouse left the area mid-hold without releasing: treat like a
+                        // release so we don't get stuck in a "holding" state.
                         if (this._mouseHolding && !this.isRunning) {
                             this._mouseHolding = false;
-                            clearTimeout(this._mouseHoldTimer);
-                            document.getElementById('timerContainer')?.classList.remove('holding');
+                            this.handleSpaceUp();
                         }
                     };
-                    const tc = document.getElementById('timerContainer');
-                    tc?.addEventListener('mousedown', this._mouseStartHandler);
-                    tc?.addEventListener('mouseup', cancelMouse);
-                    tc?.addEventListener('mouseleave', cancelMouse);
-                    // Show cursor hint
-                    if (tc) tc.style.cursor = 'pointer';
+
+                    tc.addEventListener('mousedown', this._mouseStartDownHandler);
+                    tc.addEventListener('mouseup', this._mouseStartUpHandler);
+                    tc.addEventListener('mouseleave', this._mouseStartLeaveHandler);
+                    tc.style.cursor = 'pointer';
                 } else {
-                    const tc = document.getElementById('timerContainer');
-                    if (tc) tc.style.cursor = '';
+                    tc.style.cursor = '';
+                }
+
+                // Keep the on-screen hint ("Space..." vs "Click...") in sync
+                if (window.settingsManager) {
+                    window.settingsManager.applyTranslations();
                 }
             }
 
