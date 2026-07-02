@@ -2106,13 +2106,19 @@
                 exportFormatLabel: 'Format',
                 exportFormatStory: 'Story',
                 exportFormatPost: 'Post',
-                exportFormatBanner: 'Banner',
+                exportFormatBanner: 'Wide',
                 exportIncludeLabel: 'Include',
                 exportOptBest: 'Best Times',
                 exportOptTrend: 'Progress Trend',
                 exportOptCount: 'Solve Count',
                 exportOptDiscipline: 'Discipline',
-                exportDownloadBtn: '⬇ Download PNG'
+                exportDownloadBtn: '⬇ Download PNG',
+
+                // Timer behaviour
+                hideUiLabel: 'Hide UI During Solve',
+                hideUiDesc: 'Hides everything except the timer while solving',
+                mouseStartLabel: 'Mouse Start',
+                mouseStartDesc: 'Start and stop the timer with mouse click instead of spacebar'
             },
             ru: {
                 // Header
@@ -2276,7 +2282,13 @@
                 exportOptTrend: 'Прогресс',
                 exportOptCount: 'Кол-во сборок',
                 exportOptDiscipline: 'Дисциплина',
-                exportDownloadBtn: '⬇ Скачать PNG'
+                exportDownloadBtn: '⬇ Скачать PNG',
+
+                // Timer behaviour
+                hideUiLabel: 'Скрывать UI во время сборки',
+                hideUiDesc: 'Скрывает всё кроме таймера пока идёт сборка',
+                mouseStartLabel: 'Запуск мышкой',
+                mouseStartDesc: 'Запускать и останавливать таймер кликом мыши вместо пробела'
             }
         };
 
@@ -2302,7 +2314,9 @@
                     customBg: 'none',
                     timeFormat: 'seconds',   // 'seconds' | 'minutes'
                     clockFormat: '24',        // '24' | '12'
-                    timeOffset: 0             // hours offset (-12..+14)
+                    timeOffset: 0,            // hours offset (-12..+14)
+                    hideUiDuringSolve: false, // hide all UI except timer while solving
+                    mouseStart: false         // start/stop timer with mouse click
                 };
                 
                 this.loadSettings();
@@ -2514,6 +2528,12 @@
                 _st('exportOptDisciplineEl',   t.exportOptDiscipline);
                 const dlBtn = document.getElementById('exportImgDownloadBtn');
                 if (dlBtn) dlBtn.textContent = t.exportDownloadBtn;
+
+                // Timer behaviour
+                _st('st-hideUiLabel',    t.hideUiLabel);
+                _st('st-hideUiDesc',     t.hideUiDesc);
+                _st('st-mouseStartLabel', t.mouseStartLabel);
+                _st('st-mouseStartDesc',  t.mouseStartDesc);
                 
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
@@ -3374,20 +3394,28 @@
 
             _syncTimeFormatUI() {
                 const fmt = this.settings.timeFormat || 'seconds';
-                // Update segmented buttons
                 document.querySelectorAll('[data-fmt]').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.fmt === fmt);
                 });
-                // Update preview example
                 const preview = document.getElementById('timeFormatPreview');
-                if (preview) {
-                    preview.textContent = fmt === 'minutes' ? '1:05.89' : '65.89';
-                }
+                if (preview) preview.textContent = fmt === 'minutes' ? '1:05.89' : '65.89';
 
                 // Sync clock format buttons
                 const clockFmt = this.settings.clockFormat || '24';
                 document.querySelectorAll('[data-clockfmt]').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.clockfmt === clockFmt);
+                });
+
+                // Sync hideUi buttons
+                const hideUi = this.settings.hideUiDuringSolve ? 'on' : 'off';
+                document.querySelectorAll('[data-hideui]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.hideui === hideUi);
+                });
+
+                // Sync mouseStart buttons
+                const ms = this.settings.mouseStart ? 'on' : 'off';
+                document.querySelectorAll('[data-mousestart]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mousestart === ms);
                 });
             }
 
@@ -3817,6 +3845,29 @@
                 // Init preview on page load
                 updateOffsetPreview();
                 setInterval(updateOffsetPreview, 30000); // update every 30s
+
+                // ── Hide UI During Solve ──
+                document.querySelectorAll('[data-hideui]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-hideui]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.settings.hideUiDuringSolve = btn.dataset.hideui === 'on';
+                        this.saveSettings();
+                        // Notify timer of change
+                        if (window.timer) window.timer._applyMouseStartMode();
+                    });
+                });
+
+                // ── Mouse Start ──
+                document.querySelectorAll('[data-mousestart]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-mousestart]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.settings.mouseStart = btn.dataset.mousestart === 'on';
+                        this.saveSettings();
+                        if (window.timer) window.timer._applyMouseStartMode();
+                    });
+                });
             }
 
             playSound(type) {
@@ -3881,9 +3932,10 @@
                 
                 this.initEventListeners();
                 this.generateScramble();
-                this.updateUI(); // Initialize with --
+                this.updateUI();
                 this.drawChart();
-                this.updateSessionDropdown(); // Initialize session dropdown
+                this.updateSessionDropdown();
+                this._applyMouseStartMode(); // Apply mouse/keyboard mode on load
             }
 
             loadSessions() {
@@ -4163,6 +4215,11 @@
                 this.timerDisplay.classList.remove('ready');
                 this.timerDisplay.classList.add('running');
                 this.hideNewBestIndicator();
+
+                // Hide UI if enabled
+                if (window.settingsManager?.settings?.hideUiDuringSolve) {
+                    this._setHideUiActive(true);
+                }
                 
                 // Apply running timer color
                 if (window.settingsManager && window.settingsManager.settings.timerColor) {
@@ -4252,8 +4309,11 @@
             stopTimer() {
                 this.isRunning = false;
                 this.timerDisplay.classList.remove('running');
-                this.timerDisplay.style.color = ''; // reset inline color, let CSS take over
-                
+                this.timerDisplay.style.color = '';
+
+                // Restore hidden UI
+                this._setHideUiActive(false);
+
                 // Force proper color in light theme
                 if (document.body.classList.contains('light-theme')) {
                     this.timerDisplay.style.color = '#222222';
@@ -5408,6 +5468,78 @@
                 });
             }
 
+            // ─── Mouse Start & Hide UI ────────────────────────
+            _applyMouseStartMode() {
+                const s = window.settingsManager?.settings;
+                const mouseStart = s?.mouseStart || false;
+
+                // Remove any previously bound mouse handler
+                if (this._mouseStartHandler) {
+                    document.getElementById('timerContainer')?.removeEventListener('mousedown', this._mouseStartHandler);
+                    this._mouseStartHandler = null;
+                }
+
+                if (mouseStart) {
+                    this._mouseStartHandler = (e) => {
+                        if (e.button !== 0) return; // left click only
+                        e.preventDefault();
+                        // Simulate spacebar logic: use existing handleSpaceDown/Up flow
+                        if (!this.isRunning) {
+                            this._mouseHolding = true;
+                            this._mouseHoldStart = Date.now();
+                            document.getElementById('timerContainer')?.classList.add('holding');
+                            // Wait for hold delay then start
+                            this._mouseHoldTimer = setTimeout(() => {
+                                if (this._mouseHolding) {
+                                    this.startTimer();
+                                    document.getElementById('timerContainer')?.classList.remove('holding');
+                                }
+                            }, s?.holdDelay || 600);
+                        } else {
+                            this.stopTimer();
+                        }
+                    };
+                    const cancelMouse = () => {
+                        if (this._mouseHolding && !this.isRunning) {
+                            this._mouseHolding = false;
+                            clearTimeout(this._mouseHoldTimer);
+                            document.getElementById('timerContainer')?.classList.remove('holding');
+                        }
+                    };
+                    const tc = document.getElementById('timerContainer');
+                    tc?.addEventListener('mousedown', this._mouseStartHandler);
+                    tc?.addEventListener('mouseup', cancelMouse);
+                    tc?.addEventListener('mouseleave', cancelMouse);
+                    // Show cursor hint
+                    if (tc) tc.style.cursor = 'pointer';
+                } else {
+                    const tc = document.getElementById('timerContainer');
+                    if (tc) tc.style.cursor = '';
+                }
+            }
+
+            _setHideUiActive(active) {
+                const elements = [
+                    document.querySelector('.left-column'),
+                    document.querySelector('.right-column'),
+                    document.querySelector('.scramble-section'),
+                    document.querySelector('.bottom-controls'),
+                    document.querySelector('.commentary-box'),
+                    document.querySelector('.app-header'),
+                ].filter(Boolean);
+
+                elements.forEach(el => {
+                    if (active) {
+                        el.style.opacity = '0';
+                        el.style.pointerEvents = 'none';
+                        el.style.transition = 'opacity 0.25s ease';
+                    } else {
+                        el.style.opacity = '';
+                        el.style.pointerEvents = '';
+                    }
+                });
+            }
+
             initSubsessionUI() {
                 // Close context menu on outside click
                 document.addEventListener('click', (e) => {
@@ -5506,7 +5638,8 @@
             // ════════════════════════════════════════
 
             initExportImageUI() {
-                this._exportFormat = 'story'; // story | post | banner
+                this._exportFormat   = 'story';
+                this._exportSessionId = null; // null = current session
 
                 document.getElementById('exportImageBtn')?.addEventListener('click', () => {
                     this._openExportImageModal();
@@ -5530,8 +5663,13 @@
                     });
                 });
 
-                ['exportOptBest', 'exportOptTrend', 'exportOptCount', 'exportOptDiscipline'].forEach(id => {
+                ['exportOptBest','exportOptTrend','exportOptCount','exportOptDiscipline'].forEach(id => {
                     document.getElementById(id)?.addEventListener('change', () => this._drawExportCard());
+                });
+
+                document.getElementById('exportSessionSelect')?.addEventListener('change', (e) => {
+                    this._exportSessionId = e.target.value;
+                    this._drawExportCard();
                 });
 
                 document.getElementById('exportImgDownloadBtn')?.addEventListener('click', () => {
@@ -5540,6 +5678,19 @@
             }
 
             _openExportImageModal() {
+                // Populate session dropdown
+                const sel = document.getElementById('exportSessionSelect');
+                if (sel) {
+                    sel.innerHTML = '';
+                    Object.values(this.sessions).forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.textContent = `${s.name} (${s.solves.length} solves)`;
+                        if (s.id === this.currentSessionId) opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+                    this._exportSessionId = this.currentSessionId;
+                }
                 document.getElementById('exportImgOverlay').style.display = 'flex';
                 this._drawExportCard();
             }
@@ -5568,235 +5719,310 @@
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
-                // Dimensions by format
                 const dims = {
-                    story:  { w: 1080, h: 1920 },
-                    post:   { w: 1080, h: 1080 },
-                    banner: { w: 1500, h: 500  }
+                    story: { w: 1080, h: 1920 },
+                    post:  { w: 1080, h: 1080 },
+                    wide:  { w: 1920, h: 1080 }
                 };
                 const { w, h } = dims[this._exportFormat] || dims.story;
-                canvas.width = w;
-                canvas.height = h;
+                canvas.width = w; canvas.height = h;
 
-                const includeBest       = document.getElementById('exportOptBest')?.checked ?? true;
-                const includeTrend      = document.getElementById('exportOptTrend')?.checked ?? true;
-                const includeCount      = document.getElementById('exportOptCount')?.checked ?? true;
+                const includeBest       = document.getElementById('exportOptBest')?.checked       ?? true;
+                const includeTrend      = document.getElementById('exportOptTrend')?.checked      ?? true;
+                const includeCount      = document.getElementById('exportOptCount')?.checked      ?? true;
                 const includeDiscipline = document.getElementById('exportOptDiscipline')?.checked ?? true;
 
-                const session = this.sessions[this.currentSessionId];
+                const sid     = this._exportSessionId || this.currentSessionId;
+                const session = this.sessions[sid] || this.sessions[this.currentSessionId];
+                const solves  = session?.solves || [];
+
                 const disciplineLabel = ScrambleGenerator.getLabel(session?.discipline || '3x3');
-                const totalSolves = this.solves.length;
-                const best = this.getBestAverage(1) ?? (this.solves.find(s => !s.dnf) ?
-                    Math.min(...this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0))) : null);
-                const ao5 = this.getBestAverage(5);
-                const ao12 = this.getBestAverage(12);
-                const trend = this._computeTrendData();
+                const totalSolves     = solves.length;
+                const excl = new Set((session?.subsessions||[]).filter(ss=>ss.excludeFromAvg).flatMap(ss=>ss.solveIds));
+                const validTimes = solves.filter(s=>!s.dnf&&!excl.has(s.id)).map(s=>s.time+(s.penalty||0));
+                const best = validTimes.length ? Math.min(...validTimes) : null;
 
-                // ── Paper background ──
-                const paperGrad = ctx.createLinearGradient(0, 0, w, h);
-                paperGrad.addColorStop(0, '#f7f1e3');
-                paperGrad.addColorStop(1, '#efe6d3');
-                ctx.fillStyle = paperGrad;
-                ctx.fillRect(0, 0, w, h);
+                const calcAo = (n) => {
+                    const el = validTimes.slice(0,n);
+                    if (el.length < n) return null;
+                    const sorted = [...el].sort((a,b)=>a-b).slice(1,-1);
+                    return sorted.reduce((a,b)=>a+b,0)/sorted.length;
+                };
+                const ao5 = calcAo(5), ao12 = calcAo(12);
 
-                // Subtle paper texture (grain dots)
-                ctx.save();
-                ctx.globalAlpha = 0.035;
-                for (let i = 0; i < 2200; i++) {
-                    ctx.fillStyle = Math.random() > 0.5 ? '#000' : '#fff';
-                    ctx.fillRect(Math.random() * w, Math.random() * h, 1.4, 1.4);
-                }
-                ctx.restore();
+                const trendData = (() => {
+                    if (validTimes.length < 20) return null;
+                    const n2 = Math.min(50, Math.floor(validTimes.length/2));
+                    const recent = validTimes.slice(0,n2), older = validTimes.slice(validTimes.length-n2);
+                    const avgR = recent.reduce((a,b)=>a+b,0)/recent.length;
+                    const avgO = older.reduce((a,b)=>a+b,0)/older.length;
+                    const diff = avgO-avgR, pct = Math.abs(diff/avgO*100);
+                    return { pct:pct.toFixed(1), direction:pct<0.5?'flat':(diff>0?'up':'down') };
+                })();
 
-                const pad = w * 0.06;
-                let y = pad;
-
-                // ── Header: logo + title ──
-                ctx.textBaseline = 'alphabetic';
-                ctx.fillStyle = '#2d2a24';
-                ctx.font = `700 ${w * 0.052}px Manrope, sans-serif`;
-                ctx.fillText('CUBE TIMER', pad, y + w * 0.05);
-
-                ctx.font = `600 ${w * 0.024}px Manrope, sans-serif`;
-                ctx.fillStyle = '#9a8f78';
-                const dateStr = new Date().toLocaleDateString(
-                    (window.settingsManager?.settings?.language === 'ru') ? 'ru-RU' : 'en-US',
-                    { year: 'numeric', month: 'long', day: 'numeric' }
-                );
-                ctx.fillText(dateStr, pad, y + w * 0.05 + w * 0.034);
-
-                y += w * 0.12;
-
-                // Discipline badge
-                if (includeDiscipline) {
-                    ctx.font = `700 ${w * 0.026}px Manrope, sans-serif`;
-                    const badgeText = disciplineLabel.toUpperCase();
-                    const badgeW = ctx.measureText(badgeText).width + w * 0.05;
-                    const badgeH = w * 0.05;
-                    this._roundRect(ctx, pad, y, badgeW, badgeH, badgeH / 2);
-                    ctx.fillStyle = '#3d3527';
-                    ctx.fill();
-                    ctx.fillStyle = '#f7f1e3';
-                    ctx.fillText(badgeText, pad + w * 0.025, y + badgeH * 0.66);
-                    y += badgeH + w * 0.04;
-                }
-
-                // ── Trend sparkline chart ──
-                if (includeTrend) {
-                    const chartH = h * (this._exportFormat === 'banner' ? 0.18 : 0.16);
-                    const chartY = y;
-                    this._roundRect(ctx, pad, chartY, w - pad * 2, chartH, w * 0.02);
-                    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-
-                    const valid = this.solves.filter(s => !s.dnf).map(s => s.time + (s.penalty || 0)).reverse();
-                    if (valid.length >= 2) {
-                        const sample = valid.length > 60
-                            ? valid.filter((_, i) => i % Math.ceil(valid.length / 60) === 0)
-                            : valid;
-                        const min = Math.min(...sample), max = Math.max(...sample);
-                        const range = (max - min) || 1;
-                        const chartPad = w * 0.025;
-                        const plotW = w - pad * 2 - chartPad * 2;
-                        const plotH = chartH - chartPad * 2;
-
-                        ctx.beginPath();
-                        sample.forEach((v, i) => {
-                            const px = pad + chartPad + (i / (sample.length - 1)) * plotW;
-                            const py = chartY + chartPad + (1 - (v - min) / range) * plotH;
-                            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-                        });
-                        ctx.strokeStyle = '#3b6ea5';
-                        ctx.lineWidth = w * 0.0045;
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.stroke();
-
-                        // Fill under line
-                        ctx.lineTo(pad + chartPad + plotW, chartY + chartH - chartPad);
-                        ctx.lineTo(pad + chartPad, chartY + chartH - chartPad);
-                        ctx.closePath();
-                        ctx.fillStyle = 'rgba(59,110,165,0.12)';
-                        ctx.fill();
-                    }
-
-                    y = chartY + chartH + w * 0.045;
-                }
-
-                // ── 4 stat cards grid (2x2) ──
-                const cardGap = w * 0.03;
-                const cardW = (w - pad * 2 - cardGap) / 2;
-                const cardH = w * (this._exportFormat === 'banner' ? 0.16 : 0.21);
+                const lang    = window.settingsManager?.settings?.language==='ru'?'ru-RU':'en-US';
+                const dateStr = new Date().toLocaleDateString(lang,{year:'numeric',month:'long',day:'numeric'});
+                const sparkData = [...solves].reverse().filter(s=>!s.dnf).map(s=>s.time+(s.penalty||0));
 
                 const cards = [];
                 if (includeBest) {
-                    cards.push({ icon: '⏱', label: 'BEST', value: best !== null ? this.formatTime(best) : '—', color: '#3b6ea5' });
-                    cards.push({ icon: '👑', label: 'BEST AO5', value: ao5 !== null ? this.formatTime(ao5) : '—', color: '#c8932f' });
+                    cards.push({label:'BEST SINGLE', value:best!==null?this.formatTime(best):'—', color:'#3b6ea5'});
+                    cards.push({label:'BEST AO5',    value:ao5!==null?this.formatTime(ao5):'—',   color:'#b07d28'});
                 }
-                if (includeTrend && trend) {
-                    const arrow = trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→';
-                    const sign  = trend.direction === 'up' ? '−' : trend.direction === 'down' ? '+' : '~';
-                    cards.push({ icon: arrow, label: 'TREND', value: `${sign}${trend.pct}%`, color: trend.direction === 'up' ? '#4c8c5c' : trend.direction === 'down' ? '#b65454' : '#8a8170' });
-                } else if (includeBest && ao12 !== null) {
-                    cards.push({ icon: 'Σ', label: 'BEST AO12', value: this.formatTime(ao12), color: '#5a8c5e' });
+                if (includeTrend && trendData) {
+                    const sign = trendData.direction==='up'?'−':trendData.direction==='down'?'+':'~';
+                    cards.push({label:'TREND', value:`${sign}${trendData.pct}%`,
+                        color:trendData.direction==='up'?'#4c8c5a':trendData.direction==='down'?'#b65454':'#8a8170'});
+                } else if (includeBest && ao12!==null) {
+                    cards.push({label:'BEST AO12', value:this.formatTime(ao12), color:'#5a8c5e'});
                 }
-                if (includeCount) {
-                    cards.push({ icon: '#', label: 'SOLVES', value: String(totalSolves), color: '#7c5ca5' });
+                if (includeCount) cards.push({label:'SOLVES', value:String(totalSolves), color:'#7c5ca5'});
+                const finalCards = cards.slice(0,4);
+
+                this._exportWoodBg(ctx,w,h);
+
+                if (this._exportFormat==='wide') {
+                    this._exportWide(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData});
+                } else {
+                    this._exportVertical(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData});
                 }
-
-                // Trim/pad to exactly 4 slots for clean grid
-                const finalCards = cards.slice(0, 4);
-
-                finalCards.forEach((card, i) => {
-                    const col = i % 2, row = Math.floor(i / 2);
-                    const cx = pad + col * (cardW + cardGap);
-                    const cy = y + row * (cardH + cardGap);
-
-                    this._roundRect(ctx, cx, cy, cardW, cardH, w * 0.018);
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(0,0,0,0.07)';
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-
-                    // Icon
-                    ctx.font = `700 ${cardW * 0.16}px Manrope, sans-serif`;
-                    ctx.fillStyle = card.color;
-                    ctx.fillText(card.icon, cx + cardW * 0.08, cy + cardH * 0.32);
-
-                    // Label
-                    ctx.font = `700 ${cardW * 0.075}px Manrope, sans-serif`;
-                    ctx.fillStyle = '#9a8f78';
-                    ctx.fillText(card.label, cx + cardW * 0.08, cy + cardH * 0.58);
-
-                    // Value
-                    ctx.font = `800 ${cardW * 0.16}px Manrope, sans-serif`;
-                    ctx.fillStyle = '#2d2a24';
-                    ctx.fillText(card.value, cx + cardW * 0.08, cy + cardH * 0.86);
-                });
-
-                const gridRows = Math.ceil(finalCards.length / 2);
-                y += gridRows * cardH + (gridRows - 1) * cardGap + w * 0.05;
-
-                // ── Footer stamp (bottom right) ──
-                const stampR = w * 0.075;
-                const stampCx = w - pad - stampR;
-                const stampCy = h - pad - stampR * (this._exportFormat === 'banner' ? 0.6 : 1);
-
-                ctx.save();
-                ctx.globalAlpha = 0.5;
-                ctx.strokeStyle = '#b5462f';
-                ctx.lineWidth = w * 0.0035;
-                ctx.beginPath();
-                ctx.arc(stampCx, stampCy, stampR, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(stampCx, stampCy, stampR * 0.78, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Mini cube icon inside stamp
-                ctx.fillStyle = '#b5462f';
-                ctx.font = `700 ${stampR * 0.7}px Manrope, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.fillText('◆', stampCx, stampCy + stampR * 0.25);
-                ctx.textAlign = 'left';
-                ctx.restore();
-
-                // ── Footer text (bottom left) ──
-                ctx.font = `600 ${w * 0.02}px Manrope, sans-serif`;
-                ctx.fillStyle = '#9a8f78';
-                ctx.fillText('Made with Cube Timer', pad, h - pad * 0.5);
             }
 
-            _roundRect(ctx, x, y, w, h, r) {
+            _exportWoodBg(ctx,w,h) {
+                const bg=ctx.createLinearGradient(0,0,w,h);
+                bg.addColorStop(0,'#5c3d1e'); bg.addColorStop(0.35,'#4a2f12');
+                bg.addColorStop(0.65,'#5c3d1e'); bg.addColorStop(1,'#3d2409');
+                ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+                ctx.save(); ctx.globalAlpha=0.18;
+                for(let i=0;i<55;i++){
+                    const x0=Math.random()*w; let cx=x0;
+                    ctx.beginPath(); ctx.moveTo(x0,0);
+                    for(let seg=0;seg<8;seg++){cx+=(Math.random()-.5)*28;ctx.lineTo(cx,h/8*seg);}
+                    ctx.strokeStyle=Math.random()>.5?'#2a1505':'#7a5228';
+                    ctx.lineWidth=Math.random()*3+0.5; ctx.stroke();
+                }
+                ctx.globalAlpha=0.055;
+                for(let i=0;i<2000;i++){
+                    ctx.fillStyle=Math.random()>.5?'#000':'#fff';
+                    ctx.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);
+                }
+                ctx.restore();
+                const vig=ctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,h*0.85);
+                vig.addColorStop(0,'rgba(0,0,0,0)'); vig.addColorStop(1,'rgba(0,0,0,0.45)');
+                ctx.fillStyle=vig; ctx.fillRect(0,0,w,h);
+            }
+
+            _exportPaper(ctx,x,y,w,h,angle=0) {
+                ctx.save();
+                ctx.translate(x+w/2,y+h/2); ctx.rotate(angle);
+                const ox=-w/2,oy=-h/2;
+                ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=28; ctx.shadowOffsetX=5; ctx.shadowOffsetY=10;
+                this._roundRect(ctx,ox,oy,w,h,8);
+                const pg=ctx.createLinearGradient(ox,oy,ox+w,oy+h);
+                pg.addColorStop(0,'#f8f2e4'); pg.addColorStop(1,'#ede4ce');
+                ctx.fillStyle=pg; ctx.fill();
+                ctx.shadowColor='transparent';
+                ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=1.5; ctx.stroke();
+                ctx.globalAlpha=0.055; ctx.strokeStyle='#8b7355'; ctx.lineWidth=1;
+                for(let ly=oy+45;ly<oy+h-12;ly+=30){
+                    ctx.beginPath(); ctx.moveTo(ox+14,ly); ctx.lineTo(ox+w-14,ly); ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            _exportPin(ctx,x,y,color,scale=1) {
+                const r=Math.round(scale*13);
+                const lc=(hex,a)=>{const r2=parseInt(hex.slice(1,3),16),g2=parseInt(hex.slice(3,5),16),b2=parseInt(hex.slice(5,7),16);return `rgb(${Math.min(255,r2+a)},${Math.min(255,g2+a)},${Math.min(255,b2+a)})`;};
+                const dc=(hex,a)=>{const r2=parseInt(hex.slice(1,3),16),g2=parseInt(hex.slice(3,5),16),b2=parseInt(hex.slice(5,7),16);return `rgb(${Math.max(0,r2-a)},${Math.max(0,g2-a)},${Math.max(0,b2-a)})`;};
+                ctx.save();
+                ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=10; ctx.shadowOffsetY=4;
+                const g=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.08,x,y,r);
+                g.addColorStop(0,lc(color,50)); g.addColorStop(0.6,color); g.addColorStop(1,dc(color,35));
+                ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+                ctx.shadowColor='transparent';
+                ctx.beginPath(); ctx.arc(x-r*.3,y-r*.3,r*.3,0,Math.PI*2);
+                ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fill();
+                ctx.shadowColor='rgba(0,0,0,0.35)'; ctx.shadowBlur=5; ctx.shadowOffsetY=2;
+                ctx.beginPath(); ctx.moveTo(x-r*.15,y+r*.7); ctx.lineTo(x+r*.15,y+r*.7); ctx.lineTo(x,y+r*2.3); ctx.closePath();
+                ctx.fillStyle='rgba(60,40,20,0.75)'; ctx.fill();
+                ctx.restore();
+            }
+
+            _exportSpark(ctx,x,y,w,h,data) {
+                ctx.save(); ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
+                if (data.length<2){ctx.restore();return;}
+                const s=data.length>75?data.filter((_,i)=>i%Math.ceil(data.length/75)===0):data;
+                const mn=Math.min(...s),mx=Math.max(...s),rng=(mx-mn)||1;
+                const cp=Math.round(Math.min(w,h)*0.09);
+                const pw=w-cp*2,ph=h-cp*2;
+                const fy=y+cp+(1-(s[0]-mn)/rng)*ph;
+                const ly2=y+cp+(1-(s[s.length-1]-mn)/rng)*ph;
+                ctx.setLineDash([6,6]); ctx.strokeStyle='rgba(59,110,165,0.2)'; ctx.lineWidth=1.5;
+                ctx.beginPath(); ctx.moveTo(x+cp,fy); ctx.lineTo(x+cp+pw,ly2); ctx.stroke();
+                ctx.setLineDash([]);
                 ctx.beginPath();
-                ctx.moveTo(x + r, y);
-                ctx.arcTo(x + w, y, x + w, y + h, r);
-                ctx.arcTo(x + w, y + h, x, y + h, r);
-                ctx.arcTo(x, y + h, x, y, r);
-                ctx.arcTo(x, y, x + w, y, r);
-                ctx.closePath();
+                s.forEach((v,i)=>{
+                    const px2=x+cp+(i/(s.length-1))*pw,py=y+cp+(1-(v-mn)/rng)*ph;
+                    i===0?ctx.moveTo(px2,py):ctx.lineTo(px2,py);
+                });
+                ctx.strokeStyle='#3b6ea5';
+                ctx.lineWidth=Math.max(2.5,Math.round(Math.min(w,h)*0.015));
+                ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke();
+                ctx.lineTo(x+cp+pw,y+h-cp); ctx.lineTo(x+cp,y+h-cp); ctx.closePath();
+                ctx.fillStyle='rgba(59,110,165,0.08)'; ctx.fill();
+                ctx.font=`500 ${Math.round(Math.min(w,h)*0.08)}px Georgia,serif`;
+                ctx.fillStyle='rgba(90,75,55,0.55)';
+                ctx.textBaseline='bottom'; ctx.textAlign='right';
+                ctx.fillText(mn.toFixed(2),x+w-cp*.3,y+h-2);
+                ctx.textBaseline='top'; ctx.textAlign='left';
+                ctx.fillText(mx.toFixed(2),x+cp*.3,y+4);
+                ctx.restore();
+            }
+
+            _exportStatOnPaper(ctx,x,y,w,h,label,value,color) {
+                const dotR=Math.round(w*0.038);
+                ctx.beginPath(); ctx.arc(x+Math.round(w*0.1),y+h*0.26,dotR,0,Math.PI*2);
+                ctx.fillStyle=color; ctx.fill();
+                ctx.textBaseline='alphabetic';
+                ctx.font=`600 ${Math.round(w*0.098)}px 'Inter',sans-serif`;
+                ctx.fillStyle='#8a7560';
+                ctx.fillText(label,x+Math.round(w*0.08),y+h*0.53);
+                let fSz=Math.round(w*0.2);
+                ctx.font=`700 ${fSz}px Georgia,'Times New Roman',serif`;
+                const maxW2=w*0.84;
+                while(ctx.measureText(value).width>maxW2&&fSz>w*0.09){fSz--;ctx.font=`700 ${fSz}px Georgia,serif`;}
+                ctx.fillStyle='#2b2519'; ctx.fillText(value,x+Math.round(w*0.08),y+h*0.84);
+            }
+
+            _exportHeader(ctx,x,y,disciplineLabel,dateStr,includeDiscipline,scale) {
+                const s=scale;
+                ctx.textBaseline='alphabetic';
+                ctx.font=`700 ${Math.round(55*s)}px Georgia,serif`;
+                ctx.fillStyle='#2b2519';
+                ctx.fillText('CUBE TIMER',x,y+Math.round(50*s));
+                ctx.font=`400 ${Math.round(24*s)}px 'Inter',sans-serif`;
+                ctx.fillStyle='#9a8060';
+                ctx.fillText(dateStr,x,y+Math.round(50*s)+Math.round(34*s));
+                let nextY=y+Math.round(50*s)+Math.round(34*s)+Math.round(22*s);
+                if (includeDiscipline) {
+                    const bSz=Math.round(27*s);
+                    ctx.font=`600 ${bSz}px 'Inter',sans-serif`;
+                    const bt=disciplineLabel.toUpperCase();
+                    const bw=ctx.measureText(bt).width+Math.round(58*s),bh=Math.round(52*s);
+                    this._roundRect(ctx,x,nextY,bw,bh,bh/2);
+                    ctx.fillStyle='#2b2519'; ctx.fill();
+                    ctx.fillStyle='#f0e8d5'; ctx.fillText(bt,x+Math.round(29*s),nextY+bh*.67);
+                    nextY+=bh+Math.round(20*s);
+                }
+                return nextY;
+            }
+
+            _exportStamp(ctx,cx,cy,r) {
+                ctx.save(); ctx.globalAlpha=0.5;
+                ctx.strokeStyle='#8b3a22'; ctx.lineWidth=Math.round(r*0.09);
+                ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(cx,cy,r*0.74,0,Math.PI*2); ctx.stroke();
+                for(let i=0;i<10;i++){
+                    const a=(i/10)*Math.PI*2;
+                    ctx.beginPath(); ctx.arc(cx+Math.cos(a)*r*.87,cy+Math.sin(a)*r*.87,r*.038,0,Math.PI*2);
+                    ctx.fillStyle='#8b3a22'; ctx.fill();
+                }
+                ctx.globalAlpha=0.6;
+                ctx.font=`700 ${Math.round(r*.52)}px Georgia,serif`;
+                ctx.fillStyle='#8b3a22'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText('\u25C8',cx,cy);
+                ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+                ctx.restore();
+            }
+
+            _exportVertical(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData}) {
+                const pad=Math.round(w*0.065);
+                const pinColors=['#c0392b','#27ae60','#8e44ad','#2980b9'];
+                const mainH=h>w?Math.round(h*0.46):Math.round(h*0.4);
+                this._exportPaper(ctx,pad,Math.round(h*0.04),w-pad*2,mainH,-0.007);
+                this._exportPin(ctx,w/2,Math.round(h*0.04)+10,'#c0392b',w/800);
+                const innerX=pad+Math.round(w*0.055);
+                const headTopY=Math.round(h*0.04)+Math.round(w*0.045);
+                const afterH=this._exportHeader(ctx,innerX,headTopY,disciplineLabel,dateStr,includeDiscipline,w/800);
+                if (includeTrend) {
+                    const chartY=afterH+Math.round(w*0.02);
+                    const chartH=mainH-(chartY-Math.round(h*0.04))-Math.round(w*0.04);
+                    this._exportSpark(ctx,innerX,chartY,w-pad*2-Math.round(w*0.11),chartH,sparkData);
+                }
+                const statsTop=Math.round(h*0.04)+mainH+Math.round(h*0.03);
+                const gap=Math.round(w*0.04);
+                const cw=Math.floor((w-pad*2-gap)/2);
+                const ch=h>w?Math.round(h*0.165):Math.round(h*0.2);
+                const angles=[-0.015,0.01,0.012,-0.008];
+                finalCards.forEach((card,i)=>{
+                    const col=i%2,row=Math.floor(i/2);
+                    const cx2=pad+col*(cw+gap),cy2=statsTop+row*(ch+Math.round(h*0.025));
+                    this._exportPaper(ctx,cx2,cy2,cw,ch,angles[i]||0);
+                    this._exportPin(ctx,cx2+cw/2,cy2+10,pinColors[i],w/800);
+                    this._exportStatOnPaper(ctx,cx2,cy2,cw,ch,card.label,card.value,card.color);
+                });
+                const sR=Math.round(w*0.052);
+                this._exportStamp(ctx,w-pad-sR,h-pad-sR,sR);
+                ctx.font=`400 ${Math.round(w*0.019)}px 'Inter',sans-serif`;
+                ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
+                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.38));
+            }
+
+            _exportWide(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData}) {
+                const pad=Math.round(h*0.08);
+                const pinColors=['#c0392b','#27ae60','#8e44ad','#2980b9'];
+                const lpW=Math.round(w*0.43),lpH=h-pad*2;
+                this._exportPaper(ctx,pad,pad,lpW,lpH,-0.007);
+                this._exportPin(ctx,pad+lpW/2,pad+10,'#c0392b',h/700);
+                const innerX=pad+Math.round(h*0.07);
+                const afterH=this._exportHeader(ctx,innerX,pad+Math.round(h*0.09),disciplineLabel,dateStr,includeDiscipline,h/700);
+                if (includeTrend) {
+                    const chartY=afterH+Math.round(h*0.03);
+                    const chartH=lpH-(chartY-pad)-Math.round(h*0.07);
+                    this._exportSpark(ctx,innerX,chartY,lpW-Math.round(h*0.14),chartH,sparkData);
+                }
+                const rStart=pad+lpW+pad;
+                const rW=w-rStart-pad;
+                const gap=Math.round(h*0.04);
+                const cw=Math.floor((rW-gap)/2),ch=Math.floor((lpH-gap)/2);
+                const angles=[-0.014,0.011,0.013,-0.009];
+                finalCards.forEach((card,i)=>{
+                    const col=i%2,row=Math.floor(i/2);
+                    const cx2=rStart+col*(cw+gap),cy2=pad+row*(ch+gap);
+                    this._exportPaper(ctx,cx2,cy2,cw,ch,angles[i]||0);
+                    this._exportPin(ctx,cx2+cw/2,cy2+10,pinColors[i],h/700);
+                    this._exportStatOnPaper(ctx,cx2,cy2,cw,ch,card.label,card.value,card.color);
+                });
+                const sR=Math.round(h*0.048);
+                this._exportStamp(ctx,w-pad*.6-sR,h-pad*.6-sR,sR);
+                ctx.font=`400 ${Math.round(h*0.022)}px 'Inter',sans-serif`;
+                ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
+                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.28));
+            }
+
+            _roundRect(ctx,x,y,w,h,r) {
+                ctx.beginPath();
+                ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+                ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+                ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
             }
 
             _downloadExportCard() {
-                const canvas = document.getElementById('exportImgCanvas');
+                const canvas=document.getElementById('exportImgCanvas');
                 if (!canvas) return;
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    const session = this.sessions[this.currentSessionId];
-                    const name = (session?.name || 'session').replace(/[^a-z0-9а-яё]+/gi, '_');
-                    a.href = url;
-                    a.download = `cubetimer_${name}_${Date.now()}.png`;
-                    document.body.appendChild(a);
-                    a.click();
+                canvas.toBlob((blob)=>{
+                    const url=URL.createObjectURL(blob);
+                    const a=document.createElement('a');
+                    const sid=this._exportSessionId||this.currentSessionId;
+                    const session=this.sessions[sid];
+                    const name=(session?.name||'session').replace(/[^a-z0-9а-яё]+/gi,'_');
+                    a.href=url; a.download=`cubetimer_${name}_${Date.now()}.png`;
+                    document.body.appendChild(a); a.click();
                     document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(url), 1000);
-                }, 'image/png');
+                    setTimeout(()=>URL.revokeObjectURL(url),1000);
+                },'image/png');
             }
+
 
             renderSubsessionStats() {
                 const session = this.sessions[this.currentSessionId];
