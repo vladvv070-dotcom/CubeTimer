@@ -7064,6 +7064,90 @@
             padding: 1rem;
         }
 
+        /* ─── csTimer Import Results ─── */
+        .cst-import-bar-track {
+            width: 100%;
+            height: 14px;
+            border-radius: 999px;
+            background: rgba(239, 68, 68, 0.25);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .cst-import-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+            border-radius: 999px;
+            transition: width 0.6s ease;
+        }
+
+        .cst-import-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .cst-import-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        body:not(.light-theme) .cst-import-stat {
+            color: #e8edf4;
+        }
+
+        .cst-import-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .cst-import-dot.ok { background: #22c55e; }
+        .cst-import-dot.skip { background: #ef4444; }
+
+        .cst-import-sessions {
+            max-height: 180px;
+            overflow-y: auto;
+            border-radius: 12px;
+            background: rgba(120, 130, 160, 0.08);
+            padding: 0.25rem 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .cst-import-session-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.55rem 0.9rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+
+        body:not(.light-theme) .cst-import-session-row {
+            color: #9aa7c2;
+        }
+
+        .cst-import-session-row .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cst-import-session-row .count {
+            flex-shrink: 0;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
         .new-session-overlay.visible {
             display: flex;
         }

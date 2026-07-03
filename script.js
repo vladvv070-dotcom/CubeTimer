@@ -1980,6 +1980,10 @@
                 exportJSON: 'Export JSON',
                 exportCSV: 'Export CSV',
                 importData: 'Import',
+                importCstimer: 'Import from csTimer',
+                cstImportTitle: 'csTimer Import Complete',
+                cstImportedLabel: 'imported',
+                cstSkippedLabel: 'skipped',
                 
                 // Settings
                 settingsTitle: 'Settings',
@@ -2152,6 +2156,10 @@
                 exportJSON: 'Экспорт JSON',
                 exportCSV: 'Экспорт CSV',
                 importData: 'Импорт',
+                importCstimer: 'Импорт из csTimer',
+                cstImportTitle: 'Импорт из csTimer завершён',
+                cstImportedLabel: 'перенесено',
+                cstSkippedLabel: 'пропущено',
                 
                 // Settings
                 settingsTitle: 'Настройки',
@@ -2357,9 +2365,13 @@
                 const exportJsonBtn = document.querySelector('#exportJsonBtn');
                 const exportCsvBtn = document.querySelector('#exportCsvBtn');
                 const importBtn = document.querySelector('#importBtn');
+                const importCstimerBtn = document.querySelector('#importCstimerBtn');
+                const importCstimerDataBtn = document.querySelector('#importCstimerDataBtn');
                 if (exportJsonBtn) exportJsonBtn.textContent = t.exportJSON;
                 if (exportCsvBtn) exportCsvBtn.textContent = t.exportCSV;
                 if (importBtn) importBtn.textContent = t.importData;
+                if (importCstimerBtn) importCstimerBtn.textContent = t.importCstimer;
+                if (importCstimerDataBtn) importCstimerDataBtn.textContent = t.importCstimer;
                 
                 // Left column
                 const lastSolvesTitle = document.querySelector('.left-column .card-title');
@@ -3785,6 +3797,16 @@
                     });
                 }
 
+                // Import from csTimer
+                const importCstimerDataBtn = document.getElementById('importCstimerDataBtn');
+                if (importCstimerDataBtn) {
+                    importCstimerDataBtn.addEventListener('click', () => {
+                        if (window.timer) {
+                            window.timer.importFromCstimer();
+                        }
+                    });
+                }
+
                 // Reset Data
                 document.getElementById('resetDataBtn').addEventListener('click', () => {
                     if (confirm('Are you sure? This will delete all solves in the current session.')) {
@@ -4120,6 +4142,17 @@
                 document.getElementById('importBtn').addEventListener('click', () => {
                     this.importData();
                 });
+
+                document.getElementById('importCstimerBtn').addEventListener('click', () => {
+                    this.importFromCstimer();
+                });
+
+                const cstImportCloseBtn = document.getElementById('cstImportCloseBtn');
+                if (cstImportCloseBtn) {
+                    cstImportCloseBtn.addEventListener('click', () => {
+                        document.getElementById('cstImportOverlay').classList.remove('visible');
+                    });
+                }
             }
 
             handleSpaceDown() {
@@ -6617,27 +6650,79 @@
                 }
             }
 
+            // Parses time entered in the Edit prompt. Accepts:
+            //   "DNF"           -> DNF
+            //   "15.68"         -> 15.68s (explicit decimal, comma also accepted: "15,68")
+            //   "1:02.36"       -> 62.36s (explicit mm:ss.xx)
+            //   "1568"          -> 15.68s (digits only: last 2 = hundredths, next 2 = seconds, rest = minutes)
+            //   "10236"         -> 1:02.36 = 62.36s (same rule, just more digits)
+            // This mirrors csTimer's own digit-entry convention, so it should feel
+            // familiar to anyone migrating from there — no need to type separators.
+            _parseTimeInput(input) {
+                if (input === null) return null;
+                let str = input.trim();
+                if (str === '') return null;
+                if (str.toUpperCase() === 'DNF') return { dnf: true, time: 0 };
+
+                // Normalize comma decimal separator
+                str = str.replace(',', '.');
+
+                let totalSeconds = null;
+
+                if (str.includes(':')) {
+                    // Explicit m:ss.xx (or h:mm:ss.xx) format
+                    const parts = str.split(':');
+                    const secPart = parseFloat(parts.pop());
+                    if (isNaN(secPart)) return null;
+                    let minutes = 0;
+                    for (const p of parts) {
+                        const n = parseInt(p, 10);
+                        if (isNaN(n)) return null;
+                        minutes = minutes * 60 + n;
+                    }
+                    totalSeconds = minutes * 60 + secPart;
+                } else if (str.includes('.')) {
+                    // Explicit decimal seconds, e.g. "15.68"
+                    const n = parseFloat(str);
+                    if (isNaN(n)) return null;
+                    totalSeconds = n;
+                } else if (/^\d+$/.test(str)) {
+                    // Pure digits, no separators: csTimer-style digit entry.
+                    const digits = str;
+                    const hundredths = parseInt(digits.slice(-2).padStart(2, '0'), 10);
+                    let rest = digits.slice(0, -2);
+                    const seconds = parseInt((rest.slice(-2) || '0').padStart(2, '0'), 10);
+                    rest = rest.slice(0, -2);
+                    const minutes = rest ? parseInt(rest, 10) : 0;
+                    totalSeconds = minutes * 60 + seconds + hundredths / 100;
+                } else {
+                    return null;
+                }
+
+                if (totalSeconds === null || isNaN(totalSeconds) || totalSeconds <= 0) return null;
+                return { dnf: false, time: totalSeconds };
+            }
+
             editSolve() {
                 if (this.solves.length === 0) return;
                 
                 const currentSession = this.sessions[this.currentSessionId];
                 const currentTime = currentSession.solves[0].dnf ? 'DNF' : this.formatTime(currentSession.solves[0].time);
-                const newTime = prompt('Enter new time (seconds) or DNF:', currentTime);
+                const newTime = prompt('Enter new time (e.g. 15.68, 1:02.36, or just 1568) or DNF:', currentTime);
                 
                 if (newTime !== null) {
-                    if (newTime.trim().toUpperCase() === 'DNF') {
+                    const parsed = this._parseTimeInput(newTime);
+                    if (!parsed) {
+                        alert('Invalid time format');
+                        return;
+                    }
+                    if (parsed.dnf) {
                         currentSession.solves[0].dnf = true;
                         currentSession.solves[0].penalty = null;
                     } else {
-                        const parsed = parseFloat(newTime);
-                        if (!isNaN(parsed) && parsed > 0) {
-                            currentSession.solves[0].time = parsed;
-                            currentSession.solves[0].dnf = false;
-                            currentSession.solves[0].penalty = null;
-                        } else {
-                            alert('Invalid time format');
-                            return;
-                        }
+                        currentSession.solves[0].time = parsed.time;
+                        currentSession.solves[0].dnf = false;
+                        currentSession.solves[0].penalty = null;
                     }
                     this.hideNewBestIndicator();
                     this.saveSessions();
@@ -6757,10 +6842,192 @@
                 }
             }
 
+            // ─── csTimer Import ──────────────────────────────
+            // csTimer's "Export All Data" produces a .txt file that is actually JSON:
+            //   { "properties": {...settings incl. sessionData...}, "session1": [...], "session2": [...], ... }
+            // Each solve entry is: [[penalty, timeMs], scramble, comment, unixTimestampSeconds]
+            //   penalty: 0 = no penalty, 2000 = +2, -1 = DNF
+            // In the wild, "properties" and "sessionData" have been seen both as plain objects
+            // and as JSON-encoded strings depending on export path, so we parse defensively.
+            _cstMaybeParse(v) {
+                if (typeof v !== 'string') return v;
+                try { return JSON.parse(v); } catch (e) { return v; }
+            }
+
+            _cstScrambleTypeToDiscipline(scrType) {
+                const map = {
+                    '222': '2x2', '222so': '2x2', '222o': '2x2',
+                    '333': '3x3', '333ni': '3x3', '333fm': '3x3', '333oh': '3x3', '333custom': '3x3',
+                    '444': '4x4', '444bld': '4x4', '444wca': '4x4', '444ni': '4x4',
+                    '555': '5x5', '555wca': '5x5', '555ni': '5x5',
+                    '666': '6x6', '777': '7x7',
+                    'pyram': 'pyraminx', 'skewb': 'skewb',
+                    'minx': 'megaminx', 'mgmp': 'megaminx'
+                };
+                return map[scrType] || null; // null = no exact match in our discipline list
+            }
+
+            _cstParseSolve(raw) {
+                if (!Array.isArray(raw) || raw.length < 2) return null;
+                const first = raw[0];
+                const [pen, timeMs] = Array.isArray(first) ? first : [0, first];
+                if (typeof timeMs !== 'number' || isNaN(timeMs)) return null;
+
+                const scramble = typeof raw[1] === 'string' ? raw[1].trim() : '';
+                const ts = (typeof raw[3] === 'number' && raw[3] > 0) ? raw[3] * 1000 : Date.now();
+                const dnf = pen === -1;
+                const penalty = (!dnf && pen > 0) ? pen / 1000 : null;
+
+                return {
+                    id: `s_cst_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                    time: Math.max(0, timeMs) / 1000,
+                    timestamp: ts,
+                    scramble,
+                    penalty,
+                    dnf
+                };
+            }
+
+            importFromCstimer() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                // No `accept` filter on purpose: some Android file-picker apps (MIUI etc.)
+                // switch to a media-gallery view and hide non-media files entirely when
+                // given a broad accept list. Leaving it unset forces the plain file
+                // browser everywhere. Content is validated after reading (JSON.parse below).
+
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+
+                    reader.onload = (event) => {
+                        try {
+                            const raw = String(event.target.result).replace(/^\uFEFF/, '');
+                            const data = JSON.parse(raw);
+
+                            // Session metadata (name + scramble type), if present
+                            let sessionMeta = {};
+                            const props = this._cstMaybeParse(data.properties);
+                            if (props && props.sessionData) {
+                                sessionMeta = this._cstMaybeParse(props.sessionData) || {};
+                            }
+
+                            const sessionKeyRe = /^session(\d+)$/;
+                            const newSessionIds = [];
+                            const sessionBreakdown = []; // [{name, count}] for the results modal
+                            let importedSessions = 0, importedSolves = 0, skipped = 0;
+
+                            for (const key of Object.keys(data)) {
+                                const m = key.match(sessionKeyRe);
+                                if (!m) continue;
+                                const num = m[1];
+
+                                const rawSolves = this._cstMaybeParse(data[key]);
+                                if (!Array.isArray(rawSolves) || rawSolves.length === 0) continue;
+
+                                const meta = sessionMeta[num] || {};
+                                const name = meta.name || `Session ${num}`;
+                                const scrType = (meta.opt && meta.opt.scrType) || '333';
+                                const discipline = this._cstScrambleTypeToDiscipline(scrType) || '3x3';
+                                const unmapped = !this._cstScrambleTypeToDiscipline(scrType);
+
+                                const solves = [];
+                                let sessionSkipped = 0;
+                                for (const rawSolve of rawSolves) {
+                                    const s = this._cstParseSolve(rawSolve);
+                                    if (s) { solves.push(s); importedSolves++; }
+                                    else { skipped++; sessionSkipped++; }
+                                }
+                                if (solves.length === 0) continue;
+
+                                // Newest-first, matching this app's convention (regardless of csTimer's original order)
+                                solves.sort((a, b) => b.timestamp - a.timestamp);
+
+                                const fullName = `csTimer: ${name}${unmapped ? ` [${scrType}]` : ''}`;
+                                const id = `session-cst-${num}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                                this.sessions[id] = {
+                                    id,
+                                    name: fullName,
+                                    solves,
+                                    isDefault: false,
+                                    discipline,
+                                    createdAt: Date.now()
+                                };
+                                newSessionIds.push(id);
+                                sessionBreakdown.push({ name: fullName, count: solves.length, skipped: sessionSkipped });
+                                importedSessions++;
+                            }
+
+                            if (importedSessions === 0) {
+                                alert('No valid csTimer session data found in this file.');
+                                return;
+                            }
+
+                            this.currentSessionId = newSessionIds[0];
+                            this.saveSessions();
+                            this.updateUI();
+                            this.updateSessionDropdown();
+
+                            this._showCstImportResult({ imported: importedSolves, skipped, sessions: sessionBreakdown });
+                        } catch (error) {
+                            alert('Error importing csTimer data: ' + error.message);
+                        }
+                    };
+
+                    reader.readAsText(file);
+                };
+
+                input.click();
+            }
+
+            // Shows the csTimer import summary modal: a progress bar of imported vs
+            // skipped solves, plus a per-session breakdown.
+            _showCstImportResult({ imported, skipped, sessions }) {
+                const overlay = document.getElementById('cstImportOverlay');
+                if (!overlay) return; // fallback safety, shouldn't happen
+
+                const total = imported + skipped;
+                const pct = total > 0 ? Math.round((imported / total) * 100) : 100;
+                const lang = window.settingsManager?.settings?.language || 'en';
+                const t = translations[lang] || translations.en;
+
+                document.getElementById('cstImportBarFill').style.width = pct + '%';
+                document.getElementById('cstImportOkLabel').textContent =
+                    `${imported} ${t.cstImportedLabel || 'imported'}`;
+
+                const skipRow = document.getElementById('cstImportSkipRow');
+                if (skipped > 0) {
+                    skipRow.style.display = 'flex';
+                    document.getElementById('cstImportSkipLabel').textContent =
+                        `${skipped} ${t.cstSkippedLabel || 'skipped'}`;
+                } else {
+                    skipRow.style.display = 'none';
+                }
+
+                const list = document.getElementById('cstImportSessionsList');
+                list.innerHTML = sessions.map(s => `
+                    <div class="cst-import-session-row">
+                        <span class="name">${this._escapeHtml(s.name)}</span>
+                        <span class="count">+${s.count}</span>
+                    </div>
+                `).join('');
+
+                document.getElementById('cstImportTitle').textContent = t.cstImportTitle || 'csTimer Import Complete';
+                overlay.classList.add('visible');
+            }
+
+            _escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+
             importData() {
                 const input = document.createElement('input');
                 input.type = 'file';
-                input.accept = '.json';
+                input.accept = '.json,application/json';
                 
                 input.onchange = (e) => {
                     const file = e.target.files[0];
