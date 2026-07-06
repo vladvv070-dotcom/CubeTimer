@@ -511,6 +511,121 @@
             z-index: 1;
         }
 
+        /* ─── Target Time & Honest Mode pills ─── */
+        .header-pills {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+
+        .header-pills-mobile {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .target-time-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(120, 130, 160, 0.25);
+            background: rgba(120, 130, 160, 0.08);
+            color: var(--text-muted);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        /* On mobile the header is too tight for the centered pill group (it lands
+           on the session dropdown), so a second copy lives right above the timer
+           instead. Only one set is ever visible at a given width. */
+        .target-time-btn-mobile {
+            display: none;
+        }
+
+        .target-time-btn:hover {
+            background: rgba(120, 130, 160, 0.15);
+        }
+
+        .target-time-btn.active {
+            border-color: rgba(74, 158, 255, 0.5);
+            background: rgba(74, 158, 255, 0.12);
+            color: #4a9eff;
+        }
+
+        /* Honest Mode uses green ("truth") instead of Target Time's blue when active */
+        .honest-mode-btn.active {
+            border-color: rgba(74, 222, 128, 0.5);
+            background: rgba(74, 222, 128, 0.14);
+            color: #22c55e;
+        }
+
+        .target-time-goal-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.03em;
+            margin-top: 0.35rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Honest Mode modal */
+        .hm-desc {
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: var(--text-muted);
+            margin: 0 0 1rem;
+        }
+
+        .hm-countdown {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            color: #22c55e;
+            margin: 0.5rem 0 1.25rem;
+        }
+
+        /* Solve History: colors the time cell green/red based on whether that
+           solve met the Target Time goal that was active when it was recorded. */
+        .sh-target-met {
+            color: #22c55e !important;
+        }
+
+        .sh-target-missed {
+            color: #ef4444 !important;
+        }
+
+        .tt-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Timer display flashes this color right after a solve, showing whether
+           the Target Time goal was met (green) or missed (red). Cleared on next hold. */
+        .timer-display.target-met {
+            color: #22c55e !important;
+        }
+
+        .timer-display.target-missed {
+            color: #ef4444 !important;
+        }
+
         /* Right Column */
         .right-column {
             display: flex;
@@ -3662,6 +3777,18 @@
 
             .header-btn span:last-child {
                 display: none !important;
+            }
+
+            .header-pills {
+                display: none !important;
+            }
+
+            .header-pills-mobile {
+                display: flex !important;
+            }
+
+            .target-time-btn-mobile {
+                display: inline-flex !important;
             }
 
             .session-select {
@@ -7148,6 +7275,90 @@
             color: #22c55e;
         }
 
+        /* Warnings list: "Session X (Puzzle) is marked as 3x3" style messages */
+        .cst-import-warnings {
+            max-height: 140px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .cst-import-warning-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.8rem;
+            line-height: 1.35;
+            color: #b45309;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+        }
+
+        body:not(.light-theme) .cst-import-warning-row {
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.12);
+        }
+
+        /* ─── Import / Export menu ─── */
+        .ie-modal {
+            max-width: 420px;
+        }
+
+        .ie-section {
+            margin-bottom: 1.1rem;
+        }
+
+        .ie-section-title {
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .ie-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .ie-menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border-radius: 10px;
+            border: 1px solid rgba(120, 130, 160, 0.18);
+            background: rgba(120, 130, 160, 0.06);
+            color: var(--text-primary);
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+
+        .ie-menu-item:hover {
+            background: rgba(74, 158, 255, 0.12);
+            border-color: rgba(74, 158, 255, 0.4);
+        }
+
+        .ie-menu-sub {
+            font-weight: 500;
+            opacity: 0.6;
+            font-size: 0.82em;
+        }
+
+        .ie-arrow {
+            opacity: 0.4;
+            font-size: 1.1rem;
+        }
+
         .new-session-overlay.visible {
             display: flex;
         }
@@ -7437,6 +7648,10 @@
                 min-width: unset !important;
             }
             .header-btn span:last-child { display: inline !important; }
+            .target-time-btn span:last-child { display: inline !important; }
+            .header-pills { display: flex !important; }
+            .header-pills-mobile { display: none !important; }
+            .target-time-btn-mobile { display: none !important; }
             .session-select {
                 min-width: 180px !important;
                 max-width: unset !important;

@@ -47,6 +47,17 @@
                 <h1 class="site-title">CUBE TIMER</h1>
             </div>
             
+            <div class="header-pills">
+                <button class="target-time-btn" id="targetTimeBtn">
+                    <span>🎯</span>
+                    <span id="targetTimeBtnLabel">Target Time</span>
+                </button>
+                <button class="target-time-btn honest-mode-btn" id="honestModeBtn">
+                    <span>🟢</span>
+                    <span id="honestModeBtnLabel">Honest Mode</span>
+                </button>
+            </div>
+
             <div class="header-controls">
                 <select class="session-select" id="sessionSelect">
                     <option value="speedcubing">Speedcubing</option>
@@ -140,11 +151,22 @@
             <!-- Center Column - Timer -->
             <div class="center-column">
                 <div class="timer-container">
+                    <div class="header-pills-mobile">
+                        <button class="target-time-btn target-time-btn-mobile" id="targetTimeBtnMobile">
+                            <span>🎯</span>
+                            <span id="targetTimeBtnLabelMobile">Target Time</span>
+                        </button>
+                        <button class="target-time-btn target-time-btn-mobile honest-mode-btn" id="honestModeBtnMobile">
+                            <span>🟢</span>
+                            <span id="honestModeBtnLabelMobile">Honest Mode</span>
+                        </button>
+                    </div>
                     <div style="position: relative;">
                         <div class="timer-display" id="timerDisplay">0.00</div>
                         <div class="new-best-indicator" id="newBestIndicator">New Single Best</div>
                     </div>
                     <div class="timer-hint">Space to start/stop</div>
+                    <div class="target-time-goal-label" id="targetTimeGoalLabel" style="display:none;"></div>
                 </div>
             </div>
 
@@ -211,9 +233,7 @@
             </div>
 
             <div class="export-buttons">
-                <button class="export-btn" id="exportBtn">📤 Export Results</button>
-                <button class="export-btn" id="importBtn">📥 Import Data</button>
-                <button class="export-btn" id="importCstimerBtn">🧊 Import from csTimer</button>
+                <button class="export-btn" id="importExportBtn">📤 Import / Export</button>
             </div>
         </footer>
     </div>
@@ -423,6 +443,21 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="custom-divider" style="margin-top:1.25rem;"></div>
+
+                        <h4 class="section-title" id="st-soundInspection" style="font-size:0.95rem; margin-top:1.25rem;">Inspection</h4>
+                        <div class="setting-group">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <div class="setting-label-new" id="voiceInspectionLabel">Voice Warnings</div>
+                                    <div class="setting-description" id="voiceInspectionDesc">Announces "8 seconds" and "12 seconds" during inspection, like a WCA judge</div>
+                                </div>
+                                <div class="toggle-switch" id="voiceInspectionToggle">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Language Section -->
@@ -567,9 +602,55 @@
                         <div class="setting-group">
                             <button class="data-btn secondary" id="exportCsvBtn">Export to CSV</button>
                             <button class="data-btn secondary" id="exportJsonBtn">Export to JSON</button>
-                            <button class="data-btn secondary" id="importDataBtn">Import Data</button>
-                            <button class="data-btn secondary" id="importCstimerDataBtn">Import from csTimer</button>
+                            <button class="data-btn secondary" id="importExportDataBtn">Import / Export</button>
                             <button class="data-btn danger" id="resetDataBtn">Reset Current Session</button>
+                        </div>
+
+                        <div class="custom-divider" style="margin-top:1.25rem;"></div>
+
+                        <!-- Auto-Export -->
+                        <div class="setting-group">
+                            <div class="setting-row" style="align-items:center; justify-content:space-between;">
+                                <div>
+                                    <div class="slider-value" id="st-autoExportLabel">Auto-Export</div>
+                                    <div class="setting-description" id="st-autoExportDesc">Automatically export your solves every N attempts</div>
+                                </div>
+                                <div class="toggle-switch" id="autoExportToggle" style="flex-shrink:0;">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+
+                            <div id="autoExportOptions" style="display:none; margin-top:1rem;">
+                                <div class="setting-row" style="align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+                                    <label class="setting-description" for="autoExportEveryInput" id="st-autoExportEveryLabel" style="margin:0;">Every N solves</label>
+                                    <input class="new-session-input" type="text" id="autoExportEveryInput" style="width:80px; text-align:center;" autocomplete="off">
+                                </div>
+
+                                <div class="setting-row" style="align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+                                    <label class="setting-description" for="autoExportFormatSelect" id="st-autoExportFormatLabel" style="margin:0;">Format</label>
+                                    <div class="discipline-select-wrapper" style="max-width:200px;">
+                                        <select class="discipline-select" id="autoExportFormatSelect">
+                                            <option value="firecube">FireCube Timer (JSON)</option>
+                                            <option value="cstimer">csTimer</option>
+                                            <option value="cubedesk">CubeDesk</option>
+                                            <option value="twistytimer">Twisty Timer</option>
+                                        </select>
+                                        <span class="discipline-select-arrow">▼</span>
+                                    </div>
+                                </div>
+
+                                <!-- Desktop only (File System Access API — no mobile browser supports it) -->
+                                <div id="autoExportFolderRow" style="display:none;">
+                                    <div class="setting-row" style="align-items:center; justify-content:space-between;">
+                                        <div>
+                                            <div class="setting-description" id="st-autoExportFolderDesc" style="margin:0;">Saves straight to a folder, no download prompt</div>
+                                            <div class="setting-description" id="autoExportFolderStatus" style="margin-top:0.25rem; opacity:0.75;">No folder selected — files will go to Downloads</div>
+                                        </div>
+                                        <button class="data-btn secondary" id="autoExportChooseFolderBtn" style="flex-shrink:0; white-space:nowrap;">Choose Folder</button>
+                                    </div>
+                                </div>
+                                <div id="autoExportMobileNote" class="setting-description" style="display:none; margin-top:0.5rem; opacity:0.75;">On phones, exported files always go to your Downloads folder.</div>
+                            </div>
                         </div>
                     </div>
 
@@ -863,36 +944,125 @@
         </div>
     </div>
 
-    <!-- csTimer Import Results -->
-    <div class="new-session-overlay" id="cstImportOverlay">
+    <!-- Import Results (generic, used for every source timer) -->
+    <div class="new-session-overlay" id="importResultOverlay">
         <div class="new-session-modal cst-import-modal">
-            <div class="new-session-title" id="cstImportTitle">csTimer Import Complete</div>
+            <div class="new-session-title" id="importResultTitle">Import Complete</div>
 
             <div class="cst-import-bar-track">
-                <div class="cst-import-bar-fill" id="cstImportBarFill"></div>
+                <div class="cst-import-bar-fill" id="importResultBarFill"></div>
             </div>
 
             <div class="cst-import-stats">
                 <div class="cst-import-stat">
                     <span class="cst-import-dot ok"></span>
-                    <span id="cstImportOkLabel">0 imported</span>
+                    <span id="importResultOkLabel">0 imported</span>
                 </div>
-                <div class="cst-import-stat" id="cstImportSkipRow">
+                <div class="cst-import-stat" id="importResultSkipRow">
                     <span class="cst-import-dot skip"></span>
-                    <span id="cstImportSkipLabel">0 skipped</span>
+                    <span id="importResultSkipLabel">0 skipped</span>
                 </div>
             </div>
 
-            <div class="cst-import-sessions" id="cstImportSessionsList"></div>
+            <div class="cst-import-sessions" id="importResultSessionsList"></div>
+            <div class="cst-import-warnings" id="importResultWarningsList"></div>
 
             <div class="new-session-actions">
-                <button class="new-session-btn primary" id="cstImportCloseBtn" style="width:100%;">OK</button>
+                <button class="new-session-btn primary" id="importResultCloseBtn" style="width:100%;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import / Export menu -->
+    <div class="new-session-overlay" id="importExportOverlay">
+        <div class="new-session-modal ie-modal">
+            <div class="new-session-title" id="ieModalTitle">Import / Export</div>
+
+            <div class="ie-section">
+                <div class="ie-section-title" id="ieExportTitle">EXPORT TO</div>
+                <div class="ie-menu">
+                    <button class="ie-menu-item" data-export="firecube"><span>FireCube Timer <span class="ie-menu-sub">(JSON)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-export="cstimer"><span>csTimer</span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-export="lastcubex"><span>Last Cube X <span class="ie-menu-sub">(csTimer)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-export="cubedesk"><span>CubeDesk</span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-export="twistytimer"><span>Twisty Timer</span><span class="ie-arrow">›</span></button>
+                </div>
+            </div>
+
+            <div class="ie-section">
+                <div class="ie-section-title" id="ieImportTitle">IMPORT FROM</div>
+                <div class="ie-menu">
+                    <button class="ie-menu-item" data-import="firecube"><span>FireCube Timer <span class="ie-menu-sub">(JSON)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-import="cstimer"><span>csTimer <span class="ie-menu-sub">(.txt)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-import="lastcubex"><span>Last Cube X <span class="ie-menu-sub">(.csv)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-import="cubedesk"><span>CubeDesk <span class="ie-menu-sub">(.txt)</span></span><span class="ie-arrow">›</span></button>
+                    <button class="ie-menu-item" data-import="twistytimer"><span>Twisty Timer <span class="ie-menu-sub">(.txt)</span></span><span class="ie-arrow">›</span></button>
+                </div>
+            </div>
+
+            <div class="new-session-actions">
+                <button class="new-session-btn cancel" id="ieCloseBtn" style="width:100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Target Time Settings -->
+    <div class="new-session-overlay" id="targetTimeOverlay">
+        <div class="new-session-modal">
+            <div class="new-session-title" id="ttModalTitle">Target Time</div>
+
+            <div class="new-session-field">
+                <div class="tt-toggle-row">
+                    <label class="new-session-label" for="targetTimeToggle" id="ttEnableLabel" style="margin-bottom:0;">Enable</label>
+                    <div class="toggle-switch" id="targetTimeToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="new-session-field">
+                <label class="new-session-label" for="targetTimeInput" id="ttGoalLabel">Goal time (e.g. 15.00, 1:02.36, or just 1500)</label>
+                <input class="new-session-input" type="text" id="targetTimeInput" autocomplete="off">
+            </div>
+
+            <div class="new-session-actions">
+                <button class="new-session-btn cancel" id="targetTimeCancel">Cancel</button>
+                <button class="new-session-btn primary" id="targetTimeSave">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Honest Mode -->
+    <div class="new-session-overlay" id="honestModeOverlay">
+        <div class="new-session-modal">
+            <div class="new-session-title" id="hmModalTitle">Honest Mode</div>
+
+            <!-- Idle state: pick a duration and start -->
+            <div id="hmIdleState">
+                <p class="hm-desc" id="hmDesc">While active, solves can't be deleted or edited (+2/DNF still work). Pick how long the honest run should last.</p>
+                <div class="new-session-field">
+                    <label class="new-session-label" for="honestModeMinutesInput" id="hmMinutesLabel">Duration (minutes)</label>
+                    <input class="new-session-input" type="text" id="honestModeMinutesInput" autocomplete="off">
+                </div>
+                <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="honestModeCancel">Cancel</button>
+                    <button class="new-session-btn primary" id="honestModeStart">Start</button>
+                </div>
+            </div>
+
+            <!-- Active state: show countdown + allow stopping early -->
+            <div id="hmActiveState" style="display:none;">
+                <p class="hm-desc" id="hmActiveDesc">Honest Mode is running. Solves are locked until it ends.</p>
+                <div class="hm-countdown" id="hmCountdownDisplay">12:34</div>
+                <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="honestModeStop" style="width:100%;">Stop Honest Mode</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.8.0</div>
+    <div class="version-display">1.13.2</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu" style="display:none;">

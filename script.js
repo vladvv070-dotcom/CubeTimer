@@ -1979,11 +1979,25 @@
                 // Bottom controls
                 exportJSON: 'Export JSON',
                 exportCSV: 'Export CSV',
-                importData: 'Import',
-                importCstimer: 'Import from csTimer',
-                cstImportTitle: 'csTimer Import Complete',
+                importExport: 'Import / Export',
+                importCompleteTitle: '{timer} Import Complete',
                 cstImportedLabel: 'imported',
                 cstSkippedLabel: 'skipped',
+                sessionMarkedAs3x3: '{session} ({puzzle}) is marked as 3x3',
+                ieExportTitle: 'EXPORT TO',
+                ieImportTitle: 'IMPORT FROM',
+                targetTimeLabel: 'Target Time',
+                targetGoalPrefix: 'Goal:',
+                secAbbrev: 'sec',
+                ttModalTitle: 'Target Time',
+                ttEnableLabel: 'Enable',
+                ttGoalLabel: 'Goal time',
+                honestModeLabel: 'Honest Mode',
+                hmModalTitle: 'Honest Mode',
+                hmDesc: "While active, solves can't be deleted or edited (+2/DNF still work). Pick how long the honest run should last.",
+                hmActiveDesc: 'Honest Mode is running. Solves are locked until it ends.',
+                hmMinutesLabel: 'Duration (minutes)',
+                honestModeLocked: "This solve is locked by Honest Mode and can't be edited or deleted until it ends.",
                 
                 // Settings
                 settingsTitle: 'Settings',
@@ -2008,6 +2022,9 @@
                 inspectionModeWca: 'DNF after inspection',
                 inspectionModeTraining: 'Training',
                 inspectionModeTrainingDesc: 'auto-start after inspection',
+                voiceInspectionLabel: 'Voice Warnings',
+                voiceInspectionDesc: 'Announces "8 seconds" and "12 seconds" during inspection, like a WCA judge',
+                voiceInspectionUnsupported: "This browser doesn't support voice synthesis, so Voice Warnings won't be audible here.",
                 timerSettings: 'Timer Settings',
                 holdDelay: 'Hold delay',
                 timerColor: 'Timer Color',
@@ -2123,7 +2140,14 @@
                 hideUiLabel: 'Hide UI During Solve',
                 hideUiDesc: 'Hides everything except the timer while solving',
                 mouseStartLabel: 'Mouse Start',
-                mouseStartDesc: 'Start and stop the timer with mouse click instead of spacebar'
+                mouseStartDesc: 'Start and stop the timer with mouse click instead of spacebar',
+                autoExportLabel: 'Auto-Export',
+                autoExportDesc: 'Automatically export your solves every N attempts',
+                autoExportEveryLabel: 'Every N solves',
+                autoExportFormatLabel: 'Format',
+                autoExportFolderDesc: 'Saves straight to a folder, no download prompt',
+                autoExportFolderSet: 'Saving to: {folder}',
+                autoExportFolderUnset: 'No folder selected — files will go to Downloads'
             },
             ru: {
                 // Header
@@ -2155,11 +2179,25 @@
                 // Bottom controls
                 exportJSON: 'Экспорт JSON',
                 exportCSV: 'Экспорт CSV',
-                importData: 'Импорт',
-                importCstimer: 'Импорт из csTimer',
-                cstImportTitle: 'Импорт из csTimer завершён',
+                importExport: 'Импорт / Экспорт',
+                importCompleteTitle: 'Импорт из {timer} завершён',
                 cstImportedLabel: 'перенесено',
                 cstSkippedLabel: 'пропущено',
+                sessionMarkedAs3x3: '{session} ({puzzle}) помечена как 3x3',
+                ieExportTitle: 'ЭКСПОРТ В',
+                ieImportTitle: 'ИМПОРТ ИЗ',
+                targetTimeLabel: 'Цель по времени',
+                targetGoalPrefix: 'Цель:',
+                secAbbrev: 'сек',
+                ttModalTitle: 'Цель по времени',
+                ttEnableLabel: 'Включить',
+                ttGoalLabel: 'Время цели',
+                honestModeLabel: 'Честный режим',
+                hmModalTitle: 'Честный режим',
+                hmDesc: 'Пока активен, сборки нельзя удалить или отредактировать (+2/DNF по-прежнему работают). Выбери, сколько продлится честный забег.',
+                hmActiveDesc: 'Честный режим активен. Сборки заблокированы до его окончания.',
+                hmMinutesLabel: 'Длительность (в минутах)',
+                honestModeLocked: 'Эта попытка заблокирована честным режимом — редактирование и удаление станут доступны после его окончания.',
                 
                 // Settings
                 settingsTitle: 'Настройки',
@@ -2208,6 +2246,9 @@
                 inspectionModeWca: 'DNF после осмотра',
                 inspectionModeTraining: 'Тренировка',
                 inspectionModeTrainingDesc: 'автостарт после осмотра',
+                voiceInspectionLabel: 'Голосовые предупреждения',
+                voiceInspectionDesc: 'Объявляет "8 секунд" и "12 секунд" во время осмотра, как судья на соревнованиях WCA',
+                voiceInspectionUnsupported: 'Этот браузер не поддерживает синтез речи, поэтому голосовые предупреждения тут не будут слышны.',
                 moodSilent: 'Молчун',
                 dataManagement: 'Управление данными',
                 resetSession: 'Сбросить сессию',
@@ -2298,7 +2339,14 @@
                 hideUiLabel: 'Скрывать UI во время сборки',
                 hideUiDesc: 'Скрывает всё кроме таймера пока идёт сборка',
                 mouseStartLabel: 'Запуск мышкой',
-                mouseStartDesc: 'Запускать и останавливать таймер кликом мыши вместо пробела'
+                mouseStartDesc: 'Запускать и останавливать таймер кликом мыши вместо пробела',
+                autoExportLabel: 'Автоэкспорт',
+                autoExportDesc: 'Автоматически экспортировать сборки каждые N попыток',
+                autoExportEveryLabel: 'Каждые N сборок',
+                autoExportFormatLabel: 'Формат',
+                autoExportFolderDesc: 'Сохраняет прямо в папку, без диалога скачивания',
+                autoExportFolderSet: 'Сохраняется в: {folder}',
+                autoExportFolderUnset: 'Папка не выбрана — файлы будут уходить в Загрузки'
             }
         };
 
@@ -2326,7 +2374,14 @@
                     clockFormat: '24',        // '24' | '12'
                     timeOffset: 0,            // hours offset (-12..+14)
                     hideUiDuringSolve: false, // hide all UI except timer while solving
-                    mouseStart: false         // start/stop timer with mouse click
+                    mouseStart: false,        // start/stop timer with mouse click
+                    targetTimeEnabled: false, // beep + color indicator when a goal time is set
+                    targetTime: null,         // goal time in seconds (null = not set yet)
+                    autoExportEnabled: false,
+                    autoExportEvery: 10,      // export every N solves
+                    autoExportFormat: 'firecube',
+                    autoExportUseFolder: false, // desktop only — write straight to a chosen folder
+                    voiceInspectionEnabled: false // speaks "8 seconds"/"12 seconds" during inspection, like a WCA judge
                 };
                 
                 this.loadSettings();
@@ -2364,14 +2419,40 @@
                 // Export buttons
                 const exportJsonBtn = document.querySelector('#exportJsonBtn');
                 const exportCsvBtn = document.querySelector('#exportCsvBtn');
-                const importBtn = document.querySelector('#importBtn');
-                const importCstimerBtn = document.querySelector('#importCstimerBtn');
-                const importCstimerDataBtn = document.querySelector('#importCstimerDataBtn');
+                const importExportBtn = document.querySelector('#importExportBtn');
+                const importExportDataBtn = document.querySelector('#importExportDataBtn');
                 if (exportJsonBtn) exportJsonBtn.textContent = t.exportJSON;
                 if (exportCsvBtn) exportCsvBtn.textContent = t.exportCSV;
-                if (importBtn) importBtn.textContent = t.importData;
-                if (importCstimerBtn) importCstimerBtn.textContent = t.importCstimer;
-                if (importCstimerDataBtn) importCstimerDataBtn.textContent = t.importCstimer;
+                if (importExportBtn) importExportBtn.textContent = `📤 ${t.importExport}`;
+                if (importExportDataBtn) importExportDataBtn.textContent = t.importExport;
+
+                // Import/Export modal
+                const ieModalTitle = document.querySelector('#ieModalTitle');
+                const ieExportTitle = document.querySelector('#ieExportTitle');
+                const ieImportTitle = document.querySelector('#ieImportTitle');
+                if (ieModalTitle) ieModalTitle.textContent = t.importExport;
+                if (ieExportTitle) ieExportTitle.textContent = t.ieExportTitle;
+                if (ieImportTitle) ieImportTitle.textContent = t.ieImportTitle;
+
+                // Target Time
+                const ttModalTitle = document.querySelector('#ttModalTitle');
+                const ttEnableLabel = document.querySelector('#ttEnableLabel');
+                const ttGoalLabel = document.querySelector('#ttGoalLabel');
+                if (ttModalTitle) ttModalTitle.textContent = t.ttModalTitle;
+                if (ttEnableLabel) ttEnableLabel.textContent = t.ttEnableLabel;
+                if (ttGoalLabel) ttGoalLabel.textContent = t.ttGoalLabel;
+                if (window.timer && window.timer._updateTargetTimeBtn) window.timer._updateTargetTimeBtn();
+
+                // Honest Mode
+                const hmModalTitle = document.querySelector('#hmModalTitle');
+                const hmDesc = document.querySelector('#hmDesc');
+                const hmActiveDesc = document.querySelector('#hmActiveDesc');
+                const hmMinutesLabel = document.querySelector('#hmMinutesLabel');
+                if (hmModalTitle) hmModalTitle.textContent = t.hmModalTitle;
+                if (hmDesc) hmDesc.textContent = t.hmDesc;
+                if (hmActiveDesc) hmActiveDesc.textContent = t.hmActiveDesc;
+                if (hmMinutesLabel) hmMinutesLabel.textContent = t.hmMinutesLabel;
+                if (window.timer && window.timer._updateHonestModeBtn) window.timer._updateHonestModeBtn();
                 
                 // Left column
                 const lastSolvesTitle = document.querySelector('.left-column .card-title');
@@ -2445,6 +2526,7 @@
                 _st('st-theme-timercolor', t.runningTimerColor);
                 _st('st-theme-timeformat', t.timeDisplayFormat || 'Time Display Format');
                 _st('st-sound',            t.enableSoundEffects);
+                _st('st-soundInspection',  t.inspection);
                 _st('st-language',         t.language);
                 _st('st-display',          t.displayOptions);
                 _st('st-mood',             t.timerMood);
@@ -2497,6 +2579,11 @@
                 if (inspModeWcaDesc) inspModeWcaDesc.textContent = t.inspectionModeWca;
                 if (inspModeTrainingTitle) inspModeTrainingTitle.textContent = t.inspectionModeTraining;
                 if (inspModeTrainingDesc) inspModeTrainingDesc.textContent = t.inspectionModeTrainingDesc;
+
+                const voiceInspectionLabel = document.getElementById('voiceInspectionLabel');
+                const voiceInspectionDesc = document.getElementById('voiceInspectionDesc');
+                if (voiceInspectionLabel) voiceInspectionLabel.textContent = t.voiceInspectionLabel;
+                if (voiceInspectionDesc) voiceInspectionDesc.textContent = t.voiceInspectionDesc;
                 
                 // NEW SETTINGS MODAL - Data buttons
                 const dataBtns = document.querySelectorAll('.data-btn');
@@ -2548,6 +2635,11 @@
                 _st('st-hideUiDesc',     t.hideUiDesc);
                 _st('st-mouseStartLabel', t.mouseStartLabel);
                 _st('st-mouseStartDesc',  t.mouseStartDesc);
+                _st('st-autoExportLabel', t.autoExportLabel);
+                _st('st-autoExportDesc',  t.autoExportDesc);
+                _st('st-autoExportEveryLabel', t.autoExportEveryLabel);
+                _st('st-autoExportFormatLabel', t.autoExportFormatLabel);
+                _st('st-autoExportFolderDesc', t.autoExportFolderDesc);
                 
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
@@ -2695,6 +2787,12 @@
                 const inspectionModeGroup = document.getElementById('inspectionModeGroup');
                 if (inspectionModeGroup) {
                     inspectionModeGroup.style.display = this.settings.inspection ? 'block' : 'none';
+                }
+
+                // Update voice inspection warnings toggle
+                const voiceInspectionToggle = document.getElementById('voiceInspectionToggle');
+                if (voiceInspectionToggle) {
+                    voiceInspectionToggle.classList.toggle('active', !!this.settings.voiceInspectionEnabled);
                 }
 
                 // Update active segmented button
@@ -3664,6 +3762,28 @@
                     });
                 }
 
+                // Voice Inspection Warnings Toggle
+                const voiceInspectionToggle = document.getElementById('voiceInspectionToggle');
+                if (voiceInspectionToggle) {
+                    voiceInspectionToggle.classList.toggle('active', !!this.settings.voiceInspectionEnabled);
+                    voiceInspectionToggle.addEventListener('click', () => {
+                        this.settings.voiceInspectionEnabled = !this.settings.voiceInspectionEnabled;
+                        voiceInspectionToggle.classList.toggle('active', this.settings.voiceInspectionEnabled);
+                        this.saveSettings();
+
+                        if (this.settings.voiceInspectionEnabled) {
+                            if (!('speechSynthesis' in window)) {
+                                const t = translations[this.settings.language] || translations.en;
+                                alert(t.voiceInspectionUnsupported || "This browser doesn't support voice synthesis, so Voice Warnings won't be audible here.");
+                            } else {
+                                // Say a quick test phrase right away, so the person doesn't
+                                // have to wait for a real inspection to find out it's silent.
+                                this.speakInspectionWarning(8);
+                            }
+                        }
+                    });
+                }
+
                 // Inspection Mode Segmented Control
                 document.querySelectorAll('.segmented-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -3787,23 +3907,11 @@
                     });
                 }
 
-                // Import Data
-                const importDataBtn = document.getElementById('importDataBtn');
-                if (importDataBtn) {
-                    importDataBtn.addEventListener('click', () => {
-                        if (window.timer) {
-                            window.timer.importData();
-                        }
-                    });
-                }
-
-                // Import from csTimer
-                const importCstimerDataBtn = document.getElementById('importCstimerDataBtn');
-                if (importCstimerDataBtn) {
-                    importCstimerDataBtn.addEventListener('click', () => {
-                        if (window.timer) {
-                            window.timer.importFromCstimer();
-                        }
+                // Import / Export
+                const importExportDataBtn = document.getElementById('importExportDataBtn');
+                if (importExportDataBtn) {
+                    importExportDataBtn.addEventListener('click', () => {
+                        if (window.timer) window.timer.openImportExportModal();
                     });
                 }
 
@@ -3888,13 +3996,107 @@
                         if (window.timer) window.timer._applyMouseStartMode();
                     });
                 }
+
+                // ── Auto-Export ──
+                this._initAutoExportUI();
+            }
+
+            // Sets up the Auto-Export settings block: toggle, interval, format, and
+            // (desktop only — File System Access API has no mobile support at all)
+            // the "choose a folder" flow.
+            _initAutoExportUI() {
+                const toggle = document.getElementById('autoExportToggle');
+                const options = document.getElementById('autoExportOptions');
+                const everyInput = document.getElementById('autoExportEveryInput');
+                const formatSelect = document.getElementById('autoExportFormatSelect');
+                const folderRow = document.getElementById('autoExportFolderRow');
+                const mobileNote = document.getElementById('autoExportMobileNote');
+                const chooseFolderBtn = document.getElementById('autoExportChooseFolderBtn');
+                const folderStatus = document.getElementById('autoExportFolderStatus');
+                if (!toggle) return;
+
+                const supportsFolderPicker = typeof window.showDirectoryPicker === 'function';
+                if (folderRow) folderRow.style.display = supportsFolderPicker ? 'block' : 'none';
+                if (mobileNote) mobileNote.style.display = supportsFolderPicker ? 'none' : 'block';
+
+                // Restore current state into the UI
+                toggle.classList.toggle('active', !!this.settings.autoExportEnabled);
+                if (options) options.style.display = this.settings.autoExportEnabled ? 'block' : 'none';
+                if (everyInput) everyInput.value = this.settings.autoExportEvery || 10;
+                if (formatSelect) formatSelect.value = this.settings.autoExportFormat || 'firecube';
+
+                if (supportsFolderPicker && folderStatus && window.timer) {
+                    window.timer._getAutoExportDirHandle().then(handle => {
+                        const t = window.timer._ieT ? window.timer._ieT() : {};
+                        if (handle) {
+                            folderStatus.textContent = (t.autoExportFolderSet || 'Saving to: {folder}').replace('{folder}', handle.name);
+                        } else {
+                            folderStatus.textContent = t.autoExportFolderUnset || 'No folder selected — files will go to Downloads';
+                        }
+                    });
+                }
+
+                toggle.addEventListener('click', () => {
+                    this.settings.autoExportEnabled = !this.settings.autoExportEnabled;
+                    toggle.classList.toggle('active', this.settings.autoExportEnabled);
+                    if (options) options.style.display = this.settings.autoExportEnabled ? 'block' : 'none';
+                    this.saveSettings();
+                });
+
+                if (everyInput) {
+                    everyInput.addEventListener('change', () => {
+                        const n = parseInt(everyInput.value, 10);
+                        this.settings.autoExportEvery = (n && n > 0) ? n : 10;
+                        everyInput.value = this.settings.autoExportEvery;
+                        this.saveSettings();
+                    });
+                }
+
+                if (formatSelect) {
+                    formatSelect.addEventListener('change', () => {
+                        this.settings.autoExportFormat = formatSelect.value;
+                        this.saveSettings();
+                    });
+                }
+
+                if (chooseFolderBtn && supportsFolderPicker) {
+                    chooseFolderBtn.addEventListener('click', async () => {
+                        try {
+                            const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                            if (window.timer) await window.timer._saveAutoExportDirHandle(handle);
+                            this.settings.autoExportUseFolder = true;
+                            this.saveSettings();
+                            if (folderStatus) {
+                                const t = window.timer?._ieT ? window.timer._ieT() : {};
+                                folderStatus.textContent = (t.autoExportFolderSet || 'Saving to: {folder}').replace('{folder}', handle.name);
+                            }
+                        } catch (e) {
+                            // User cancelled the picker — nothing to do.
+                        }
+                    });
+                }
+            }
+
+            // Reuses a single AudioContext for all beeps instead of creating a new one
+            // per sound. Repeatedly spinning up fresh AudioContexts (as this used to
+            // do) is a well-known cause of glitchy/dropped audio, especially on
+            // mobile — some browsers throttle or silently drop sounds when contexts
+            // pile up faster than they're garbage-collected.
+            _getAudioContext() {
+                if (!this._audioCtx || this._audioCtx.state === 'closed') {
+                    this._audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this._audioCtx.state === 'suspended') {
+                    this._audioCtx.resume();
+                }
+                return this._audioCtx;
             }
 
             playSound(type) {
                 if (!this.settings.sounds) return;
                 
                 // Create simple beep sounds using Web Audio API
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioContext = this._getAudioContext();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
@@ -3913,6 +4115,101 @@
                 
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
+            }
+
+            // Target Time beeps: 'short' = the accelerating warning tick, 'long' = the
+            // sustained tone that fires once the goal is missed.
+            playTargetBeep(type) {
+                if (!this.settings.sounds) return;
+
+                const audioContext = this._getAudioContext();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                if (type === 'long') {
+                    oscillator.frequency.value = 480;
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.55);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.75);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.8);
+                } else {
+                    oscillator.frequency.value = 1250;
+                    gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.07);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.08);
+                }
+            }
+
+            // Speaks "8 seconds" / "12 seconds" during inspection, matching how a real
+            // WCA judge calls out elapsed time. Respects both the master Sound Effects
+            // toggle and its own dedicated Voice Warnings toggle.
+            speakInspectionWarning(secondsElapsed) {
+                if (!this.settings.sounds || !this.settings.voiceInspectionEnabled) return;
+                if (!('speechSynthesis' in window)) return;
+
+                const lang = this.settings.language || 'en';
+                const isRu = lang === 'ru';
+                const text = isRu ? `${secondsElapsed} секунд` : `${secondsElapsed} seconds`;
+
+                const speakNow = () => {
+                    try {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        utterance.lang = isRu ? 'ru-RU' : 'en-US';
+                        utterance.rate = 1.05;
+                        utterance.volume = 1;
+                        window.speechSynthesis.speak(utterance);
+                    } catch (e) {
+                        // Some browser/WebView engines expose `speechSynthesis` without
+                        // fully supporting it — fail silently rather than throw.
+                    }
+                };
+
+                // Some engines (Android WebViews in particular) haven't loaded any
+                // voices yet on first use — getVoices() returns [] and speak() then
+                // does nothing audible. If that's the case, wait once for the
+                // 'voiceschanged' event (with a short timeout fallback so a solve
+                // never hangs waiting on it) before actually speaking.
+                const trySpeak = () => {
+                    if (window.speechSynthesis.getVoices().length > 0 || this._voicesReady) {
+                        speakNow();
+                        return;
+                    }
+                    let done = false;
+                    const onVoicesChanged = () => {
+                        if (done) return;
+                        done = true;
+                        this._voicesReady = true;
+                        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+                        speakNow();
+                    };
+                    window.speechSynthesis.addEventListener('voiceschanged', onVoicesChanged);
+                    // Fallback: some engines never fire voiceschanged at all but can
+                    // still speak fine with zero voices reported — try anyway after
+                    // a short wait rather than staying silent forever.
+                    setTimeout(() => {
+                        if (done) return;
+                        done = true;
+                        window.speechSynthesis.removeEventListener('voiceschanged', onVoicesChanged);
+                        speakNow();
+                    }, 250);
+                };
+
+                // Only cancel if something is actually pending — calling cancel()
+                // immediately before speak() in the same tick is a known source of
+                // the new utterance getting silently dropped in some engines. A tiny
+                // delay after cancelling gives the engine time to actually clear
+                // before we queue the next one.
+                if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                    window.speechSynthesis.cancel();
+                    setTimeout(trySpeak, 50);
+                } else {
+                    trySpeak();
+                }
             }
         }
 
@@ -3956,6 +4253,11 @@
                 this.drawChart();
                 this.updateSessionDropdown();
                 this._applyMouseStartMode(); // Apply mouse/keyboard mode on load
+                this._updateTargetTimeBtn();
+                this._updateHonestModeBtn();
+                if (this.sessions[this.currentSessionId]?.honestMode) {
+                    this._startHonestModeTicker();
+                }
             }
 
             loadSessions() {
@@ -3971,6 +4273,13 @@
                         }
                         if (!s.subsessions) {
                             s.subsessions = [];
+                            needsSave = true;
+                        }
+                        // Honest Mode: if it was active but its timer already ran out
+                        // while the app was closed, clear the active lock (the
+                        // subsession itself stays, it just stops being "in progress").
+                        if (s.honestMode && s.honestMode.endsAt <= Date.now()) {
+                            s.honestMode = null;
                             needsSave = true;
                         }
                         // Assign stable IDs to any solves that don't have one
@@ -4014,7 +4323,8 @@
                         solves: [],
                         subsessions: [],
                         isDefault: true,
-                        discipline: '3x3'
+                        discipline: '3x3',
+                        honestMode: null
                     }
                 };
             }
@@ -4068,8 +4378,13 @@
                 const timerArea = document.querySelector('.center-column');
                 if (timerArea) {
                     let touchStarted = false;
-                    
+
+                    // Don't hijack taps on interactive elements sitting inside the
+                    // timer area (currently: the mobile Target Time pill).
+                    const isInteractiveTarget = (e) => !!e.target.closest('.target-time-btn, button, a, select, input');
+
                     timerArea.addEventListener('touchstart', (e) => {
+                        if (isInteractiveTarget(e)) return;
                         // Prevent default to stop scrolling
                         e.preventDefault();
                         touchStarted = true;
@@ -4094,6 +4409,7 @@
 
                     // Prevent context menu on long press
                     timerArea.addEventListener('contextmenu', (e) => {
+                        if (isInteractiveTarget(e)) return;
                         e.preventDefault();
                     });
                 }
@@ -4135,23 +4451,190 @@
                     this.editSolve();
                 });
 
-                document.getElementById('exportBtn').addEventListener('click', () => {
-                    this.exportData();
+                document.getElementById('importExportBtn').addEventListener('click', () => {
+                    this.openImportExportModal();
                 });
 
-                document.getElementById('importBtn').addEventListener('click', () => {
-                    this.importData();
-                });
-
-                document.getElementById('importCstimerBtn').addEventListener('click', () => {
-                    this.importFromCstimer();
-                });
-
-                const cstImportCloseBtn = document.getElementById('cstImportCloseBtn');
-                if (cstImportCloseBtn) {
-                    cstImportCloseBtn.addEventListener('click', () => {
-                        document.getElementById('cstImportOverlay').classList.remove('visible');
+                const importResultCloseBtn = document.getElementById('importResultCloseBtn');
+                if (importResultCloseBtn) {
+                    importResultCloseBtn.addEventListener('click', () => {
+                        document.getElementById('importResultOverlay').classList.remove('visible');
                     });
+                }
+
+                const ieCloseBtn = document.getElementById('ieCloseBtn');
+                if (ieCloseBtn) {
+                    ieCloseBtn.addEventListener('click', () => {
+                        document.getElementById('importExportOverlay').classList.remove('visible');
+                    });
+                }
+
+                const ieOverlay = document.getElementById('importExportOverlay');
+                if (ieOverlay) {
+                    ieOverlay.addEventListener('click', (e) => {
+                        const exportBtn = e.target.closest('[data-export]');
+                        const importBtn = e.target.closest('[data-import]');
+                        if (exportBtn) this._handleExportChoice(exportBtn.dataset.export);
+                        else if (importBtn) this._handleImportChoice(importBtn.dataset.import);
+                    });
+                }
+
+                // ── Target Time ──
+                const targetTimeBtn = document.getElementById('targetTimeBtn');
+                const targetTimeBtnMobile = document.getElementById('targetTimeBtnMobile');
+                const targetTimeOverlay = document.getElementById('targetTimeOverlay');
+                const targetTimeToggle = document.getElementById('targetTimeToggle');
+                const targetTimeInput = document.getElementById('targetTimeInput');
+
+                const openTargetTimeModal = () => {
+                    const s = window.settingsManager.settings;
+                    targetTimeToggle.classList.toggle('active', !!s.targetTimeEnabled);
+                    targetTimeInput.value = s.targetTime ? this.formatTime(s.targetTime) : '';
+                    targetTimeOverlay.classList.add('visible');
+                    setTimeout(() => targetTimeInput.focus(), 50);
+                };
+
+                if (targetTimeBtn) targetTimeBtn.addEventListener('click', openTargetTimeModal);
+                if (targetTimeBtnMobile) targetTimeBtnMobile.addEventListener('click', openTargetTimeModal);
+
+                if (targetTimeToggle) {
+                    targetTimeToggle.addEventListener('click', () => {
+                        targetTimeToggle.classList.toggle('active');
+                    });
+                }
+
+                const closeTargetTimeModal = () => targetTimeOverlay.classList.remove('visible');
+
+                const targetTimeCancel = document.getElementById('targetTimeCancel');
+                if (targetTimeCancel) targetTimeCancel.addEventListener('click', closeTargetTimeModal);
+
+                const targetTimeSave = document.getElementById('targetTimeSave');
+                if (targetTimeSave) {
+                    targetTimeSave.addEventListener('click', () => {
+                        const enabled = targetTimeToggle.classList.contains('active');
+                        const parsed = this._parseGoalTimeInput(targetTimeInput.value);
+
+                        if (enabled && !parsed) {
+                            alert('Invalid goal time');
+                            return;
+                        }
+
+                        const s = window.settingsManager.settings;
+                        s.targetTimeEnabled = enabled;
+                        if (parsed) s.targetTime = parsed.time;
+                        window.settingsManager.saveSettings();
+
+                        this._updateTargetTimeBtn();
+                        closeTargetTimeModal();
+                    });
+                }
+
+                // ── Honest Mode ──
+                const honestModeBtn = document.getElementById('honestModeBtn');
+                const honestModeBtnMobile = document.getElementById('honestModeBtnMobile');
+                const honestModeOverlay = document.getElementById('honestModeOverlay');
+                const hmIdleState = document.getElementById('hmIdleState');
+                const hmActiveState = document.getElementById('hmActiveState');
+                const honestModeMinutesInput = document.getElementById('honestModeMinutesInput');
+                const hmCountdownDisplay = document.getElementById('hmCountdownDisplay');
+
+                const openHonestModeModal = () => {
+                    const session = this.sessions[this.currentSessionId];
+                    const active = session && session.honestMode;
+
+                    if (active) {
+                        hmIdleState.style.display = 'none';
+                        hmActiveState.style.display = 'block';
+                        this._refreshHonestModeCountdownDisplay();
+                    } else {
+                        hmIdleState.style.display = 'block';
+                        hmActiveState.style.display = 'none';
+                        honestModeMinutesInput.value = '';
+                    }
+
+                    honestModeOverlay.classList.add('visible');
+                    if (!active) setTimeout(() => honestModeMinutesInput.focus(), 50);
+                };
+
+                if (honestModeBtn) honestModeBtn.addEventListener('click', openHonestModeModal);
+                if (honestModeBtnMobile) honestModeBtnMobile.addEventListener('click', openHonestModeModal);
+
+                const closeHonestModeModal = () => honestModeOverlay.classList.remove('visible');
+
+                const honestModeCancel = document.getElementById('honestModeCancel');
+                if (honestModeCancel) honestModeCancel.addEventListener('click', closeHonestModeModal);
+
+                const honestModeStart = document.getElementById('honestModeStart');
+                if (honestModeStart) {
+                    honestModeStart.addEventListener('click', () => {
+                        const parsed = this._parseGoalTimeInput(honestModeMinutesInput.value);
+                        if (!parsed || parsed.time <= 0) {
+                            alert('Enter how many minutes Honest Mode should run for.');
+                            return;
+                        }
+                        this.startHonestMode(parsed.time);
+                        closeHonestModeModal();
+                    });
+                }
+
+                const honestModeStop = document.getElementById('honestModeStop');
+                if (honestModeStop) {
+                    honestModeStop.addEventListener('click', () => {
+                        this.endHonestMode();
+                        closeHonestModeModal();
+                    });
+                }
+            }
+
+            // Keeps the countdown text inside the (currently open) Honest Mode modal
+            // in sync — separate from _updateHonestModeBtn, which only updates the pills.
+            _refreshHonestModeCountdownDisplay() {
+                const display = document.getElementById('hmCountdownDisplay');
+                if (!display) return;
+                const session = this.sessions[this.currentSessionId];
+                if (!session || !session.honestMode) return;
+
+                const remaining = Math.max(0, session.honestMode.endsAt - Date.now());
+                const m = Math.floor(remaining / 60000);
+                const s = Math.floor((remaining % 60000) / 1000);
+                display.textContent = `${m}:${String(s).padStart(2, '0')}`;
+            }
+
+            // Refreshes both Target Time pill instances (header on desktop, above the
+            // timer on mobile — only one is visible at a time via CSS) and the goal
+            // label near the timer, to reflect current settings.
+            _updateTargetTimeBtn() {
+                const btn = document.getElementById('targetTimeBtn');
+                const label = document.getElementById('targetTimeBtnLabel');
+                const btnMobile = document.getElementById('targetTimeBtnMobile');
+                const labelMobile = document.getElementById('targetTimeBtnLabelMobile');
+                const goalLabel = document.getElementById('targetTimeGoalLabel');
+
+                const s = window.settingsManager?.settings;
+                const lang = window.settingsManager?.settings?.language || 'en';
+                const t = translations[lang] || translations.en;
+                const isSet = s && s.targetTimeEnabled && s.targetTime > 0;
+
+                const text = isSet ? this.formatTime(s.targetTime) : (t.targetTimeLabel || 'Target Time');
+
+                [[btn, label], [btnMobile, labelMobile]].forEach(([b, l]) => {
+                    if (!b || !l) return;
+                    l.textContent = text;
+                    b.classList.toggle('active', !!isSet);
+                });
+
+                if (goalLabel) {
+                    if (isSet) {
+                        const usesMinutes = s.targetTime >= 60;
+                        const timeStr = this.formatTime(s.targetTime);
+                        const display = (!usesMinutes && Number.isInteger(s.targetTime))
+                            ? String(s.targetTime) : timeStr;
+                        const unit = usesMinutes ? '' : ` ${t.secAbbrev || 'sec'}`;
+                        goalLabel.textContent = `${t.targetGoalPrefix || 'Goal:'} ${display}${unit}`;
+                        goalLabel.style.display = 'block';
+                    } else {
+                        goalLabel.style.display = 'none';
+                    }
                 }
             }
 
@@ -4190,6 +4673,7 @@
                 this.isHolding = true;
                 this.isReady = false;
                 this.holdStartTime = Date.now();
+                this.timerDisplay.classList.remove('target-met', 'target-missed');
 
                 // Set timeout for ready state
                 this.holdTimeout = setTimeout(() => {
@@ -4244,8 +4728,13 @@
                 this.isRunning = true;
                 this.startTime = performance.now();
                 this.timerDisplay.classList.remove('ready');
+                this.timerDisplay.classList.remove('target-met', 'target-missed');
                 this.timerDisplay.classList.add('running');
                 this.hideNewBestIndicator();
+
+                // Reset Target Time beeper state for the new solve
+                this._ttNextBeepAt = undefined;
+                this._ttLongBeepFired = false;
 
                 // Hide UI if enabled
                 if (window.settingsManager?.settings?.hideUiDuringSolve) {
@@ -4288,6 +4777,14 @@
             updateInspection() {
                 this.inspectionTime--;
                 this.timerDisplay.textContent = this.inspectionTime.toString();
+
+                // WCA judges call "8 seconds" after 8s elapsed (7s remaining) and
+                // "12 seconds" after 12s elapsed (3s remaining).
+                if (this.inspectionTime === 7) {
+                    window.settingsManager?.speakInspectionWarning(8);
+                } else if (this.inspectionTime === 3) {
+                    window.settingsManager?.speakInspectionWarning(12);
+                }
                 
                 // Color changes based on time
                 if (this.inspectionTime > 8) {
@@ -4366,7 +4863,14 @@
 
                 // Save the solve
                 this.saveSolve(this.time);
-                
+
+                // Target Time: flash the timer green (goal met) or red (goal missed)
+                const s = window.settingsManager?.settings;
+                if (s && s.targetTimeEnabled && s.targetTime > 0) {
+                    this.timerDisplay.classList.remove('target-met', 'target-missed');
+                    this.timerDisplay.classList.add(this.time <= s.targetTime ? 'target-met' : 'target-missed');
+                }
+
                 // Generate new scramble
                 setTimeout(() => {
                     this.generateScramble();
@@ -4379,8 +4883,173 @@
                 const elapsed = (performance.now() - this.startTime) / 1000;
                 this.time = elapsed;
                 this.timerDisplay.textContent = this.formatTime(elapsed);
+                this._updateTargetTimeBeeper(elapsed);
 
                 this.animationFrame = requestAnimationFrame(() => this.updateTimer());
+            }
+
+            // Target Time: beeps faster and faster as elapsed time approaches the goal,
+            // then one long beep exactly at the goal, then silence — makes it obvious
+            // the goal was missed without having to look at the timer.
+            _updateTargetTimeBeeper(elapsed) {
+                const s = window.settingsManager?.settings;
+                if (!s || !s.targetTimeEnabled || !s.targetTime || s.targetTime <= 0) return;
+
+                const target = s.targetTime;
+                const warnWindow = Math.min(5, target * 0.5); // seconds before target when beeping starts
+                const remaining = target - elapsed;
+
+                if (remaining <= 0) {
+                    if (!this._ttLongBeepFired) {
+                        this._ttLongBeepFired = true;
+                        window.settingsManager.playTargetBeep('long');
+                    }
+                    return;
+                }
+
+                if (remaining > warnWindow) return;
+
+                if (this._ttNextBeepAt === undefined || elapsed >= this._ttNextBeepAt) {
+                    window.settingsManager.playTargetBeep('short');
+                    const ratio = Math.max(0, remaining / warnWindow); // 1 (far) -> 0 (close)
+                    const interval = 0.12 + 0.68 * ratio; // seconds until next beep, shrinks as we approach target
+                    this._ttNextBeepAt = elapsed + interval;
+                }
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // Honest Mode
+            // ════════════════════════════════════════════════════════════
+            // A timed run where solves can't be deleted or edited while it's active
+            // (but +2/DNF stay available). Implemented as an auto-created subsession
+            // (green stripe in Solve History) whose solves get locked only while
+            // session.honestMode is set; once it ends (timer runs out or user stops
+            // it early) the lock lifts immediately — the subsession itself stays
+            // forever as a visual record, it just stops being "in progress".
+
+            // Called right after a new solve is added to a session, while its Honest
+            // Mode run (if any) is still active — tags the solve into that subsession.
+            _registerSolveInHonestMode(session, solve) {
+                if (!session || !session.honestMode) return;
+                const ss = (session.subsessions || []).find(s => s.id === session.honestMode.subsessionId);
+                if (ss) ss.solveIds.push(solve.id);
+            }
+
+            // True if this solve currently can't be deleted/edited because it belongs
+            // to an in-progress Honest Mode run.
+            _isSolveHonestLocked(session, solve) {
+                if (!session || !session.honestMode || !solve) return false;
+                const ss = (session.subsessions || []).find(s => s.id === session.honestMode.subsessionId);
+                return !!ss && ss.solveIds.includes(solve.id);
+            }
+
+            _honestModeLockedAlert() {
+                const lang = window.settingsManager?.settings?.language || 'en';
+                const t = translations[lang] || translations.en;
+                alert(t.honestModeLocked || "This solve is locked by Honest Mode and can't be edited or deleted until it ends.");
+            }
+
+            _honestModeSessionLabel(count) {
+                return count === 0 ? 'HONEST MODE' : `HONEST MODE ${count + 1}`;
+            }
+
+            startHonestMode(minutes) {
+                const session = this.sessions[this.currentSessionId];
+                if (!session || !minutes || minutes <= 0) return;
+
+                if (!session.subsessions) session.subsessions = [];
+                const existingHonestCount = session.subsessions.filter(ss => ss.name.startsWith('HONEST MODE')).length;
+
+                const subsession = {
+                    id: `ss_honest_${Date.now()}`,
+                    name: this._honestModeSessionLabel(existingHonestCount),
+                    color: '#4ade80', // green — matches the existing subsession palette
+                    excludeFromAvg: false, // honest solves count toward the real average by default
+                    solveIds: []
+                };
+                session.subsessions.push(subsession);
+
+                session.honestMode = {
+                    subsessionId: subsession.id,
+                    endsAt: Date.now() + Math.round(minutes * 60 * 1000)
+                };
+
+                this.saveSessions();
+                if (window.sessionsManager) {
+                    window.sessionsManager.populateSolveHistory();
+                    window.sessionsManager.renderSubsessionStats();
+                }
+                this._updateHonestModeBtn();
+                this._startHonestModeTicker();
+            }
+
+            // Ends the CURRENT session's active Honest Mode run, whether it expired
+            // naturally or the user stopped it early. The subsession stays; only the
+            // active lock is cleared.
+            endHonestMode() {
+                const session = this.sessions[this.currentSessionId];
+                if (session) {
+                    session.honestMode = null;
+                    this.saveSessions();
+                }
+                if (this._honestModeInterval) {
+                    clearInterval(this._honestModeInterval);
+                    this._honestModeInterval = null;
+                }
+                this._updateHonestModeBtn();
+                if (window.sessionsManager) window.sessionsManager.populateSolveHistory();
+            }
+
+            _startHonestModeTicker() {
+                if (this._honestModeInterval) clearInterval(this._honestModeInterval);
+                this._honestModeInterval = setInterval(() => {
+                    const session = this.sessions[this.currentSessionId];
+                    if (!session || !session.honestMode) {
+                        clearInterval(this._honestModeInterval);
+                        this._honestModeInterval = null;
+                        return;
+                    }
+                    if (session.honestMode.endsAt <= Date.now()) {
+                        this.endHonestMode();
+                    } else {
+                        this._updateHonestModeBtn();
+                    }
+                }, 1000);
+            }
+
+            // Refreshes both Honest Mode pill instances (header + mobile) to reflect
+            // the CURRENTLY SELECTED session's state — call this on session switch too.
+            _updateHonestModeBtn() {
+                const btn = document.getElementById('honestModeBtn');
+                const label = document.getElementById('honestModeBtnLabel');
+                const btnMobile = document.getElementById('honestModeBtnMobile');
+                const labelMobile = document.getElementById('honestModeBtnLabelMobile');
+
+                const session = this.sessions[this.currentSessionId];
+                const lang = window.settingsManager?.settings?.language || 'en';
+                const t = translations[lang] || translations.en;
+                const active = session && session.honestMode;
+
+                let text;
+                if (active) {
+                    const remaining = Math.max(0, session.honestMode.endsAt - Date.now());
+                    const m = Math.floor(remaining / 60000);
+                    const s = Math.floor((remaining % 60000) / 1000);
+                    text = `${m}:${String(s).padStart(2, '0')}`;
+                } else {
+                    text = t.honestModeLabel || 'Honest Mode';
+                }
+
+                [[btn, label], [btnMobile, labelMobile]].forEach(([b, l]) => {
+                    if (!b || !l) return;
+                    l.textContent = text;
+                    b.classList.toggle('active', !!active);
+                });
+
+                const overlay = document.getElementById('honestModeOverlay');
+                if (overlay && overlay.classList.contains('visible')) {
+                    this._refreshHonestModeCountdownDisplay();
+                }
             }
 
             formatTime(seconds) {
@@ -4397,19 +5066,27 @@
             }
 
             saveSolve(time) {
+                const s = window.settingsManager?.settings;
+                const targetMet = (s && s.targetTimeEnabled && s.targetTime > 0)
+                    ? (time <= s.targetTime)
+                    : null; // null = Target Time wasn't active for this solve
+
                 const solve = {
                     id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                     time: time,
                     timestamp: Date.now(),
                     scramble: document.getElementById('scrambleText').textContent,
                     penalty: null,
-                    dnf: false
+                    dnf: false,
+                    targetMet
                 };
 
                 const currentSession = this.sessions[this.currentSessionId];
                 if (currentSession) {
                     currentSession.solves.unshift(solve);
+                    this._registerSolveInHonestMode(currentSession, solve);
                     this.saveSessions();
+                    this._maybeAutoExport();
                     
                     // Update solve history if it's open
                     if (window.sessionsManager && document.getElementById('solveHistorySection').style.display === 'flex') {
@@ -4429,6 +5106,7 @@
             // WCA mode: inspection expired → save DNF automatically
             saveSolveDNF() {
                 const solve = {
+                    id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                     time: 0,
                     timestamp: Date.now(),
                     scramble: document.getElementById('scrambleText').textContent,
@@ -4439,7 +5117,9 @@
                 const currentSession = this.sessions[this.currentSessionId];
                 if (currentSession) {
                     currentSession.solves.unshift(solve);
+                    this._registerSolveInHonestMode(currentSession, solve);
                     this.saveSessions();
+                    this._maybeAutoExport();
 
                     if (window.sessionsManager && document.getElementById('solveHistorySection').style.display === 'flex') {
                         window.sessionsManager.populateSolveHistory();
@@ -5423,16 +6103,24 @@
                         timeDisplay += '+2';
                     }
 
+                    const targetClass = solve.targetMet === true ? 'sh-target-met'
+                        : solve.targetMet === false ? 'sh-target-missed' : '';
+
+                    const honestLocked = this._isSolveHonestLocked(session, solve);
+                    const deleteBtnHtml = honestLocked
+                        ? `<button class="solve-action-btn delete" data-index="${index}" data-action="delete" disabled title="Locked by Honest Mode">🔒</button>`
+                        : `<button class="solve-action-btn delete" data-index="${index}" data-action="delete">Delete</button>`;
+
                     row.innerHTML = `
                         <td>${solveNumber}</td>
-                        <td><strong>${timeDisplay}</strong></td>
+                        <td><strong class="${targetClass}">${timeDisplay}</strong></td>
                         <td>${ao5 !== null ? this.formatTime(ao5) : '–'}</td>
                         <td>${ao12 !== null ? this.formatTime(ao12) : '–'}</td>
                         <td>${ao100 !== null ? this.formatTime(ao100) : '–'}</td>
                         <td>
                             <span class="solve-scramble">${solve.scramble || 'No scramble'}</span>
                             <div class="solve-actions">
-                                <button class="solve-action-btn delete" data-index="${index}" data-action="delete">Delete</button>
+                                ${deleteBtnHtml}
                                 <button class="solve-action-btn penalty" data-index="${index}" data-action="penalty">+2</button>
                                 <button class="solve-action-btn dnf" data-index="${index}" data-action="dnf">DNF</button>
                             </div>
@@ -5527,6 +6215,7 @@
 
                     this._mouseStartDownHandler = (e) => {
                         if (e.button !== 0) return; // left click only
+                        if (e.target.closest('.target-time-btn, button, a, select, input')) return;
                         e.preventDefault();
                         this._mouseHolding = true;
                         this.handleSpaceDown();
@@ -6134,9 +6823,16 @@
             }
 
             deleteSolveFromHistory(index) {
-                if (!confirm('Delete this solve?')) return;
-                
                 const session = this.sessions[this.currentSessionId];
+                const solve = session.solves[index];
+
+                if (this._isSolveHonestLocked(session, solve)) {
+                    this._honestModeLockedAlert();
+                    return;
+                }
+
+                if (!confirm('Delete this solve?')) return;
+
                 session.solves.splice(index, 1);
                 this.saveSessions();
                 this.populateSolveHistory();
@@ -6241,6 +6937,16 @@
                 const sessionSelect = document.getElementById('sessionSelect');
                 if (sessionSelect) {
                     this.updateSessionDropdown();
+                }
+
+                // Honest Mode is per-session: reflect whichever session we just
+                // switched to, and (re)start/stop the countdown ticker accordingly.
+                this._updateHonestModeBtn();
+                if (this.sessions[sessionId]?.honestMode) {
+                    this._startHonestModeTicker();
+                } else if (this._honestModeInterval) {
+                    clearInterval(this._honestModeInterval);
+                    this._honestModeInterval = null;
                 }
             }
 
@@ -6635,9 +7341,14 @@
 
             deleteSolve() {
                 if (this.solves.length === 0) return;
-                
+
+                const currentSession = this.sessions[this.currentSessionId];
+                if (this._isSolveHonestLocked(currentSession, currentSession.solves[0])) {
+                    this._honestModeLockedAlert();
+                    return;
+                }
+
                 if (confirm('Delete last solve?')) {
-                    const currentSession = this.sessions[this.currentSessionId];
                     currentSession.solves.shift();
                     this.hideNewBestIndicator();
                     this.saveSessions();
@@ -6703,10 +7414,53 @@
                 return { dnf: false, time: totalSeconds };
             }
 
+            // Parses the Target Time goal field. Deliberately NOT the same convention
+            // as _parseTimeInput: there, bare digits are csTimer-style digit-entry
+            // (last 2 digits = hundredths), which is right for typing a stopwatch
+            // reading but wrong for a goal — someone typing "15" here means "15
+            // whole seconds", not 0.15s. So here, bare digits are just seconds.
+            //   "15"       -> 15s
+            //   "15.5"     -> 15.5s
+            //   "1:30"     -> 90s
+            _parseGoalTimeInput(input) {
+                if (input === null) return null;
+                let str = input.trim();
+                if (str === '') return null;
+
+                str = str.replace(',', '.');
+                let totalSeconds = null;
+
+                if (str.includes(':')) {
+                    const parts = str.split(':');
+                    const secPart = parseFloat(parts.pop());
+                    if (isNaN(secPart)) return null;
+                    let minutes = 0;
+                    for (const p of parts) {
+                        const n = parseInt(p, 10);
+                        if (isNaN(n)) return null;
+                        minutes = minutes * 60 + n;
+                    }
+                    totalSeconds = minutes * 60 + secPart;
+                } else {
+                    // Covers both "15" and "15.5" — a bare number is just that many seconds.
+                    const n = parseFloat(str);
+                    if (isNaN(n)) return null;
+                    totalSeconds = n;
+                }
+
+                if (totalSeconds === null || isNaN(totalSeconds) || totalSeconds <= 0) return null;
+                return { dnf: false, time: totalSeconds };
+            }
+
             editSolve() {
                 if (this.solves.length === 0) return;
                 
                 const currentSession = this.sessions[this.currentSessionId];
+                if (this._isSolveHonestLocked(currentSession, currentSession.solves[0])) {
+                    this._honestModeLockedAlert();
+                    return;
+                }
+
                 const currentTime = currentSession.solves[0].dnf ? 'DNF' : this.formatTime(currentSession.solves[0].time);
                 const newTime = prompt('Enter new time (e.g. 15.68, 1:02.36, or just 1568) or DNF:', currentTime);
                 
@@ -6842,18 +7596,282 @@
                 }
             }
 
-            // ─── csTimer Import ──────────────────────────────
-            // csTimer's "Export All Data" produces a .txt file that is actually JSON:
-            //   { "properties": {...settings incl. sessionData...}, "session1": [...], "session2": [...], ... }
-            // Each solve entry is: [[penalty, timeMs], scramble, comment, unixTimestampSeconds]
-            //   penalty: 0 = no penalty, 2000 = +2, -1 = DNF
-            // In the wild, "properties" and "sessionData" have been seen both as plain objects
-            // and as JSON-encoded strings depending on export path, so we parse defensively.
-            _cstMaybeParse(v) {
+            // ════════════════════════════════════════════════════════════
+            // Import / Export — unified multi-timer system
+            // ════════════════════════════════════════════════════════════
+            //
+            // All formats below were verified against real source code (not guessed):
+            //   - csTimer:      cs0x7f/cstimer (JSON wrapped in .txt)
+            //   - CubeDesk:     kash/cubedesk (DataSettings.tsx export + cstimer.ts import)
+            //   - Twisty Timer: aricneto/TwistyTimer (MainActivity.java CSV export/import)
+            //   - Last Cube X:  closed-source iOS app with no public spec. Export uses the
+            //     csTimer format (per product instructions); import uses a best-effort,
+            //     defensive CSV parser since the exact column layout isn't publicly documented.
+
+            openImportExportModal() {
+                document.getElementById('importExportOverlay').classList.add('visible');
+            }
+
+            _escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = String(str);
+                return div.innerHTML;
+            }
+
+            _ieT() {
+                const lang = window.settingsManager?.settings?.language || 'en';
+                return translations[lang] || translations.en;
+            }
+
+            // ─── Shared helpers ──────────────────────────────
+            _maybeParseJson(v) {
                 if (typeof v !== 'string') return v;
                 try { return JSON.parse(v); } catch (e) { return v; }
             }
 
+            // Opens a file picker with no `accept` filter (some Android pickers hide
+            // non-media files entirely when given a narrow/broad type list — see prior
+            // fix history) and hands the raw text to the given callback.
+            _pickFile(onText) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const text = String(event.target.result).replace(/^\uFEFF/, '');
+                        onText(text, file.name);
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            // Tries to write directly into the folder the user picked for auto-export
+            // (desktop Chrome/Edge/Opera only — the File System Access API has no
+            // mobile support at all, Android has no matching system picker). Falls
+            // back to a normal browser download everywhere else, which lands in the
+            // Downloads folder like any other file — this is the only option on phones.
+            async _downloadFile(filename, content, mime) {
+                const dirHandle = await this._getAutoExportDirHandle();
+                if (dirHandle) {
+                    try {
+                        const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
+                        if (perm === 'granted') {
+                            const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(content);
+                            await writable.close();
+                            return;
+                        }
+                    } catch (e) {
+                        // Fall through to the normal download below (e.g. permission was
+                        // revoked, or the folder was moved/deleted since it was picked).
+                    }
+                }
+
+                const blob = new Blob([content], { type: mime || 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // ─── Auto-export folder handle (IndexedDB) ──────────────
+            // FileSystemDirectoryHandle objects can't go in localStorage (not JSON),
+            // but IndexedDB supports storing them directly via structured clone.
+            _autoExportDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open('firecube-autoexport', 1);
+                    req.onupgradeneeded = () => req.result.createObjectStore('handles');
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+
+            async _saveAutoExportDirHandle(handle) {
+                const db = await this._autoExportDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('handles', 'readwrite');
+                    tx.objectStore('handles').put(handle, 'dir');
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+            }
+
+            async _getAutoExportDirHandle() {
+                if (!window.settingsManager?.settings?.autoExportUseFolder) return null;
+                if (!('indexedDB' in window)) return null;
+                try {
+                    const db = await this._autoExportDB();
+                    return await new Promise((resolve) => {
+                        const tx = db.transaction('handles', 'readonly');
+                        const req = tx.objectStore('handles').get('dir');
+                        req.onsuccess = () => resolve(req.result || null);
+                        req.onerror = () => resolve(null);
+                    });
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            async _clearAutoExportDirHandle() {
+                if (!('indexedDB' in window)) return;
+                try {
+                    const db = await this._autoExportDB();
+                    const tx = db.transaction('handles', 'readwrite');
+                    tx.objectStore('handles').delete('dir');
+                } catch (e) { /* ignore */ }
+            }
+
+            // ─── Auto-export trigger ──────────────
+            // Called after every solve is saved; fires the configured export once
+            // the current session's solve count is a multiple of the chosen interval.
+            _maybeAutoExport() {
+                const s = window.settingsManager?.settings;
+                if (!s || !s.autoExportEnabled) return;
+
+                const every = parseInt(s.autoExportEvery, 10);
+                if (!every || every <= 0) return;
+
+                const session = this.sessions[this.currentSessionId];
+                if (!session || session.solves.length === 0) return;
+                if (session.solves.length % every !== 0) return;
+
+                switch (s.autoExportFormat) {
+                    case 'cstimer': this._exportToCstimerFormat('firecube_autoexport'); break;
+                    case 'cubedesk': this._exportToCubeDeskFormat(); break;
+                    case 'twistytimer': this._exportToTwistyTimerFormat(); break;
+                    default: this.exportData(); break; // 'firecube' / anything unrecognized
+                }
+            }
+
+            // Takes generic parsed sessions — [{ name, disciplineRaw, discipline, unmapped, solves }] —
+            // creates real sessions in this app, and shows the result modal.
+            // `timerLabel` is used both for the modal title and to prefix session names.
+            _finishImport(timerLabel, parsedSessions) {
+                if (!parsedSessions || parsedSessions.length === 0) {
+                    alert(`No valid ${timerLabel} data found in this file.`);
+                    return;
+                }
+
+                const newSessionIds = [];
+                const sessionBreakdown = [];
+                const warnings = [];
+                let importedSolves = 0, skipped = 0;
+
+                for (const ps of parsedSessions) {
+                    if (!ps.solves || ps.solves.length === 0) continue;
+
+                    ps.solves.sort((a, b) => b.timestamp - a.timestamp);
+                    importedSolves += ps.solves.length;
+                    skipped += ps.skipped || 0;
+
+                    const fullName = `${timerLabel}: ${ps.name}`;
+                    const id = `session-imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                    this.sessions[id] = {
+                        id,
+                        name: fullName,
+                        solves: ps.solves,
+                        isDefault: false,
+                        discipline: ps.discipline || '3x3',
+                        createdAt: Date.now()
+                    };
+                    newSessionIds.push(id);
+                    sessionBreakdown.push({ name: fullName, count: ps.solves.length });
+
+                    if (ps.unmapped) {
+                        const t = this._ieT();
+                        const tmpl = t.sessionMarkedAs3x3 || '{session} ({puzzle}) is marked as 3x3';
+                        warnings.push(tmpl
+                            .replace('{session}', ps.name)
+                            .replace('{puzzle}', ps.disciplineRaw || '?'));
+                    }
+                }
+
+                if (newSessionIds.length === 0) {
+                    alert(`No valid ${timerLabel} data found in this file.`);
+                    return;
+                }
+
+                this.currentSessionId = newSessionIds[0];
+                this.saveSessions();
+                this.updateUI();
+                this.updateSessionDropdown();
+
+                this._showImportResult({ timerLabel, imported: importedSolves, skipped, sessions: sessionBreakdown, warnings });
+            }
+
+            // Shows the generic import summary modal: progress bar, per-session
+            // breakdown, and "Session X (Puzzle) is marked as 3x3" style warnings.
+            _showImportResult({ timerLabel, imported, skipped, sessions, warnings }) {
+                const overlay = document.getElementById('importResultOverlay');
+                if (!overlay) return;
+
+                const total = imported + skipped;
+                const pct = total > 0 ? Math.round((imported / total) * 100) : 100;
+                const t = this._ieT();
+
+                document.getElementById('importResultBarFill').style.width = pct + '%';
+                document.getElementById('importResultOkLabel').textContent =
+                    `${imported} ${t.cstImportedLabel || 'imported'}`;
+
+                const skipRow = document.getElementById('importResultSkipRow');
+                if (skipped > 0) {
+                    skipRow.style.display = 'flex';
+                    document.getElementById('importResultSkipLabel').textContent =
+                        `${skipped} ${t.cstSkippedLabel || 'skipped'}`;
+                } else {
+                    skipRow.style.display = 'none';
+                }
+
+                const list = document.getElementById('importResultSessionsList');
+                list.innerHTML = (sessions || []).map(s => `
+                    <div class="cst-import-session-row">
+                        <span class="name">${this._escapeHtml(s.name)}</span>
+                        <span class="count">+${s.count}</span>
+                    </div>
+                `).join('');
+
+                const warnList = document.getElementById('importResultWarningsList');
+                warnList.innerHTML = (warnings || []).map(w => `
+                    <div class="cst-import-warning-row">⚠️ ${this._escapeHtml(w)}</div>
+                `).join('');
+
+                const titleTmpl = t.importCompleteTitle || '{timer} Import Complete';
+                document.getElementById('importResultTitle').textContent = titleTmpl.replace('{timer}', timerLabel);
+                overlay.classList.add('visible');
+            }
+
+            // ─── FireCube Timer (JSON) — our own native format ──────────────
+            _parseFireCubeJson(text) {
+                const data = JSON.parse(text);
+                const parsedSessions = [];
+
+                if (data.sessions) {
+                    for (const key of Object.keys(data.sessions)) {
+                        const s = data.sessions[key];
+                        if (!s || !Array.isArray(s.solves) || s.solves.length === 0) continue;
+                        parsedSessions.push({
+                            name: s.name || key,
+                            discipline: s.discipline || '3x3',
+                            solves: s.solves.map(sv => ({ ...sv }))
+                        });
+                    }
+                } else if (Array.isArray(data.solves)) {
+                    parsedSessions.push({ name: 'Imported', discipline: '3x3', solves: data.solves });
+                }
+
+                return parsedSessions;
+            }
+
+            // ─── csTimer (.txt, JSON-wrapped) ──────────────
+            // { properties: { sessionData: {...} }, session1: [...], session2: [...] }
+            // Each solve: [[penalty, timeMs], scramble, comment, unixTimestampSeconds]
+            //   penalty: 0 = clean, 2000 = +2, -1 = DNF
             _cstScrambleTypeToDiscipline(scrType) {
                 const map = {
                     '222': '2x2', '222so': '2x2', '222o': '2x2',
@@ -6864,7 +7882,7 @@
                     'pyram': 'pyraminx', 'skewb': 'skewb',
                     'minx': 'megaminx', 'mgmp': 'megaminx'
                 };
-                return map[scrType] || null; // null = no exact match in our discipline list
+                return map[scrType] || null;
             }
 
             _cstParseSolve(raw) {
@@ -6888,141 +7906,591 @@
                 };
             }
 
-            importFromCstimer() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                // No `accept` filter on purpose: some Android file-picker apps (MIUI etc.)
-                // switch to a media-gallery view and hide non-media files entirely when
-                // given a broad accept list. Leaving it unset forces the plain file
-                // browser everywhere. Content is validated after reading (JSON.parse below).
+            _parseCstimerTxt(text) {
+                const data = JSON.parse(text);
 
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-
-                    reader.onload = (event) => {
-                        try {
-                            const raw = String(event.target.result).replace(/^\uFEFF/, '');
-                            const data = JSON.parse(raw);
-
-                            // Session metadata (name + scramble type), if present
-                            let sessionMeta = {};
-                            const props = this._cstMaybeParse(data.properties);
-                            if (props && props.sessionData) {
-                                sessionMeta = this._cstMaybeParse(props.sessionData) || {};
-                            }
-
-                            const sessionKeyRe = /^session(\d+)$/;
-                            const newSessionIds = [];
-                            const sessionBreakdown = []; // [{name, count}] for the results modal
-                            let importedSessions = 0, importedSolves = 0, skipped = 0;
-
-                            for (const key of Object.keys(data)) {
-                                const m = key.match(sessionKeyRe);
-                                if (!m) continue;
-                                const num = m[1];
-
-                                const rawSolves = this._cstMaybeParse(data[key]);
-                                if (!Array.isArray(rawSolves) || rawSolves.length === 0) continue;
-
-                                const meta = sessionMeta[num] || {};
-                                const name = meta.name || `Session ${num}`;
-                                const scrType = (meta.opt && meta.opt.scrType) || '333';
-                                const discipline = this._cstScrambleTypeToDiscipline(scrType) || '3x3';
-                                const unmapped = !this._cstScrambleTypeToDiscipline(scrType);
-
-                                const solves = [];
-                                let sessionSkipped = 0;
-                                for (const rawSolve of rawSolves) {
-                                    const s = this._cstParseSolve(rawSolve);
-                                    if (s) { solves.push(s); importedSolves++; }
-                                    else { skipped++; sessionSkipped++; }
-                                }
-                                if (solves.length === 0) continue;
-
-                                // Newest-first, matching this app's convention (regardless of csTimer's original order)
-                                solves.sort((a, b) => b.timestamp - a.timestamp);
-
-                                const fullName = `csTimer: ${name}${unmapped ? ` [${scrType}]` : ''}`;
-                                const id = `session-cst-${num}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-                                this.sessions[id] = {
-                                    id,
-                                    name: fullName,
-                                    solves,
-                                    isDefault: false,
-                                    discipline,
-                                    createdAt: Date.now()
-                                };
-                                newSessionIds.push(id);
-                                sessionBreakdown.push({ name: fullName, count: solves.length, skipped: sessionSkipped });
-                                importedSessions++;
-                            }
-
-                            if (importedSessions === 0) {
-                                alert('No valid csTimer session data found in this file.');
-                                return;
-                            }
-
-                            this.currentSessionId = newSessionIds[0];
-                            this.saveSessions();
-                            this.updateUI();
-                            this.updateSessionDropdown();
-
-                            this._showCstImportResult({ imported: importedSolves, skipped, sessions: sessionBreakdown });
-                        } catch (error) {
-                            alert('Error importing csTimer data: ' + error.message);
-                        }
-                    };
-
-                    reader.readAsText(file);
-                };
-
-                input.click();
-            }
-
-            // Shows the csTimer import summary modal: a progress bar of imported vs
-            // skipped solves, plus a per-session breakdown.
-            _showCstImportResult({ imported, skipped, sessions }) {
-                const overlay = document.getElementById('cstImportOverlay');
-                if (!overlay) return; // fallback safety, shouldn't happen
-
-                const total = imported + skipped;
-                const pct = total > 0 ? Math.round((imported / total) * 100) : 100;
-                const lang = window.settingsManager?.settings?.language || 'en';
-                const t = translations[lang] || translations.en;
-
-                document.getElementById('cstImportBarFill').style.width = pct + '%';
-                document.getElementById('cstImportOkLabel').textContent =
-                    `${imported} ${t.cstImportedLabel || 'imported'}`;
-
-                const skipRow = document.getElementById('cstImportSkipRow');
-                if (skipped > 0) {
-                    skipRow.style.display = 'flex';
-                    document.getElementById('cstImportSkipLabel').textContent =
-                        `${skipped} ${t.cstSkippedLabel || 'skipped'}`;
-                } else {
-                    skipRow.style.display = 'none';
+                let sessionMeta = {};
+                const props = this._maybeParseJson(data.properties);
+                if (props && props.sessionData) {
+                    sessionMeta = this._maybeParseJson(props.sessionData) || {};
                 }
 
-                const list = document.getElementById('cstImportSessionsList');
-                list.innerHTML = sessions.map(s => `
-                    <div class="cst-import-session-row">
-                        <span class="name">${this._escapeHtml(s.name)}</span>
-                        <span class="count">+${s.count}</span>
-                    </div>
-                `).join('');
+                const sessionKeyRe = /^session(\d+)$/;
+                const parsedSessions = [];
 
-                document.getElementById('cstImportTitle').textContent = t.cstImportTitle || 'csTimer Import Complete';
-                overlay.classList.add('visible');
+                for (const key of Object.keys(data)) {
+                    const m = key.match(sessionKeyRe);
+                    if (!m) continue;
+                    const num = m[1];
+
+                    const rawSolves = this._maybeParseJson(data[key]);
+                    if (!Array.isArray(rawSolves) || rawSolves.length === 0) continue;
+
+                    const meta = sessionMeta[num] || {};
+                    const name = meta.name || `Session ${num}`;
+                    const scrType = (meta.opt && meta.opt.scrType) || '333';
+                    const discipline = this._cstScrambleTypeToDiscipline(scrType);
+
+                    const solves = [];
+                    let sessionSkipped = 0;
+                    for (const rawSolve of rawSolves) {
+                        const s = this._cstParseSolve(rawSolve);
+                        if (s) solves.push(s); else sessionSkipped++;
+                    }
+                    if (solves.length === 0) continue;
+
+                    parsedSessions.push({
+                        name, solves, skipped: sessionSkipped,
+                        discipline: discipline || '3x3',
+                        disciplineRaw: scrType,
+                        unmapped: !discipline
+                    });
+                }
+
+                return parsedSessions;
             }
 
-            _escapeHtml(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
+            // ─── CubeDesk (.txt/.json) ──────────────
+            // { sessions: [{id, name, order}], solves: [{time, raw_time, cube_type, scramble,
+            //   session_id, started_at, ended_at, dnf, plus_two, notes, ...}] }
+            // `time` includes any +2 baked in (or is -1 for DNF); `raw_time` is the pre-penalty
+            // seconds value, which is what we actually want to store.
+            _cubeDeskTypeToDiscipline(cubeType) {
+                const map = {
+                    '333': '3x3', '222': '2x2', '444': '4x4', '555': '5x5',
+                    '666': '6x6', '777': '7x7',
+                    'pyraminx': 'pyraminx', 'skewb': 'skewb', 'minx': 'megaminx'
+                };
+                return map[cubeType] || null;
             }
 
+            _parseCubeDeskTxt(text) {
+                const data = JSON.parse(text);
+                if (!Array.isArray(data.solves)) throw new Error('Not a valid CubeDesk export');
+
+                const nameById = {};
+                (data.sessions || []).forEach(s => { nameById[s.id] = s.name; });
+
+                const groups = {}; // key: session_id + cube_type
+                for (const solve of data.solves) {
+                    if (typeof solve.raw_time !== 'number') continue;
+
+                    const cubeType = solve.cube_type || '333';
+                    const key = `${solve.session_id || 'default'}::${cubeType}`;
+                    if (!groups[key]) {
+                        const discipline = this._cubeDeskTypeToDiscipline(cubeType);
+                        groups[key] = {
+                            name: `${nameById[solve.session_id] || solve.session_id || 'Session'} (${cubeType})`,
+                            discipline: discipline || '3x3',
+                            disciplineRaw: cubeType,
+                            unmapped: !discipline,
+                            solves: [],
+                            skipped: 0
+                        };
+                    }
+
+                    const ts = typeof solve.started_at === 'number' ? solve.started_at : Date.now();
+                    groups[key].solves.push({
+                        id: `s_cd_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                        time: Math.max(0, solve.raw_time),
+                        timestamp: ts,
+                        scramble: solve.scramble || '',
+                        penalty: solve.plus_two ? 2 : null,
+                        dnf: !!solve.dnf
+                    });
+                }
+
+                return Object.values(groups);
+            }
+
+            // ─── Twisty Timer (.txt) ──────────────
+            // Two shapes have been observed in the wild:
+            //   1) Full backup (as documented in aricneto/TwistyTimer source): a comma
+            //      header (cosmetic only) then ';'-delimited, '"'-quoted data rows:
+            //      Puzzle,Category,Time(millis),Date(millis),Scramble,Penalty,Comment
+            //      Penalty: 0 = none, 1 = +2 (already baked into Time), 2 = DNF
+            //   2) A simpler "share/export" shape actually seen from real user files:
+            //      no header at all, just 3 ';'-delimited quoted columns per line:
+            //      "8.14";"R U2 F' ...";"2025-01-16T19:54:29.685+02:00"
+            //      Time here is already plain decimal SECONDS, and there's no
+            //      puzzle/penalty info in the file at all — the puzzle type has to be
+            //      guessed from the filename (e.g. "Twisty_Timer_2x2.txt"), and every
+            //      solve is treated as clean (no way to recover +2/DNF from this shape).
+            _twistyTimerTypeToDiscipline(puzzle) {
+                const map = {
+                    '222': '2x2', '333': '3x3', '444': '4x4', '555': '5x5',
+                    '666': '6x6', '777': '7x7',
+                    'pyra': 'pyraminx', 'skewb': 'skewb', 'mega': 'megaminx'
+                };
+                return map[(puzzle || '').toLowerCase()] || null;
+            }
+
+            // Best-effort puzzle-type guess from a filename like "Twisty_Timer_2x2.txt"
+            // or "twisty timer pyraminx export.txt".
+            _guessDisciplineFromFilename(fileName) {
+                const name = (fileName || '').toLowerCase();
+                // Using (?<!\d)...(?!\d) instead of \b: \b doesn't create a boundary
+                // between "_" and a digit (underscore counts as a word character), so
+                // "Twisty_Timer_2x2.txt" would otherwise fail to match "2x2".
+                const patterns = [
+                    [/2x2x2|2x2|(?<!\d)222(?!\d)/, '2x2'],
+                    [/3x3x3|3x3|(?<!\d)333(?!\d)/, '3x3'],
+                    [/4x4x4|4x4|(?<!\d)444(?!\d)/, '4x4'],
+                    [/5x5x5|5x5|(?<!\d)555(?!\d)/, '5x5'],
+                    [/6x6x6|6x6|(?<!\d)666(?!\d)/, '6x6'],
+                    [/7x7x7|7x7|(?<!\d)777(?!\d)/, '7x7'],
+                    [/pyraminx|pyra/, 'pyraminx'],
+                    [/skewb/, 'skewb'],
+                    [/megaminx|mega/, 'megaminx']
+                ];
+                for (const [re, disc] of patterns) {
+                    if (re.test(name)) return disc;
+                }
+                return null;
+            }
+
+            _parseCsvLine(line, delimiter) {
+                // Handles a single "quoted;fields" line (Twisty Timer / Cubic Timer style).
+                const out = [];
+                let cur = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    if (ch === '"') {
+                        if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+                        else inQuotes = !inQuotes;
+                    } else if (ch === delimiter && !inQuotes) {
+                        out.push(cur); cur = '';
+                    } else {
+                        cur += ch;
+                    }
+                }
+                out.push(cur);
+                return out;
+            }
+
+            _parseTwistyTimerTxt(text, fileName) {
+                const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+                if (lines.length === 0) throw new Error('Empty Twisty Timer file');
+
+                // Detect which shape we're dealing with by checking the column count
+                // of the first data-looking line.
+                const probeCols = this._parseCsvLine(lines[0], ';');
+
+                if (probeCols.length >= 7) {
+                    // Shape 1: full backup, first line is a (comma) header to skip.
+                    return this._parseTwistyTimerFull(lines);
+                }
+
+                // Shape 2: simple 3-column "time;scramble;date" export, no header,
+                // no puzzle/penalty info in the file itself.
+                return this._parseTwistyTimerSimple(lines, fileName);
+            }
+
+            _parseTwistyTimerFull(lines) {
+                const groups = {};
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = this._parseCsvLine(lines[i], ';');
+                    if (cols.length < 7) continue;
+
+                    const [puzzle, category, timeMs, dateMs, scramble, penaltyCode] = cols;
+                    const key = `${puzzle}::${category}`;
+                    if (!groups[key]) {
+                        const discipline = this._twistyTimerTypeToDiscipline(puzzle);
+                        groups[key] = {
+                            name: category ? `${puzzle}-${category}` : puzzle,
+                            discipline: discipline || '3x3',
+                            disciplineRaw: puzzle,
+                            unmapped: !discipline,
+                            solves: [],
+                            skipped: 0
+                        };
+                    }
+
+                    const timeNum = parseInt(timeMs, 10);
+                    if (isNaN(timeNum)) { groups[key].skipped++; continue; }
+
+                    const penalty = penaltyCode === '1' ? 2 : null; // already baked into timeMs
+                    const dnf = penaltyCode === '2';
+                    const ts = parseInt(dateMs, 10) || Date.now();
+
+                    groups[key].solves.push({
+                        id: `s_tt_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                        time: Math.max(0, timeNum - (penalty ? 2000 : 0)) / 1000,
+                        timestamp: ts,
+                        scramble: scramble || '',
+                        penalty,
+                        dnf
+                    });
+                }
+
+                return Object.values(groups);
+            }
+
+            _parseTwistyTimerSimple(lines, fileName) {
+                const discipline = this._guessDisciplineFromFilename(fileName);
+                const group = {
+                    name: fileName ? fileName.replace(/\.[^.]+$/, '') : 'Twisty Timer Import',
+                    discipline: discipline || '3x3',
+                    disciplineRaw: fileName || '?',
+                    unmapped: !discipline,
+                    solves: [],
+                    skipped: 0
+                };
+
+                for (const line of lines) {
+                    const cols = this._parseCsvLine(line, ';');
+                    if (cols.length < 3) { group.skipped++; continue; }
+
+                    const [timeStr, scramble, dateStr] = cols;
+                    const timeNum = parseFloat(timeStr);
+                    if (isNaN(timeNum) || timeNum <= 0) { group.skipped++; continue; }
+
+                    const ts = this._parseDateFlexible(dateStr) || Date.now();
+
+                    // This export shape carries no penalty/DNF information at all, so
+                    // every solve here is imported as clean.
+                    group.solves.push({
+                        id: `s_tt_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                        time: timeNum,
+                        timestamp: ts,
+                        scramble: scramble || '',
+                        penalty: null,
+                        dnf: false
+                    });
+                }
+
+                return [group];
+            }
+
+            _parseDateFlexible(str) {
+                if (!str) return null;
+                const n = Number(str);
+                if (!isNaN(n) && n > 0) {
+                    // Could be seconds or already millis; treat as millis if it's a huge number.
+                    return n > 1e12 ? n : n * 1000;
+                }
+                const parsed = Date.parse(str);
+                return isNaN(parsed) ? null : parsed;
+            }
+
+            // ─── Last Cube X (.csv) ──────────────
+            // No public spec exists for this closed-source app, but a real user export
+            // confirmed the actual shape: ';'-delimited, '"'-quoted, WITH a header that
+            // closely mirrors Twisty Timer's own format:
+            //   Puzzle;Session;Time(millis);Date(millis);Scramble;Penalty;Remark;Reconstruction
+            // Time(millis) is plain integer milliseconds (NOT the ambiguous digit-entry
+            // format used elsewhere in this app) — dividing by 1000 gives seconds
+            // directly. Puzzle values are WCA long-form ("3x3x3", "Pyraminx", "Square-1"),
+            // and Session is a separate, sometimes-translated display name (e.g. a user
+            // can rename "Pyraminx" to "Пирамидка"). Penalty follows the same 0/1/2
+            // convention as Twisty Timer (0 = none, 1 = +2 baked into Time, 2 = DNF),
+            // given how closely the two header shapes match.
+            //
+            // If a file doesn't match this header, we fall back to a generic heuristic
+            // column-sniffer so other Last Cube X versions/exports still have a chance.
+            _lastCubeXPuzzleToDiscipline(puzzle) {
+                const p = (puzzle || '').toLowerCase().trim();
+                const map = {
+                    '2x2x2': '2x2', '2x2': '2x2',
+                    '3x3x3': '3x3', '3x3': '3x3',
+                    '4x4x4': '4x4', '4x4': '4x4',
+                    '5x5x5': '5x5', '5x5': '5x5',
+                    '6x6x6': '6x6', '6x6': '6x6',
+                    '7x7x7': '7x7', '7x7': '7x7',
+                    'pyraminx': 'pyraminx', 'skewb': 'skewb', 'megaminx': 'megaminx'
+                };
+                return map[p] || null;
+            }
+
+            _parseLastCubeXCsv(text) {
+                const delimiter = text.includes(';') ? ';' : ',';
+                const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+                if (lines.length === 0) throw new Error('Empty file');
+
+                const header = this._parseCsvLine(lines[0], delimiter).map(h => h.trim().toLowerCase());
+                const puzzleIdx = header.indexOf('puzzle');
+                const sessionIdx = header.indexOf('session');
+                const timeIdx = header.findIndex(h => h.startsWith('time'));
+                const dateIdx = header.findIndex(h => h.startsWith('date'));
+                const scrambleIdx = header.indexOf('scramble');
+                const penaltyIdx = header.indexOf('penalty');
+                const isMillis = timeIdx !== -1 && header[timeIdx].includes('millis');
+
+                if (timeIdx !== -1 && puzzleIdx !== -1) {
+                    // Confirmed real shape (or close enough to it)
+                    return this._parseLastCubeXKnownShape(lines, delimiter, {
+                        puzzleIdx, sessionIdx, timeIdx, dateIdx, scrambleIdx, penaltyIdx, isMillis
+                    });
+                }
+
+                return this._parseLastCubeXHeuristic(lines, delimiter, header);
+            }
+
+            _parseLastCubeXKnownShape(lines, delimiter, idx) {
+                const groups = {};
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = this._parseCsvLine(lines[i], delimiter);
+                    if (cols.length <= idx.timeIdx) continue;
+
+                    const rawPuzzle = cols[idx.puzzleIdx] || '3x3';
+                    const rawSession = idx.sessionIdx !== -1 ? cols[idx.sessionIdx] : rawPuzzle;
+                    const key = `${rawPuzzle}::${rawSession}`;
+
+                    if (!groups[key]) {
+                        const discipline = this._lastCubeXPuzzleToDiscipline(rawPuzzle);
+                        groups[key] = {
+                            name: rawSession || rawPuzzle,
+                            discipline: discipline || '3x3',
+                            disciplineRaw: rawPuzzle,
+                            unmapped: !discipline,
+                            solves: [],
+                            skipped: 0
+                        };
+                    }
+
+                    const rawTime = cols[idx.timeIdx];
+                    const timeNum = idx.isMillis ? parseInt(rawTime, 10) : parseFloat(rawTime);
+                    if (isNaN(timeNum)) { groups[key].skipped++; continue; }
+
+                    const penaltyCode = idx.penaltyIdx !== -1 ? cols[idx.penaltyIdx] : '0';
+                    const dnf = penaltyCode === '2';
+                    const penalty = (!dnf && penaltyCode === '1') ? 2 : null;
+                    const timeMs = idx.isMillis ? timeNum : Math.round(timeNum * 1000);
+                    const rawDate = idx.dateIdx !== -1 ? cols[idx.dateIdx] : null;
+                    const ts = this._parseDateFlexible(rawDate) || Date.now();
+
+                    groups[key].solves.push({
+                        id: `s_lcx_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                        time: Math.max(0, timeMs - (penalty ? 2000 : 0)) / 1000,
+                        timestamp: ts,
+                        scramble: idx.scrambleIdx !== -1 ? (cols[idx.scrambleIdx] || '') : '',
+                        penalty,
+                        dnf
+                    });
+                }
+
+                return Object.values(groups);
+            }
+
+            // Fallback for Last Cube X files that don't match the known header shape.
+            _parseLastCubeXHeuristic(lines, delimiter, header) {
+                const findCol = (...names) => header.findIndex(h => names.some(n => h.includes(n)));
+
+                const timeIdx = findCol('time');
+                const scrambleIdx = findCol('scramble');
+                const dateIdx = findCol('date', 'created', 'timestamp');
+                const penaltyIdx = findCol('penalty', '+2', 'plustwo');
+                const dnfIdx = findCol('dnf');
+                const puzzleIdx = findCol('puzzle', 'cube', 'type', 'event');
+
+                const hasHeader = timeIdx !== -1;
+                const startRow = hasHeader ? 1 : 0;
+
+                const groups = {};
+                let globalSkipped = 0;
+
+                for (let i = startRow; i < lines.length; i++) {
+                    const cols = this._parseCsvLine(lines[i], delimiter);
+
+                    const rawTime = hasHeader ? cols[timeIdx] : cols[0];
+                    const rawScramble = hasHeader && scrambleIdx !== -1 ? cols[scrambleIdx] : cols[1];
+                    const rawDate = hasHeader && dateIdx !== -1 ? cols[dateIdx] : cols[2];
+                    const rawPuzzle = hasHeader && puzzleIdx !== -1 ? cols[puzzleIdx] : null;
+                    const rawDnf = hasHeader && dnfIdx !== -1 ? cols[dnfIdx] : null;
+                    const rawPenalty = hasHeader && penaltyIdx !== -1 ? cols[penaltyIdx] : null;
+
+                    const dnfFromColumn = /^(dnf|yes|true|1)$/i.test(String(rawDnf || '').trim());
+                    const timeText = String(rawTime || '').trim();
+                    const parsed = this._parseTimeInput(timeText);
+
+                    if (!parsed && !dnfFromColumn) { globalSkipped++; continue; }
+
+                    const puzzleKey = (rawPuzzle || '3x3').toLowerCase().trim();
+                    if (!groups[puzzleKey]) {
+                        const discipline = this._lastCubeXPuzzleToDiscipline(puzzleKey);
+                        groups[puzzleKey] = {
+                            name: 'Last Cube X Import',
+                            discipline: discipline || '3x3',
+                            disciplineRaw: rawPuzzle || '3x3',
+                            unmapped: !!rawPuzzle && !discipline,
+                            solves: [],
+                            skipped: 0
+                        };
+                    }
+
+                    const dnf = dnfFromColumn || (parsed && parsed.dnf);
+                    const penalty = !dnf && /^(\+2|yes|true|1)$/i.test(String(rawPenalty || '')) ? 2 : null;
+                    const ts = this._parseDateFlexible(rawDate) || Date.now();
+
+                    groups[puzzleKey].solves.push({
+                        id: `s_lcx_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                        time: (dnf || !parsed) ? 0 : parsed.time,
+                        timestamp: ts,
+                        scramble: rawScramble || '',
+                        penalty,
+                        dnf
+                    });
+                }
+
+                const result = Object.values(groups);
+                if (result.length > 0) result[0].skipped = globalSkipped;
+                return result;
+            }
+
+            // ════════════════════════════════════════════════════════════
+            // Exporters — convert this app's data INTO another timer's format
+            // ════════════════════════════════════════════════════════════
+
+            _disciplineToCstScrType(discipline) {
+                const map = {
+                    '2x2': '222so', '3x3': '333', '4x4': '444wca', '5x5': '555wca',
+                    '6x6': '666wca', '7x7': '777wca',
+                    'pyraminx': 'pyrso', 'skewb': 'skbso', 'megaminx': 'mgmp'
+                };
+                return map[discipline] || '333';
+            }
+
+            // Shared by "csTimer" and "Last Cube X" (which also accepts csTimer-format files).
+            _exportToCstimerFormat(filenamePrefix) {
+                const sessionData = {};
+                const out = {};
+                let idx = 0;
+
+                for (const key of Object.keys(this.sessions)) {
+                    const session = this.sessions[key];
+                    idx++;
+                    sessionData[idx] = {
+                        name: session.name,
+                        opt: { scrType: this._disciplineToCstScrType(session.discipline) },
+                        rank: idx
+                    };
+
+                    out[`session${idx}`] = session.solves.map(s => {
+                        const penalty = s.dnf ? -1 : (s.penalty ? Math.round(s.penalty * 1000) : 0);
+                        return [
+                            [penalty, Math.round(s.time * 1000)],
+                            s.scramble || '',
+                            '',
+                            Math.round((s.timestamp || Date.now()) / 1000)
+                        ];
+                    });
+                }
+
+                out.properties = { sessionData: JSON.stringify(sessionData) };
+                this._downloadFile(`${filenamePrefix}_${Date.now()}.txt`, JSON.stringify(out), 'text/plain');
+            }
+
+            _disciplineToCubeDeskType(discipline) {
+                const map = {
+                    '2x2': '222', '3x3': '333', '4x4': '444', '5x5': '555',
+                    '6x6': '666', '7x7': '777',
+                    'pyraminx': 'pyraminx', 'skewb': 'skewb', 'megaminx': 'minx'
+                };
+                return map[discipline] || '333';
+            }
+
+            _exportToCubeDeskFormat() {
+                const sessions = [];
+                const solves = [];
+                let order = 0;
+
+                for (const key of Object.keys(this.sessions)) {
+                    const session = this.sessions[key];
+                    order++;
+                    sessions.push({ id: key, name: session.name, order });
+
+                    const cubeType = this._disciplineToCubeDeskType(session.discipline);
+                    for (const s of session.solves) {
+                        const ts = s.timestamp || Date.now();
+                        solves.push({
+                            id: `s_${ts}_${Math.random().toString(36).slice(2, 7)}`,
+                            time: s.dnf ? -1 : (s.time + (s.penalty || 0)),
+                            raw_time: s.time,
+                            cube_type: cubeType,
+                            scramble: s.scramble || '',
+                            session_id: key,
+                            started_at: ts,
+                            ended_at: ts + Math.round(s.time * 1000),
+                            dnf: !!s.dnf,
+                            plus_two: !!s.penalty,
+                            notes: '',
+                            trainer_name: null,
+                            created_at: new Date(ts).toISOString(),
+                            from_timer: true,
+                            bulk: false
+                        });
+                    }
+                }
+
+                this._downloadFile(`firecube_cubedesk_${Date.now()}.txt`, JSON.stringify({ sessions, solves }), 'text/plain');
+            }
+
+            _disciplineToTwistyTimerType(discipline) {
+                const map = {
+                    '2x2': '222', '3x3': '333', '4x4': '444', '5x5': '555',
+                    '6x6': '666', '7x7': '777',
+                    'pyraminx': 'pyra', 'skewb': 'skewb', 'megaminx': 'mega'
+                };
+                return map[discipline] || '333';
+            }
+
+            _exportToTwistyTimerFormat() {
+                let out = 'Puzzle,Category,Time(millis),Date(millis),Scramble,Penalty,Comment\n';
+
+                for (const key of Object.keys(this.sessions)) {
+                    const session = this.sessions[key];
+                    const puzzle = this._disciplineToTwistyTimerType(session.discipline);
+
+                    for (const s of session.solves) {
+                        const timeMs = Math.round((s.time + (s.penalty || 0)) * 1000);
+                        const penaltyCode = s.dnf ? 2 : (s.penalty ? 1 : 0);
+                        const ts = s.timestamp || Date.now();
+                        out += `"${puzzle}";"${session.name.replace(/"/g, '""')}";"${timeMs}";"${ts}";"${(s.scramble || '').replace(/"/g, '""')}";"${penaltyCode}";""\n`;
+                    }
+                }
+
+                this._downloadFile(`firecube_twistytimer_${Date.now()}.txt`, out, 'text/plain');
+            }
+
+            // ─── Import/Export menu wiring ──────────────
+            _handleImportChoice(source) {
+                const t = this._ieT();
+
+                const parsersAndLabels = {
+                    firecube: { label: 'FireCube Timer', parse: (txt, name) => this._parseFireCubeJson(txt) },
+                    cstimer: { label: 'csTimer', parse: (txt, name) => this._parseCstimerTxt(txt) },
+                    lastcubex: { label: 'Last Cube X', parse: (txt, name) => this._parseLastCubeXCsv(txt) },
+                    cubedesk: { label: 'CubeDesk', parse: (txt, name) => this._parseCubeDeskTxt(txt) },
+                    twistytimer: { label: 'Twisty Timer', parse: (txt, name) => this._parseTwistyTimerTxt(txt, name) }
+                };
+
+                const entry = parsersAndLabels[source];
+                if (!entry) return;
+
+                document.getElementById('importExportOverlay').classList.remove('visible');
+
+                this._pickFile((text, fileName) => {
+                    try {
+                        const parsedSessions = entry.parse(text, fileName);
+                        this._finishImport(entry.label, parsedSessions);
+                    } catch (error) {
+                        alert(`Error importing ${entry.label} data: ` + error.message);
+                    }
+                });
+            }
+
+            _handleExportChoice(source) {
+                document.getElementById('importExportOverlay').classList.remove('visible');
+                switch (source) {
+                    case 'firecube': this.exportData(); break;
+                    case 'cstimer': this._exportToCstimerFormat('firecube_cstimer'); break;
+                    case 'lastcubex': this._exportToCstimerFormat('firecube_lastcubex'); break;
+                    case 'cubedesk': this._exportToCubeDeskFormat(); break;
+                    case 'twistytimer': this._exportToTwistyTimerFormat(); break;
+                }
+            }
 
             importData() {
                 const input = document.createElement('input');
