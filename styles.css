@@ -512,15 +512,19 @@
         }
 
         /* ─── Target Time & Honest Mode pills ─── */
+        /* A normal flex child (not absolutely centered) so it can never overlap the
+           logo or the session dropdown/buttons — its available space is whatever's
+           left between them, which flexbox always respects. Absolute dead-centering
+           in the whole header used to drift into the dropdown on narrower windows
+           or with long session names. */
         .header-pills {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
+            flex: 1;
+            min-width: 0;
+            padding: 0 0.5rem;
         }
 
         .header-pills-mobile {
@@ -1015,6 +1019,18 @@
             padding: 1rem;
             background: rgba(255, 255, 255, 0.03);
             border-radius: 12px;
+        }
+
+        /* Wraps a label + description together so long descriptions can wrap onto
+           a second line without squishing the toggle-switch next to it (flexbox
+           shrinks all children by default unless told otherwise). */
+        .setting-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .setting-row .toggle-switch {
+            flex-shrink: 0;
         }
 
         .setting-label-new {
