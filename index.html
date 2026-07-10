@@ -499,6 +499,20 @@
                     <!-- Timer Mood Section -->
                     <div class="settings-section-content" id="section-mood">
                         <h3 class="section-title" id="st-mood">Timer Mood</h3>
+
+                        <!-- Commentary Language — independent from the UI language -->
+                        <div class="setting-group" style="margin-bottom: 1.25rem;">
+                            <div class="inspection-mode-label" id="commentaryLangLabel">Commentary Language</div>
+                            <div class="segmented-control">
+                                <button class="segmented-btn active" id="commentaryLangRu" data-clang="ru">
+                                    <span class="seg-title">Русский</span>
+                                </button>
+                                <button class="segmented-btn" id="commentaryLangEn" data-clang="en">
+                                    <span class="seg-title">English</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="setting-group">
                             <div class="mood-grid">
                                 <button class="mood-card active" data-mood="friend">
@@ -640,14 +654,10 @@
                                 </div>
 
                                 <!-- Desktop only (File System Access API — no mobile browser supports it) -->
-                                <div id="autoExportFolderRow" style="display:none;">
-                                    <div class="setting-row" style="align-items:center; justify-content:space-between;">
-                                        <div>
-                                            <div class="setting-description" id="st-autoExportFolderDesc" style="margin:0;">Saves straight to a folder, no download prompt</div>
-                                            <div class="setting-description" id="autoExportFolderStatus" style="margin-top:0.25rem; opacity:0.75;">No folder selected — files will go to Downloads</div>
-                                        </div>
-                                        <button class="data-btn secondary" id="autoExportChooseFolderBtn" style="flex-shrink:0; white-space:nowrap;">Choose Folder</button>
-                                    </div>
+                                <div id="autoExportFolderRow" class="autoexport-folder-block" style="display:none;">
+                                    <div class="setting-description" id="st-autoExportFolderDesc">Saves straight to a folder, no download prompt</div>
+                                    <div class="autoexport-folder-status" id="autoExportFolderStatus">No folder selected — files will go to Downloads</div>
+                                    <button class="data-btn secondary" id="autoExportChooseFolderBtn">📁 Choose Folder</button>
                                 </div>
                                 <div id="autoExportMobileNote" class="setting-description" style="display:none; margin-top:0.5rem; opacity:0.75;">On phones, exported files always go to your Downloads folder.</div>
                             </div>
@@ -772,6 +782,37 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Pie charts -->
+                <div class="additional-stats" style="margin-top: 1.5rem;">
+                    <!-- Clean / +2 / DNF split -->
+                    <div class="stats-block">
+                        <div class="stats-block-title" id="st-stat-penalty-pie">Clean vs Penalties</div>
+                        <div class="pie-chart-container">
+                            <canvas id="penaltyPieCanvas"></canvas>
+                        </div>
+                        <div class="pie-chart-legend" id="penaltyPieLegend"></div>
+                    </div>
+
+                    <!-- Solves by discipline -->
+                    <div class="stats-block" id="disciplinePieBlock">
+                        <div class="stats-block-title" id="st-stat-discipline-pie">Solves by Puzzle</div>
+                        <div class="pie-chart-container">
+                            <canvas id="disciplinePieCanvas"></canvas>
+                        </div>
+                        <div class="pie-chart-legend" id="disciplinePieLegend"></div>
+                    </div>
+
+                    <!-- Solves by subsession -->
+                    <div class="stats-block" id="subsessionPieBlock" style="display:none;">
+                        <div class="stats-block-title" id="st-stat-subsession-pie">Solves by Subsession</div>
+                        <div class="pie-chart-container">
+                            <canvas id="subsessionPieCanvas"></canvas>
+                        </div>
+                        <div class="pie-chart-legend" id="subsessionPieLegend"></div>
+                    </div>
+                </div>
+
                 <!-- Trend & Heatmap blocks -->
                 <div class="additional-stats" style="margin-top: 1.5rem;">
                     <!-- Subsessions stats block -->
@@ -1050,19 +1091,19 @@
                 </div>
             </div>
 
-            <!-- Active state: show countdown + allow stopping early -->
+            <!-- Active state: show countdown only — no early stop, that defeats the point -->
             <div id="hmActiveState" style="display:none;">
-                <p class="hm-desc" id="hmActiveDesc">Honest Mode is running. Solves are locked until it ends.</p>
+                <p class="hm-desc" id="hmActiveDesc">Honest Mode is running. Solves are locked until it ends — it can't be stopped early.</p>
                 <div class="hm-countdown" id="hmCountdownDisplay">12:34</div>
                 <div class="new-session-actions">
-                    <button class="new-session-btn cancel" id="honestModeStop" style="width:100%;">Stop Honest Mode</button>
+                    <button class="new-session-btn cancel" id="honestModeCloseActive" style="width:100%;">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.14.0</div>
+    <div class="version-display">1.16.0</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu" style="display:none;">

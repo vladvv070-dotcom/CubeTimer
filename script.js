@@ -1887,6 +1887,1825 @@
                     ]
                 } // end of rival mood
             }; // end of moods database
+
+                this.moodsEn = {
+                    friend: {
+                        slow_time: [
+                        'You\'re not in a rush today, huh 🤨',
+                        'The cube didn\'t run away… but still',
+                        'Me: "It\'s fine"\nFriend: "Fine isn\'t 38 seconds"',
+                        'Slow but steady… very slow',
+                        'No rush, we\'ve got all the time in the world',
+                        'Were you cooking dinner in between turns?',
+                        'Uh… were you reading the instructions as you went?',
+                        'The Ninja Turtles called — they want to know your technique',
+                        'Could\'ve been faster, but okay',
+                        'Me: "I tried"\nFriend: "Clearly"',
+                        'So, is the cube broken or something?',
+                        'Stay calm, just stay calm',
+                        'You didn\'t fall asleep in there, right?',
+                        'A very philosophical approach to solving, respect',
+                        'Slow doesn\'t mean bad. But it was slow.',
+                        'Cube: "Could\'ve picked up the pace"',
+                        'Nah, it\'s fine, very dignified',
+                        'Time\'s relative, right?',
+                        'I wouldn\'t have rushed either, in your shoes',
+                        'Were you narrating every turn out loud?',
+                        'Being methodical is good, but...',
+                        'Speed isn\'t everything, but still',
+                        'Maybe you need a break?',
+                        'The cube thought you\'d given up',
+                        'Me: "How long?"\nFriend: "Better not ask"',
+                        'A very unhurried approach',
+                        'At least you finished it',
+                        'Time flies when you\'re not solving a cube',
+                        'But quality over speed, right?',
+                        'The cube aged while you were solving it',
+                        'I could\'ve done two in that time',
+                        'That was a pretty relaxed solve',
+                        'No rush at all, huh?',
+                        'Were you even trying to hurry?',
+                        'A very meditative solve',
+                        'My coffee went cold in that time',
+                        'Well, all that matters is you finished',
+                        'Did you forget an algorithm somewhere?',
+                        'Patience is your strong suit',
+                        'At least it was clean... probably'
+                        ],
+                        fast_time: [
+                        'WHOA 😳 now THAT\'S what I\'m talking about!',
+                        'Wait, hold on, did you actually solve that yourself?',
+                        'Remember this moment',
+                        'THERE it is, now THAT looks right!',
+                        'Me: "Did you see that?"\nFriend: "Noticed"',
+                        'The cube didn\'t even realize what happened',
+                        'Fast, clean, beautiful',
+                        'Now THIS I like!',
+                        'Can you do that again? No, seriously',
+                        'Uh, are the cameras rolling? We need to record this',
+                        'Let me guess — lucky scramble?',
+                        'Not bad, not bad at all 👀',
+                        'WCA, say hello to your next talent',
+                        'That\'s exactly how it\'s done!',
+                        'Cube: "Hey, take it easy!"',
+                        'Turns out the speed of light isn\'t the limit after all',
+                        'That was… fast',
+                        'I\'d be proud of that, honestly',
+                        'Your fingers were just flying',
+                        'Wow. Just wow.',
+                        'Now THAT\'S speed!',
+                        'Where\'d that speed come from?',
+                        'The cube didn\'t even get a chance to resist',
+                        'Me: "Fast"\nFriend: "Very fast"',
+                        'Turbo mode activated',
+                        'Even your eyes couldn\'t keep up with your hands',
+                        'That was elegant',
+                        'Fingers on autopilot?',
+                        'Now THAT\'S a pace!',
+                        'The cube gave up without a fight',
+                        'At this rate you\'ll have a new record soon',
+                        'Impressive, no argument there',
+                        'Speed mode: engaged',
+                        'Beautiful work',
+                        'That\'s what skill looks like',
+                        'That was elegant',
+                        'Your fingers worked like clockwork',
+                        'Clean solve',
+                        'Looks straight-up professional',
+                        'Now THAT\'S a pace I can respect!'
+                        ],
+                        pb_single: [
+                        '🎉 NEW RECORD! Legend!',
+                        'THAT WAS INSANELY FAST!',
+                        'Write down the date. This is history.',
+                        'Me: "I did it"\nFriend: "YOU DID IT!"',
+                        'PERSONAL BEST, BABY!',
+                        'The cube is shocked. I\'m shocked. Everyone\'s shocked.',
+                        'Now THAT\'S a plot twist! Literally',
+                        'Screenshot it, NOW',
+                        'New best time — new life',
+                        'THIS CALLS FOR A CELEBRATION',
+                        'Hands: 100% skill, 0% luck',
+                        'The cube didn\'t even have time to process it',
+                        'AND THAT WAS EVEN POSSIBLE???',
+                        'Record smashed, you can breathe out now',
+                        'That… that was beautiful 😭',
+                        'I\'d already be dancing in your shoes',
+                        'NEW BAR SET',
+                        'Feliks Zemdegs called — asking how you did it',
+                        'Speed: YES. Accuracy: YES. Record: YES.',
+                        'That was something else',
+                        'PERSONAL RECORD DESTROYED!!! 🔥',
+                        'History has been rewritten',
+                        'New heights reached',
+                        'Me: "RECORD!"\nFriend: "RECORD!!!"',
+                        'That deserves a round of applause',
+                        'There it is — perfection',
+                        'BEST TIME UPDATED ⚡',
+                        'A legendary solve',
+                        'This goes down in history',
+                        'The ceiling\'s been broken!',
+                        'New level unlocked',
+                        'The cube got conquered at a whole new speed',
+                        'A PERFECT SOLVE',
+                        'This is a moment of triumph',
+                        'New personal max achieved',
+                        'A historic event',
+                        'Straight-up out of this world',
+                        'Unbelievable speed!',
+                        'Magic just happened',
+                        'That was gorgeous'
+                        ],
+                        pb_average: [
+                        'Consistency\'s growing — beautiful!',
+                        'Averages are improving, that\'s awesome',
+                        'Me: "Progress?"\nFriend: "Absolutely"',
+                        'You\'re getting better, that\'s a fact',
+                        'Average time\'s dropping, I can see it',
+                        'Keep going like this!',
+                        'Consistency is the path to success',
+                        'Now THIS is progress',
+                        'The learning curve is climbing',
+                        'Averages don\'t lie — you\'re crushing it',
+                        'Consistently fast = top tier',
+                        'This isn\'t luck anymore, it\'s skill',
+                        'Average time improved — feels good',
+                        'Keep it up, there\'s real momentum!',
+                        'The system\'s working, plain to see',
+                        'Consistency\'s improving',
+                        'The training is paying off',
+                        'Average numbers are climbing',
+                        'Progress is clearly showing',
+                        'Solve quality is improving',
+                        'The self-improvement is showing',
+                        'Your average level is rising',
+                        'The stats don\'t lie',
+                        'Results are getting more consistent',
+                        'This is called growth',
+                        'The skill is solidifying',
+                        'A confident rise in the numbers',
+                        'The trend is positive',
+                        'Those average times are pleasing',
+                        'Steady improvement'
+                        ],
+                        worse_average: [
+                        'It happens, don\'t stress',
+                        'Just an unlucky streak',
+                        'The next one\'ll be better, you\'ll see',
+                        'A bad day ≠ bad skills',
+                        'Me: "Something\'s off"\nFriend: "Happens to everyone"',
+                        'Even the best have off days',
+                        'This is temporary, don\'t dwell on it',
+                        'The cube\'s just not in the mood today',
+                        'A small dip, nothing serious',
+                        'Even Usain Bolt didn\'t always run his fastest',
+                        'Relax, they\'re just numbers',
+                        'We\'ll fix it all tomorrow',
+                        'One bad day doesn\'t define you',
+                        'Rest up and come back stronger',
+                        'It\'s part of the process',
+                        'Everyone goes through this',
+                        'Don\'t fixate on one bad streak',
+                        'Plateaus happen to everyone',
+                        'Just not your day',
+                        'Rest matters too',
+                        'Sometimes you need to take a step back',
+                        'This is normal',
+                        'Not every day can be perfect',
+                        'A little turbulence',
+                        'Everyone goes through this',
+                        'Just a glitch in the matrix',
+                        'Temporary difficulties',
+                        'A skill re-check wouldn\'t hurt',
+                        'Rest up, you\'ll bounce back',
+                        'It\'s not the end of the world'
+                        ],
+                        plus_two: [
+                        '+2… a classic',
+                        'Those two seconds were unnecessary, huh?',
+                        'A judge wouldn\'t have forgiven that',
+                        '+2 — every speedcuber\'s pain',
+                        'Me: "Just +2"\nFriend: "Just 2 SECONDS"',
+                        'A technical moment happened',
+                        'So close to perfect… so close',
+                        '+2 penalty incoming',
+                        'Two seconds of happiness, stolen',
+                        'Ugh, without that it would\'ve been top tier',
+                        '+2 isn\'t a death sentence, but it stings',
+                        'The cube was almost there… almost',
+                        'Style penalty',
+                        'So close to perfection',
+                        '+2 — a reminder to be more precise',
+                        'Almost perfect',
+                        'A two-second difference',
+                        'Technical nuances',
+                        'A small inaccuracy',
+                        'Penalties happen',
+                        'Almost clean',
+                        '+2 is experience',
+                        'The finish wasn\'t quite perfect',
+                        'A tiny mistake',
+                        'Details decide everything',
+                        'Penalty recorded',
+                        'Two seconds — that\'s a lot',
+                        'Accuracy matters',
+                        'Almost penalty-free',
+                        'That last turn let you down'
+                        ],
+                        dnf: [
+                        'Well… it happens 😬',
+                        'The cube won',
+                        'Not your day today, but there\'s always another',
+                        'DNF is also experience',
+                        'Me: "Didn\'t work out"\nFriend: "Happens"',
+                        'Didn\'t finish it — no big deal, you\'ll get it next time',
+                        'Cube: 1, You: 0. Rematch?',
+                        'Sometimes the cube\'s just stronger',
+                        'DNFs happen even to the pros',
+                        'It\'s fine, you\'ll finish it next time',
+                        'That was a tough solve, yeah',
+                        'The cube\'s feeling mischievous today',
+                        'DNF isn\'t the end of the world',
+                        'Wanna try again?',
+                        'Some days the cube just won\'t cooperate',
+                        'Didn\'t come together',
+                        'Technical difficulties',
+                        'The cube didn\'t want to be solved',
+                        'Was that a tough scramble?',
+                        'Stuff happens',
+                        'Didn\'t work out, but that\'s okay',
+                        'The next attempt will go better',
+                        'A glitch happened',
+                        'Well, that one just didn\'t click',
+                        'Turns out the cube was craftier',
+                        'This one just wasn\'t your solve',
+                        'Did the algorithm slip your mind?',
+                        'It happens sometimes',
+                        'The cube put up a fight',
+                        'Not the day for this scramble'
+                        ],
+                        delete: [
+                        'UH, THAT\'S NOT COOL 😡',
+                        'Rewriting history, are we?',
+                        'Deleted it — must\'ve hurt',
+                        'Me: "Delete it?"\nFriend: "Seriously?"',
+                        'Okay, that never happened',
+                        'Whoa, hold on, you can\'t just delete it like that',
+                        'Delete button go brrrr',
+                        'We\'re forgetting it like a bad dream',
+                        'That solve never existed',
+                        'Removed from history',
+                        'Memory successfully wiped',
+                        'No one will ever know',
+                        'Wait, you could just DO that?',
+                        'I saw nothing 👀',
+                        'Classified files deleted',
+                        'Erasing the tracks',
+                        'History has been edited',
+                        'That never happened',
+                        'Delete and forget',
+                        'Inconvenient facts removed',
+                        'Rewriting history',
+                        'The delete button did its job',
+                        'Cleaning up the stats',
+                        'Tracks covered',
+                        'Editing on the fly',
+                        'Wiped from memory',
+                        'Eraser applied',
+                        'Result annulled',
+                        'Deleted of your own free will',
+                        'Let\'s just forget this one'
+                        ],
+                        neutral: [
+                        'Solid!',
+                        'Alright, moving on',
+                        'Not bad, not bad',
+                        'Decent time',
+                        'Me: "How was it?"\nFriend: "Fine"',
+                        'Keep it up',
+                        'A standard solve',
+                        'Everything on track',
+                        'An average result',
+                        'Nothing special, but not bad either',
+                        'An average result is still a result',
+                        'Keep it going',
+                        'A steady pace',
+                        'Consistency is good',
+                        'Just a regular practice',
+                        'Within the norm',
+                        'A steady solve',
+                        'A standard level',
+                        'As usual',
+                        'A familiar result',
+                        'Nothing out of the ordinary',
+                        'A steady average level',
+                        'Business as usual',
+                        'An ordinary solve',
+                        'An expected result',
+                        'In your own style',
+                        'A typical time',
+                        'As always',
+                        'An average number',
+                        'Just business as usual',
+                        'A standard approach',
+                        'A routine solve',
+                        'Your usual pace',
+                        'In your own manner',
+                        'Typical for you'
+                        ]
+                    },
+                    teaser: {
+                        slow_time: [
+                        'Was that the warmup or the whole thing? 🤨',
+                        'Can you go faster, or nah?',
+                        'Me: "Slow"\nFriend: "Very slow"',
+                        'The cube fell asleep',
+                        'Can\'t get slower than that, honestly',
+                        'Are you messing with me?',
+                        'Snail speed, confirmed',
+                        'Painful to watch',
+                        'Maybe reread the instructions?',
+                        'The cube aged while you solved it',
+                        'That was… interesting',
+                        'I\'d have gotten there faster walking',
+                        'Seriously, that long?',
+                        'Someone\'s off their game today',
+                        'Even a turtle\'s faster',
+                        'Maybe you need a break? A long one',
+                        'Were you even trying to hurry?',
+                        'The cube gave up out of boredom',
+                        'That\'s a slowness record',
+                        'Maybe the timer\'s broken? No, that\'s you',
+                        'Slower isn\'t possible, only backward',
+                        'Solving philosophy, huh?',
+                        'The cube thought you\'d changed your mind',
+                        'There was plenty of time',
+                        'Did you forget an algorithm?',
+                        'Well that\'s a fail',
+                        'I don\'t even know what to say',
+                        'Speed: 0, Motivation: 0',
+                        'The cube beat you on time',
+                        'Mmm... painful',
+                        'No rush, we\'ve got all day',
+                        'Was that a solve or a meditation session?',
+                        'That was a lazy little solve',
+                        'Maybe grab a coffee?',
+                        'The cube got older',
+                        'I already forgot we started',
+                        'Thought hard about every move?',
+                        'Speed\'s not your thing',
+                        'Well, at least you finished',
+                        'Time dragged on forever',
+                        'I\'ll pretend I didn\'t see that 🙂',
+                        'NPC moment 💀',
+                        'Wish I could go that slow right now',
+                        'We\'ll forget this happened, okay?',
+                        'Replay it?',
+                        'Let\'s just pretend it didn\'t happen',
+                        'I\'ll just watch... oh no',
+                        'HAHA WHAT',
+                        'Yeah, yeah, whatever',
+                        'No comment (but that was a fail)',
+                        'Is it even legal to be this slow?',
+                        'Bro really took his time 💀',
+                        'I could do that too, if I wasn\'t in a rush',
+                        'We both tried... no wait, just me',
+                        'Legend of slow-motion footage',
+                        'THAT slow?',
+                        'Didn\'t know you could go THAT slow',
+                        '🙂 (won\'t say anything else)',
+                        'Main character of the movie \'Unhurried\'',
+                        'That was clean... clean and slow',
+                        'Alright, you won the snail race',
+                        'I\'m shocked, honestly',
+                        'Sigma grindset, slow-mo edition',
+                        'Not gonna say anything. Actually, I will: SLOW',
+                        'Hats off... out of sheer boredom 🎩',
+                        'Okay, that was... long',
+                        'You and I are on the same level (turtle level)',
+                        'Alright, this isn\'t serious anymore',
+                        '💀💀💀 rip speed',
+                        'I\'m just... wow',
+                        'Why was six afraid of seven? Because seven eight nine... and you\'re just slow',
+                        'Six seven eight... what step are you stuck on?',
+                        'Seven ate nine, and you\'re still on six',
+                        'Six is afraid of seven, and seven\'s afraid of your speed 💀',
+                        'If speed were a number, this would be... six',
+                        'Seven eight nine, and you\'re still thinking'
+                        ],
+                        fast_time: [
+                        'Whoa, the hands actually work!',
+                        'Finally, something decent',
+                        'Now THIS looks legit',
+                        'Could\'ve done that from the start!',
+                        'Me: "Not bad"\nFriend: "For you, yeah"',
+                        'Lucky scramble?',
+                        'Is that a fluke or do you actually have skill?',
+                        'Huh, interesting',
+                        'Didn\'t see that coming',
+                        'Did someone solve it for you?',
+                        'Finally woke up',
+                        'Now THIS is better',
+                        'Well, finally',
+                        'You CAN do it when you want to',
+                        'Unexpectedly fast',
+                        'Do it again, if you can',
+                        'Was that you or your brother?',
+                        'Where\'d that speed come from?',
+                        'Suspiciously fast',
+                        'Wow, you\'ve actually got it',
+                        'Every time from now on, yeah?',
+                        'Fast is good, but is it consistent?',
+                        'Lucky, admit it',
+                        'Well, at least it happened once',
+                        'Not used to results like this from you',
+                        'Let\'s see you do that again',
+                        'Luck\'s a wonderful thing',
+                        'The planets aligned',
+                        'That was your best attempt',
+                        'Finally, something worthwhile',
+                        'Could\'ve done that from the start!',
+                        'See, you CAN do it',
+                        'Why not always like this?',
+                        'Unexpected twist',
+                        'Talent woke up',
+                        'That was a lucky break',
+                        'Finally, the hands cooperated',
+                        'Wow, actual progress',
+                        'So it WAS possible',
+                        'Random luck',
+                        'PURE SIGMA 😎',
+                        'Okay, that was beautiful',
+                        'Alright, respect',
+                        'Hats off 🎩',
+                        'Okay, this just got serious',
+                        'Bro really did that 💀',
+                        'Legend',
+                        'Main character',
+                        'Didn\'t know you had THAT in you',
+                        'Is this even legal?',
+                        'That was clean',
+                        'I\'m shocked, honestly',
+                        'HAHA DID YOU SEE THAT???',
+                        'You really are sigma',
+                        'Wait, that was allowed???',
+                        'Alright, you won this round',
+                        'I\'d have done the same (probably)',
+                        'We both tried, but you\'re better',
+                        'I can do that too... no, lying',
+                        'No comment (that was elite)',
+                        'Yeah, yeah, gorgeous',
+                        'Wish I could go that fast right now',
+                        '🙂 (impressed)',
+                        'An NPC could never',
+                        'We\'re NOT on the same level anymore',
+                        'Not gonna say anything. Respect',
+                        'I\'ll just watch... WOW',
+                        'Replay it? No, that\'s a pass',
+                        'Sigma grindset: activated',
+                        '💀💀💀 he actually did it',
+                        'Speed level: seven ate nine',
+                        'Six seven eight... wait, you\'re already at nine!',
+                        'Seven was afraid, but you\'re faster 😎',
+                        'If fast were a number, this would be seven'
+                        ],
+                        pb_single: [
+                        'Whoa, you\'re serious right now? 😳',
+                        'A RECORD! Didn\'t see that coming',
+                        'Is the timer broken maybe?',
+                        'Me: "A record?"\nFriend: "Looks like it"',
+                        'You actually solved that yourself?',
+                        'Lucky doesn\'t even cover it',
+                        'A fluke? No, a RECORD',
+                        'Finally, something worthwhile',
+                        'Wait, that was even possible???',
+                        'Record\'s set, now just repeat it',
+                        'The bar just went up, don\'t relax',
+                        'Now THERE\'S some pressure',
+                        'Can you do it again? Doubt it',
+                        'Lucky break of the year',
+                        'Record counted, but by accident',
+                        'That fast? Suspicious',
+                        'New heights, interesting',
+                        'PERSONAL BEST, wow',
+                        'Not used to results like this',
+                        'That was something',
+                        'Record broken, shocking',
+                        'Alright, you impressed me',
+                        'Fluke or skill?',
+                        'Lucky with the algorithm?',
+                        'Well... nice job, I guess',
+                        'Didn\'t even expect that',
+                        'A record-breaking fluke',
+                        'Can you repeat it?',
+                        'That was unexpected',
+                        'Alright, that counts',
+                        'You surprised me, no argument there',
+                        'Random magic',
+                        'New record logged',
+                        'A lucky scramble',
+                        'Okay, that\'s impressive',
+                        'Didn\'t expect it that fast',
+                        'A random success',
+                        'A record, but can you repeat it?',
+                        'Luck or skill?',
+                        'Alright, that was good',
+                        'A LEGEND WAS BORN 🔥',
+                        'Didn\'t know you were THIS good',
+                        'SIGMA RECORD 💀',
+                        'Bro broke the system',
+                        'Main character moment',
+                        'That was purely LEGENDARY',
+                        'HAHA HE ACTUALLY DID IT',
+                        'I\'m SHOCKED',
+                        'No comment... THIS IS A RECORD',
+                        'Yeah, yeah, A RECORD',
+                        'Wish I could break a record right now 😎',
+                        '💀💀💀 legendary',
+                        'Hats off, ALL of them 🎩🎩🎩',
+                        'We both tried, but you\'re a LEGEND',
+                        'I can do that too... no I can\'t',
+                        'Alright, you definitely won',
+                        'Replay it? NO, THIS COUNTS',
+                        'Is this even LEGAL, that fast???',
+                        'Let\'s pretend... NO, THIS IS A RECORD',
+                        'I\'m just... RESPECT',
+                        'An NPC could never pull that off',
+                        'We\'re on DIFFERENT PLANETS now',
+                        'Sigma grindset: success',
+                        'Not gonna say a thing. LEGEND.',
+                        '🙂 (crying happy tears for you)'
+                        ],
+                        pb_average: [
+                        'Averages are climbing, a fluke?',
+                        'Huh, you got more consistent',
+                        'There\'s progress, gotta admit it',
+                        'Me: "Better?"\nFriend: "Seems like it"',
+                        'Alright, there\'s movement',
+                        'Maybe you\'re starting to get it',
+                        'The stats don\'t lie',
+                        'Averages are better, keep going',
+                        'Finally, progress is visible',
+                        'You\'re actually putting in effort',
+                        'Results are improving, huh',
+                        'Maybe the practice is paying off?',
+                        'Alright, there\'s consistency',
+                        'Average numbers are climbing',
+                        'Not as bad as before',
+                        'Movement in the right direction',
+                        'The learning curve is climbing',
+                        'Maybe you\'re not hopeless',
+                        'Progress is clearly showing',
+                        'Averages aren\'t so terrible',
+                        'Consistency\'s showing up',
+                        'Maybe you\'re actually learning',
+                        'Results are getting better',
+                        'Not as useless as it seemed',
+                        'The trend is positive',
+                        'Alright, there\'s improvement',
+                        'Averages are looking nice',
+                        'Maybe there\'s potential',
+                        'Consistency is good',
+                        'Progress is noticeable',
+                        'Okay, the sigma grindset is working',
+                        'Didn\'t expect actual PROGRESS',
+                        'Bro is improving 💀',
+                        'Alright, respect',
+                        'Main character is learning',
+                        'The legend grows',
+                        'Yeah, yeah, progress',
+                        '🙂 (pleasantly surprised)',
+                        'No comment (there\'s progress)',
+                        'HAHA you\'re growing',
+                        'I\'m shocked (in a good way)',
+                        'Wish I could improve like that right now',
+                        'We\'re both growing',
+                        'An NPC doesn\'t grow, but you do',
+                        'I\'m improving too (right along with you)'
+                        ],
+                        worse_average: [
+                        'Oh, what is THIS now?',
+                        'Averages dropping, classic',
+                        'A regression happened',
+                        'Me: "Worse?"\nFriend: "Definitely"',
+                        'Here we go, backsliding again',
+                        'Someone got comfortable',
+                        'The stats are sad',
+                        'Average numbers are dropping',
+                        'There was progress, now there isn\'t',
+                        'A trip back to the past',
+                        'Someone lost their form',
+                        'Averages got worse, fact',
+                        'That\'s a fail',
+                        'Results are dropping',
+                        'The learning curve is going down',
+                        'Maybe you\'re tired?',
+                        'The regression is obvious',
+                        'Averages aren\'t pleasing',
+                        'Quality is dropping',
+                        'Definitely not your day',
+                        'Results got worse',
+                        'You\'re sliding',
+                        'Average numbers are sad',
+                        'Form\'s been lost',
+                        'The trend is negative',
+                        'The stats don\'t lie — it\'s worse',
+                        'The regression is obvious',
+                        'Maybe you need a break?',
+                        'Results are dropping down',
+                        'That\'s a setback',
+                        'NPC moment 💀',
+                        'I\'ll pretend I didn\'t notice',
+                        'We\'ll forget this',
+                        'Let\'s redo it all',
+                        'Let\'s just pretend it didn\'t happen',
+                        '🙂 (sad)',
+                        'Yeah, yeah, a regression',
+                        'Wish I wasn\'t backsliding right now',
+                        'No comment (a regression)',
+                        'HAHA oops',
+                        'I\'ll just watch... sadly',
+                        'Bro fell off 💀',
+                        'Main character on pause',
+                        'The legend\'s taking a rest',
+                        'Sigma regression',
+                        'We\'re both disappointed'
+                        ],
+                        plus_two: [
+                        '+2, a classic',
+                        'Penalties are your thing',
+                        'Accuracy\'s not your strong suit',
+                        '+2 unnecessary seconds',
+                        'Me: "+2 again"\nFriend: "A habit"',
+                        'The finish didn\'t land',
+                        'Penalty logged',
+                        'Could\'ve been more careful',
+                        '+2 — your calling card',
+                        'Penalty earned',
+                        'Can\'t finish it clean?',
+                        '+2, as always',
+                        'Penalty happened',
+                        'The finale was a bust',
+                        'Could\'ve been more precise',
+                        '+2 — that hurts',
+                        'Penalty received',
+                        'Just not meant to be clean',
+                        'Penalty again',
+                        'Two seconds lost',
+                        'The finish let you down',
+                        '+2, you get the idea',
+                        'Accuracy\'s shaky',
+                        'The penalty\'s yours',
+                        'Penalties — your specialty',
+                        'Can\'t do it without a penalty',
+                        '+2 happened',
+                        'The finale isn\'t perfect',
+                        'Could\'ve done better',
+                        'Penalty accepted',
+                        '+2 sigma-penalty 💀',
+                        'Bro got penalized',
+                        'Classic NPC',
+                        'Yeah, yeah, +2',
+                        '🙂 (+2)',
+                        'I\'ll pretend I didn\'t see the penalty',
+                        'No comment (there\'s a +2)',
+                        'HAHA penalty',
+                        'Wish I didn\'t have a +2 right now',
+                        'We\'ll forget this (the +2 stays though)',
+                        'Penalty moment',
+                        'A legend with a +2',
+                        'Main character messed up',
+                        'I\'ll just watch... +2',
+                        'Replay it? No, the +2 stays'
+                        ],
+                        dnf: [
+                        'DNF, seriously? 😑',
+                        'The cube won, as always',
+                        'Didn\'t finish it, sad',
+                        'DNF — your specialty',
+                        'Me: "DNF?"\nFriend: "Yep"',
+                        'The cube\'s stronger',
+                        'Couldn\'t pull it off',
+                        'Did Not Finish — sound familiar?',
+                        'Fail logged',
+                        'Cube: 1, You: 0',
+                        'A DNF happened',
+                        'Didn\'t quite finish, it happens',
+                        'A glitch occurred',
+                        'The cube didn\'t cooperate',
+                        'DNF recorded',
+                        'Didn\'t work out',
+                        'A fail',
+                        'Turns out the cube was craftier',
+                        'DNF\'s on the board',
+                        'Not your day',
+                        'The cube won again',
+                        'DNF — that\'s kind of your thing',
+                        'Didn\'t come together',
+                        'A failed solve',
+                        'DNF, added to the collection',
+                        'The cube fought back',
+                        'Couldn\'t handle the task',
+                        'DNF again',
+                        'A fail was inevitable',
+                        'The cube won',
+                        'DNF sigma-fail 💀',
+                        'Bro did not finish 😬',
+                        'NPC couldn\'t handle it',
+                        'Yeah, yeah, DNF',
+                        '🙂 (a sad DNF)',
+                        'I\'ll pretend I didn\'t see the DNF',
+                        'No comment (the DNF speaks for itself)',
+                        'HAHA didn\'t finish',
+                        'Wish I wasn\'t DNF-ing right now',
+                        'We\'ll forget this (the DNF stays though)',
+                        'Replay the DNF? Yes',
+                        'Let\'s pretend the DNF didn\'t happen',
+                        'I\'ll just watch... DNF',
+                        'A legend with a DNF',
+                        'Main character failed',
+                        'I DNF sometimes too (lying)',
+                        'We both lost to the cube',
+                        'The cube\'s the main character now',
+                        '💀💀💀 rip solve',
+                        'Did Not Finish: a classic'
+                        ],
+                        delete: [
+                        'Deleting it? Was it embarrassing? 😏',
+                        'The delete button, your favorite',
+                        'History\'s getting edited',
+                        'Me: "Delete it?"\nFriend: "Embarrassing, huh"',
+                        'Inconvenient facts, erased',
+                        'The delete button is yours now',
+                        'Wait, what was that?',
+                        'Erasing the tracks',
+                        'Delete go brrr',
+                        'Got rid of the inconvenient part',
+                        'History\'s been rewritten',
+                        'Embarrassment, deleted',
+                        'The delete button\'s in the chat',
+                        'Was that awkward?',
+                        'Wait, hold on, what did you delete?',
+                        'Tracks covered',
+                        'Delete: activated',
+                        'Erasing the failures',
+                        'History\'s been edited',
+                        'Got rid of the fail',
+                        'Deletion in progress',
+                        'Tracks removed',
+                        'The delete button works',
+                        'Embarrassing — deleted',
+                        'History\'s been cleaned up',
+                        'Uncomfortable? Delete it',
+                        'Delete — your best friend',
+                        'Erased the failure',
+                        'History\'s been fixed',
+                        'The delete button, beloved',
+                        'Delete: sigma button 😏',
+                        'Bro deleted evidence 💀',
+                        'NPC erasing history',
+                        'Yeah, yeah, deleted',
+                        '🙂 (saw what you deleted)',
+                        'I\'ll pretend I didn\'t notice the delete',
+                        'No comment (delete pressed)',
+                        'HAHA deleted the embarrassing part',
+                        'Wish I could delete stuff right now',
+                        'We\'ll forget this (but we remember)',
+                        'Redo the history?',
+                        'Let\'s pretend it didn\'t happen (deleted)',
+                        'I\'ll just watch... delete',
+                        'A legend of deletion',
+                        'Main character hiding the evidence',
+                        'I delete stuff too (sometimes)',
+                        'We both know what happened',
+                        'The delete button — best friend',
+                        '💀💀💀 deleted',
+                        'History successfully rewritten'
+                        ],
+                        neutral: [
+                        'Well, okay',
+                        'Usual',
+                        'Standard',
+                        'Me: "Decent?"\nFriend: "Meh"',
+                        'So-so',
+                        'Nothing special',
+                        'Ordinary',
+                        'As always',
+                        'Even',
+                        'Meh',
+                        'Fine',
+                        'Standard',
+                        'Routine',
+                        'Business as usual',
+                        'Nothing new',
+                        'Typical',
+                        'No change',
+                        'Routine',
+                        'As usual',
+                        'A standard result',
+                        'Nothing impressive',
+                        'Ordinary',
+                        'A typical result',
+                        'The usual',
+                        'An even solve',
+                        'A standard approach',
+                        'A regular level',
+                        'No surprises',
+                        'A routine solve',
+                        'The usual result',
+                        'Nothing special',
+                        'A typical time',
+                        'An ordinary solve',
+                        'Your standard',
+                        'Familiar and boring',
+                        'An NPC solve',
+                        'Yeah, yeah, fine',
+                        '🙂',
+                        'An ordinary moment',
+                        'Bro is just existing',
+                        'Standard-sigma',
+                        'Not gonna say anything',
+                        'No comment',
+                        'Wish I could be that average right now',
+                        'We\'re both average',
+                        'Same here',
+                        'Main character\'s resting',
+                        'The legend\'s sleeping',
+                        'Six seven eight... an average count',
+                        'Seven eight nine, and the result\'s average',
+                        'Why was six afraid? Because the result was mediocre',
+                        '6-7 level, fine',
+                        'Alright',
+                        'Okay',
+                        'Hm',
+                        '...',
+                        'Meh, fine',
+                        'Something like that',
+                        'Yeah'
+                        ]
+                    },
+                    trainer: {
+                        slow_time: [
+                        'No rush, precision matters more than speed',
+                        'Control above all else',
+                        'Focus on the quality of your movements',
+                        'Plan your next step ahead of time',
+                        'Fewer pauses between stages',
+                        'Work on smoothing out your transitions',
+                        'Analyze your own actions',
+                        'Consistency is built gradually',
+                        'Concentration is the key to improvement',
+                        'Break down each stage separately',
+                        'Don\'t rush, evaluate the result',
+                        'Pace will come with practice',
+                        'Focus on technique, not on time',
+                        'Better slow and correct',
+                        'Analyze where you\'re losing time',
+                        'Work on the confidence of your movements',
+                        'Planning saves seconds',
+                        'Control matters more than haste',
+                        'Build up your muscle memory',
+                        'Every solve is experience',
+                        'Focus on the next step',
+                        'Smoothness of movement comes with time',
+                        'Don\'t fixate on speed',
+                        'Work on your consistency',
+                        'Technique matters more than pace',
+                        'Analyze your pauses',
+                        'Concentration comes with training',
+                        'Every stage deserves attention',
+                        'Don\'t rush, the result matters more',
+                        'Solve quality is the priority',
+                        'Plan your movements ahead of time',
+                        'Work on your confidence',
+                        'Consistency matters more than records',
+                        'Analyze every attempt',
+                        'Control will come with practice',
+                        'Focus on the process',
+                        'Technique takes time',
+                        'Don\'t jump to conclusions',
+                        'Build up a consistent sequence of actions',
+                        'Every solve teaches you something'
+                        ],
+                        fast_time: [
+                        'Great pace, confident movements',
+                        'Good work, consistency is growing',
+                        'That\'s a quality solve',
+                        'Technique is at a good level',
+                        'Keep it up',
+                        'Confident movements, keep it going',
+                        'Excellent concentration',
+                        'That\'s a good result',
+                        'Consistency is at its peak',
+                        'The planning paid off',
+                        'A quality execution',
+                        'The movements were clean',
+                        'Good control',
+                        'This is already a serious level',
+                        'Technique is improving',
+                        'Great work',
+                        'A consistent result',
+                        'The movements were smooth',
+                        'Good concentration',
+                        'That\'s a quality attempt',
+                        'A confident pace',
+                        'The planning helped',
+                        'Excellent execution',
+                        'The technique is working',
+                        'Consistency is noticeable',
+                        'Good level of control',
+                        'That\'s a solid result',
+                        'The movements were efficient',
+                        'Great work on yourself',
+                        'Quality is improving',
+                        'A good attempt',
+                        'Consistency is growing',
+                        'Technique is in place',
+                        'Excellent control',
+                        'That\'s a strong solve',
+                        'The movements were precise',
+                        'Good concentration',
+                        'A quality result',
+                        'Consistency is visible',
+                        'Keep working just like this'
+                        ],
+                        pb_single: [
+                        'A new record — the result of your training',
+                        'Great work, the progress is obvious',
+                        'That\'s an achievement, keep going',
+                        'Record logged, good work',
+                        'Progress is noticeable, keep it up',
+                        'A new height reached',
+                        'An excellent result of your training',
+                        'That\'s a well-earned record',
+                        'The work on yourself is paying off',
+                        'A new level reached',
+                        'A record is a good sign',
+                        'Progress is clear',
+                        'An excellent attempt',
+                        'That\'s the result of persistence',
+                        'A new bar set',
+                        'Good work on your speed',
+                        'The record shows growth',
+                        'That\'s an achievement, appreciate it',
+                        'Excellent progress',
+                        'The work keeps paying off',
+                        'A new max — well earned',
+                        'This is an important milestone',
+                        'Record logged',
+                        'Excellent work',
+                        'The progress continues',
+                        'A new result achieved',
+                        'That\'s a good sign of growth',
+                        'The record is the result of practice',
+                        'An excellent achievement',
+                        'The work on yourself paid off',
+                        'A new level',
+                        'The record shows potential',
+                        'That\'s a well-deserved result',
+                        'Excellent progress, clearly visible',
+                        'A new height conquered'
+                        ],
+                        pb_average: [
+                        'Averages are improving — there\'s progress',
+                        'Consistency is growing, keep going',
+                        'That\'s a good sign of development',
+                        'The training is paying off',
+                        'Average numbers are climbing',
+                        'The work on consistency is showing',
+                        'Progress is visible in the numbers',
+                        'Solve quality is improving',
+                        'Consistency is a sign of growth',
+                        'The average results are pleasing',
+                        'This is the result of systematic training',
+                        'The progress is obvious',
+                        'Consistency is on the rise',
+                        'The averages show growth',
+                        'The work is paying off',
+                        'Solve quality is increasing',
+                        'That\'s a good trend',
+                        'Consistency has improved',
+                        'Progress in the averages is visible',
+                        'The work on yourself continues',
+                        'The average results are better',
+                        'Consistency is getting stronger',
+                        'That\'s a sign of skill development',
+                        'The progress continues',
+                        'Quality is steadily growing',
+                        'Average numbers have improved',
+                        'The work is bearing fruit',
+                        'Consistency is the key to success',
+                        'Progress is noticeable',
+                        'The training is working'
+                        ],
+                        worse_average: [
+                        'Don\'t fixate on it, this is temporary',
+                        'Take a pause, then continue',
+                        'Setbacks happen, keep working',
+                        'Rest is also part of training',
+                        'Don\'t dwell on it, focus on the next one',
+                        'Temporary difficulties are normal',
+                        'Take a break, you\'ll come back stronger',
+                        'Not every day can be perfect',
+                        'Analyze, but don\'t obsess',
+                        'This is part of the learning process',
+                        'Focus on the technique',
+                        'Rest matters for progress',
+                        'Don\'t let setbacks throw off your mindset',
+                        'A temporary dip is normal',
+                        'Keep working on yourself',
+                        'Take a pause and analyze',
+                        'Not every session will be your best',
+                        'Focus on quality, not the result',
+                        'This is temporary, keep training',
+                        'Rest up and come back with fresh energy',
+                        'Don\'t fixate on the statistics',
+                        'Analyze and move forward',
+                        'Temporary difficulties pass',
+                        'Focus on the process',
+                        'Don\'t take setbacks to heart',
+                        'This is part of the path to progress',
+                        'Take a break, it\'ll help',
+                        'Focus on technique and control',
+                        'Keep working steadily',
+                        'A temporary dip isn\'t the end'
+                        ],
+                        plus_two: [
+                        'Work on that final turn',
+                        'Control at the end matters',
+                        'Pay attention to the last moves',
+                        'The finish requires concentration',
+                        'Work on your accuracy',
+                        'The last stage matters too',
+                        'Focus on finishing well',
+                        'Control the final turns',
+                        'Accuracy is needed at the finish',
+                        'Work on your closing moves',
+                        'The finale needs attention',
+                        'Pay attention to the last step',
+                        'Control all the way to the end',
+                        'Work on your finish',
+                        'Accuracy at the end matters',
+                        'Focus on the final turns',
+                        'The finale is part of the solve too',
+                        'Control every stage',
+                        'Work on the accuracy of your finish',
+                        'The final moves need control',
+                        'Pay attention to the finish',
+                        'The finish should be clean',
+                        'Accuracy all the way to the end',
+                        'Work on your final turns',
+                        'Control at the finish matters',
+                        'Focus on the closing stage',
+                        'The finale requires concentration',
+                        'Work on your accuracy',
+                        'Control your finish',
+                        'The last step matters too'
+                        ],
+                        dnf: [
+                        'The next attempt matters more',
+                        'Don\'t dwell on it, move forward',
+                        'This is experience, keep going',
+                        'Focus on the next solve',
+                        'Analyze it and try again',
+                        'Don\'t take it to heart, keep going',
+                        'This is part of learning',
+                        'The next one will be better',
+                        'Don\'t fixate on the setback',
+                        'Keep working',
+                        'This is temporary',
+                        'Focus on the process',
+                        'Analyze the mistakes',
+                        'The next attempt awaits',
+                        'Don\'t stop',
+                        'This is part of the path',
+                        'Keep training',
+                        'Focus on the next one',
+                        'Don\'t take it too personally',
+                        'This is experience for growth',
+                        'The next one matters more',
+                        'Analyze and move forward',
+                        'Don\'t dwell on it',
+                        'Keep working on yourself',
+                        'This is a temporary setback',
+                        'Focus on improving',
+                        'The next attempt will show more',
+                        'Don\'t stop here',
+                        'Keep training',
+                        'This is part of the process'
+                        ],
+                        delete: [
+                        'Focus on the attempts ahead',
+                        'Results matter, not the stats',
+                        'Keep working on yourself',
+                        'The next attempt awaits',
+                        'Don\'t fixate on one solve',
+                        'Focus on the learning process',
+                        'Keep training',
+                        'That\'s your choice',
+                        'Overall progress is what matters',
+                        'The next solve matters more',
+                        'Don\'t stop',
+                        'Keep working',
+                        'Focus on your development',
+                        'This is part of the process',
+                        'Keep moving forward',
+                        'The next attempts will show more',
+                        'Don\'t fixate on it',
+                        'Work on improving',
+                        'That\'s your decision',
+                        'Keep training',
+                        'Focus on future results',
+                        'The next one matters more',
+                        'Don\'t stop here',
+                        'Keep working',
+                        'This is normal',
+                        'Focus on progress',
+                        'Keep developing',
+                        'The next attempts await',
+                        'Don\'t fixate on the statistics',
+                        'Keep working on yourself'
+                        ],
+                        neutral: [
+                        'A consistent solve',
+                        'Keep it up',
+                        'An even result',
+                        'Work on your consistency',
+                        'A good attempt',
+                        'Keep training',
+                        'That\'s a normal result',
+                        'Keep at it',
+                        'Consistency matters',
+                        'Keep working',
+                        'An even execution',
+                        'A good approach',
+                        'Keep practicing',
+                        'A consistent level',
+                        'Work on your technique',
+                        'That\'s good',
+                        'Keep developing',
+                        'An even attempt',
+                        'Work on improving',
+                        'Consistency is holding steady',
+                        'Keep it up the same way',
+                        'Good work',
+                        'An even result',
+                        'Keep training',
+                        'A consistent execution',
+                        'Keep at it',
+                        'This is normal',
+                        'Keep working on yourself',
+                        'An even pace',
+                        'Consistency is visible',
+                        'Keep practicing',
+                        'A good level',
+                        'Work on your development',
+                        'This is consistent',
+                        'Keep it up like this'
+                        ]
+                    },
+                    enemy: {
+                        slow_time: [
+                        'Yeah, that\'s exactly what I expected',
+                        'Consistency at being bad — your one talent',
+                        'You\'re not even trying',
+                        'Can\'t get any slower than that',
+                        'That\'s a failure',
+                        'A pathetic sight',
+                        'Aren\'t you ashamed?',
+                        'A turtle\'s faster',
+                        'Was that even an attempt?',
+                        'Useless',
+                        'Why do you even bother trying',
+                        'Embarrassing',
+                        'Wasting your time',
+                        'Zero progress',
+                        'Weak',
+                        'This is rock bottom',
+                        'Didn\'t even try',
+                        'Zero effort',
+                        'Pathetic to watch',
+                        'A miserable attempt',
+                        'Zero result',
+                        'You gave up a long time ago',
+                        'A useless waste of time',
+                        'A worthless result',
+                        'This is a disaster',
+                        'Horrifyingly slow',
+                        'Hopeless',
+                        'You lost',
+                        'A complete failure',
+                        'Talentless',
+                        'This is laughable',
+                        'Pathetic attempts',
+                        'No future in this',
+                        'Wasting your energy for nothing',
+                        'This is rock bottom of rock bottom',
+                        'Not even close',
+                        'A terrible result',
+                        'Zero skill',
+                        'Spineless',
+                        'This is shameful'
+                        ],
+                        fast_time: [
+                        'Lucky. Won\'t happen again',
+                        'Once doesn\'t prove anything',
+                        'A fluke',
+                        'That\'s a fluke',
+                        'Don\'t get too excited',
+                        'It won\'t happen again',
+                        'Pure luck',
+                        'Nothing special',
+                        'A random lucky break',
+                        'Don\'t count on a repeat',
+                        'This is an anomaly',
+                        'Just lucky',
+                        'A one-time thing',
+                        'Don\'t think you\'re good',
+                        'That\'s not to your credit',
+                        'The cube solved itself',
+                        'An easy scramble',
+                        'Don\'t brag',
+                        'That means nothing',
+                        'A random success',
+                        'Don\'t get comfortable',
+                        'That\'s not skill',
+                        'Just luck',
+                        'Nothing more than that',
+                        'A statistical error',
+                        'Not to your credit',
+                        'That wasn\'t really you',
+                        'The scramble did you a favor',
+                        'Pure, unfiltered luck',
+                        'Nothing impressive',
+                        'Don\'t think too highly of yourself',
+                        'This is temporary',
+                        'A fluke and nothing else',
+                        'Beginner\'s luck',
+                        'Won\'t happen again',
+                        'A data anomaly',
+                        'A random spike',
+                        'Don\'t get your hopes up',
+                        'This is empty',
+                        'Undeserved'
+                        ],
+                        pb_single: [
+                        'Lucky. Won\'t happen again',
+                        'Once doesn\'t prove anything',
+                        'A fluke',
+                        'Won\'t happen again',
+                        'This is your ceiling',
+                        'Won\'t happen again',
+                        'Enjoy it while it lasts',
+                        'This is the ceiling',
+                        'It\'s downhill from here',
+                        'A record? Laughable',
+                        'This is a fluke',
+                        'Don\'t get your hopes up',
+                        'That\'s a fluke',
+                        'The absolute maximum',
+                        'Don\'t expect more',
+                        'This is the limit',
+                        'That\'s it, the end of progress',
+                        'You\'ll be back to normal soon',
+                        'Don\'t get too excited',
+                        'A random record',
+                        'It\'ll never happen again',
+                        'This is an anomaly',
+                        'Your absolute ceiling',
+                        'It\'s only decline from here',
+                        'Enjoy the moment',
+                        'Your last success',
+                        'You won\'t see it again',
+                        'This is the finale',
+                        'The end of growth',
+                        'Your luck ran out',
+                        'That was the last time',
+                        'A record? Temporary',
+                        'You\'ll forget it soon',
+                        'This is your max',
+                        'It\'s a plateau from here',
+                        'Don\'t expect it again',
+                        'Your peak result',
+                        'The highest point has passed',
+                        'That was your peak',
+                        'No more growth from here'
+                        ],
+                        pb_average: [
+                        'A random streak',
+                        'Won\'t happen again',
+                        'This is a fluke',
+                        'Temporary',
+                        'It\'ll all go back to normal soon',
+                        'This is an anomaly',
+                        'Don\'t get your hopes up',
+                        'A fluke',
+                        'Just lucky',
+                        'That\'s not skill',
+                        'Temporary luck',
+                        'You\'ll crash soon',
+                        'That\'s not consistency',
+                        'A random success',
+                        'Don\'t think too highly of yourself',
+                        'A fluke streak',
+                        'A temporary spike',
+                        'It\'ll go back to normal soon',
+                        'Don\'t get too excited',
+                        'Luck isn\'t infinite',
+                        'This is an anomalous streak',
+                        'Temporary consistency',
+                        'It\'ll fall apart soon',
+                        'It won\'t happen again',
+                        'Random consistency',
+                        'Not to your credit',
+                        'A temporary result',
+                        'A crash is coming soon',
+                        'Don\'t count on staying consistent',
+                        'This is just luck'
+                        ],
+                        worse_average: [
+                        'Well, of course',
+                        'As expected',
+                        'Consistently bad',
+                        'Nothing new',
+                        'A typical result',
+                        'Business as usual',
+                        'What else did you expect',
+                        'Predictable',
+                        'Predictable',
+                        'Always like this',
+                        'Your normal',
+                        'As always',
+                        'Nothing changes',
+                        'Consistency in failure',
+                        'A typical decline',
+                        'The usual story',
+                        'A natural outcome',
+                        'Makes sense',
+                        'What else to expect',
+                        'Your reality',
+                        'As usual',
+                        'Expected',
+                        'A typical ending',
+                        'A standard failure',
+                        'Normal for you',
+                        'Everything\'s going as planned',
+                        'A predictable result',
+                        'As it should be',
+                        'A predictable outcome',
+                        'Your level'
+                        ],
+                        plus_two: [
+                        'Even a penalty was earned',
+                        'Mistakes — that\'s your thing',
+                        'Sloppiness',
+                        'Couldn\'t handle it',
+                        'A typical mistake',
+                        'Hands going the wrong way',
+                        'Blew the finish',
+                        'Didn\'t finish it properly',
+                        'Weak concentration',
+                        'Messed up, as always',
+                        'Poor control',
+                        'Inaccuracy',
+                        'Couldn\'t handle something simple',
+                        'A basic mistake',
+                        'Zero accuracy',
+                        'Blew something easy',
+                        'Typical sloppiness',
+                        'Didn\'t finish it all the way',
+                        'A weak finish',
+                        'A beginner\'s mistake',
+                        'Clumsiness',
+                        'Blew something simple',
+                        'Couldn\'t handle the basics',
+                        'A typical miss',
+                        'Poor execution',
+                        'Carelessness',
+                        'Mistake after mistake',
+                        'Can\'t finish it',
+                        'Weak technique',
+                        'A control failure'
+                        ],
+                        dnf: [
+                        'How convenient',
+                        'A great way to avoid showing reality',
+                        'Hid from it',
+                        'Coward',
+                        'Couldn\'t do it',
+                        'Gave up',
+                        'Ran from the truth',
+                        'Weak',
+                        'Couldn\'t handle it',
+                        'Blew the attempt',
+                        'Quit',
+                        'Didn\'t finish it',
+                        'Ran away',
+                        'Couldn\'t pull it off',
+                        'Weakness',
+                        'Didn\'t have the guts',
+                        'A failure',
+                        'Couldn\'t manage it',
+                        'Surrender',
+                        'Gave up immediately',
+                        'Couldn\'t see it through',
+                        'Ran away',
+                        'Blew the basics',
+                        'Couldn\'t handle something simple',
+                        'A weak attempt',
+                        'Quit halfway',
+                        'Didn\'t finish it all the way',
+                        'Gave up fast',
+                        'Didn\'t have the strength',
+                        'Blew the task'
+                        ],
+                        delete: [
+                        'Delete it, sure. Hiding the truth is your style',
+                        'History\'s not in your favor, huh?',
+                        'Deleting the evidence',
+                        'Hiding the failure',
+                        'Erasing the truth',
+                        'Cowardice',
+                        'Hiding from reality',
+                        'Scared of the stats',
+                        'Delete it, weakling',
+                        'History remembers everything',
+                        'Hiding your failures',
+                        'A coward to the end',
+                        'Delete it, of course',
+                        'Hiding the truth',
+                        'Scared of the numbers',
+                        'A weakness of character',
+                        'Hiding from reality',
+                        'Delete it, doesn\'t matter',
+                        'Erasing the failures',
+                        'Scared of the facts',
+                        'Cowardly',
+                        'Hide the failures',
+                        'Hiding the truth',
+                        'The weak one deletes',
+                        'Scared of the data',
+                        'Hiding the failure',
+                        'Deleting the evidence of failure',
+                        'Erasing the failures',
+                        'A coward and a liar',
+                        'Hiding the truth'
+                        ],
+                        neutral: [
+                        'Nothing special',
+                        'An ordinary attempt',
+                        'Mediocre',
+                        'Nothing impressive',
+                        'Grayness',
+                        'A typical result',
+                        'No worse, but no better either',
+                        'Mediocrity',
+                        'Business as usual',
+                        'Nothing new',
+                        'A standard attempt',
+                        'The gray mass',
+                        'A typical solve',
+                        'Nothing interesting',
+                        'An ordinary level',
+                        'An average result',
+                        'Nothing outstanding',
+                        'Typical',
+                        'Standard',
+                        'The usual story',
+                        'Nothing special',
+                        'Average quality',
+                        'A typical execution',
+                        'Nothing notable',
+                        'Ordinary work',
+                        'Grayness and mediocrity',
+                        'A typical level',
+                        'Nothing bright about it',
+                        'A standard execution',
+                        'An ordinary approach',
+                        'Nothing impressive',
+                        'A gray result',
+                        'A typical attempt',
+                        'Nothing new',
+                        'An ordinary solve'
+                        ]
+                    },
+                    rival: {
+                        slow_time: [
+                        'Not bad… but I\'d have done it faster',
+                        'Hm, I\'d have finished a second earlier',
+                        'You tried, but I\'m still ahead',
+                        'I\'d solve that scramble half a second quicker',
+                        'A bit slow… I\'d already be done',
+                        'Meh, I usually handle it faster',
+                        'I don\'t even think twice on scrambles like that',
+                        'You were thinking, I\'d already be solving',
+                        'Hm, times like that are rare for me',
+                        'I wouldn\'t have let myself be that slow',
+                        'Seriously? I do it faster',
+                        'In that time I solve two cubes',
+                        'You\'re dragging, I\'m already at the finish',
+                        'Unhurried… I\'d have flown through it',
+                        'I do solves like that in one go',
+                        'Slow for me, normal for you',
+                        'I wouldn\'t have dragged it out like that',
+                        'You\'re on pause, I\'m focused on results',
+                        'I don\'t post times like that',
+                        'Hm, I\'d already be on the next scramble',
+                        'In that time I could\'ve done it twice',
+                        'You\'re thinking, I\'m just doing',
+                        'I don\'t accept that kind of pace',
+                        'Slow… I\'m used to speed',
+                        'I wouldn\'t have dragged it out that long',
+                        'You\'re crawling, I\'m flying',
+                        'I don\'t even count results like that',
+                        'Hm, that\'s a warmup for me',
+                        'In that time I do three algs',
+                        'You\'re stalling, I\'m already ahead',
+                        'I wouldn\'t allow myself to be like that',
+                        'A bit slow for a serious attempt, and I\'m faster',
+                        'Even on autopilot I\'m faster',
+                        'You think for a long time, I just solve',
+                        'I don\'t consider that pace normal',
+                        'Hm, even my worst times are faster',
+                        'I wouldn\'t have fussed around that long',
+                        'You\'re stretching it out, I\'m compressing it',
+                        'I\'m at least a second faster, guaranteed',
+                        'Slow, and I\'m used to a rhythm'
+                        ],
+                        fast_time: [
+                        'Good… but I\'m still faster',
+                        'Nice, I\'d have made it even cleaner',
+                        'Finally decent. But not my level',
+                        'Not bad, my averages are even lower',
+                        'Oh, progress… but I\'m ahead',
+                        'Good, but I\'d have improved it',
+                        'Decent pace, mine\'s even better',
+                        'Respectable… but I\'m usually faster',
+                        'Oh, you\'re growing… but I\'m higher up',
+                        'Good, that\'s just normal for me',
+                        'Nice job, but I\'m a second faster',
+                        'Decent attempt, I\'d add some speed',
+                        'That came out well, but I\'d make it cleaner',
+                        'I see the effort, I just do it',
+                        'A respectable result, but I\'m ahead',
+                        'Good, that\'s the norm for me',
+                        'Finally decent, but I\'m better',
+                        'Not bad, I\'d make it even more efficient',
+                        'A good attempt, but I\'m more consistent',
+                        'Nice job, I do that every time',
+                        'Decent, but I\'m a level higher',
+                        'That turned out well, I\'d add more',
+                        'Decent pace, but I\'m faster',
+                        'Respectable, that\'s standard for me',
+                        'A good solve, but I do it cleaner',
+                        'Nice job, I\'d shave off another second',
+                        'That turned out decent, but I\'m more efficient',
+                        'Good, I show that consistently',
+                        'Not bad speed, but I\'m faster',
+                        'A respectable result, but I\'m better',
+                        'A good attempt, but I\'m higher',
+                        'Nice job, that\'s just my normal',
+                        'Decent, but I\'m a step ahead',
+                        'Good, I\'d have improved it more',
+                        'That turned out well, but I\'m more consistent',
+                        'A respectable solve, but I\'m cleaner',
+                        'That came out well, but I\'m usually faster',
+                        'Nice job, I do that every single time',
+                        'Decent, but I\'m more efficient',
+                        'A good attempt, but mine\'s better'
+                        ],
+                        pb_single: [
+                        'Not bad… but my record\'s still lower',
+                        'Oh, progress. Catching up… almost',
+                        'Good, but I\'d have improved it more',
+                        'A record? I do that every day',
+                        'Nice job, I\'ve been at that level for ages',
+                        'Progress is visible, but I\'m ahead',
+                        'A decent record, mine\'s lower',
+                        'Oh, you\'re growing… but I\'m higher',
+                        'Good, that\'s normal for me',
+                        'A record… but I\'m faster',
+                        'Nice job, my PB\'s better',
+                        'There\'s progress, but I\'m more consistent',
+                        'A good result, mine\'s top tier',
+                        'A record? I do that consistently',
+                        'Not bad, but I\'m a level higher',
+                        'Nice job, my record\'s cooler',
+                        'Progress is visible, but I stay ahead',
+                        'That turned out well, mine\'s better',
+                        'That\'s your record, mine\'s lower',
+                        'Nice job, but I was faster',
+                        'Progress, and I\'m already there',
+                        'A good PB, but mine\'s more top tier',
+                        'Not bad, mine\'s cooler',
+                        'A record… that\'s just normal for me',
+                        'Nice job, but I\'m a step higher',
+                        'There\'s progress, but I\'m more consistent',
+                        'Good, my record\'s better',
+                        'That\'s your record, mine\'s faster',
+                        'Nice job, but I\'m ahead',
+                        'Progress is visible, but mine\'s top tier'
+                        ],
+                        pb_average: [
+                        'A good streak… but my average\'s lower',
+                        'Progress in consistency, but I\'m more consistent',
+                        'Not bad, keeping the level up, but I\'m steadier',
+                        'A good streak, but mine\'s better',
+                        'Consistent… but mine\'s even steadier',
+                        'A decent average, mine\'s lower',
+                        'Good consistency, but I\'m better',
+                        'Progress is visible, but I\'m more consistent',
+                        'A decent streak, but mine\'s more top tier',
+                        'Good job holding it, but mine\'s even better',
+                        'Consistency\'s growing, but I\'m ahead',
+                        'A decent Ao5, mine\'s lower',
+                        'A good streak, but I\'m more consistent',
+                        'There\'s progress, but mine\'s top tier',
+                        'Not bad, but my average\'s better',
+                        'Good consistency, but mine\'s steadier',
+                        'A decent streak, but mine\'s faster',
+                        'You\'re staying consistent, but I\'m ahead',
+                        'A decent average, but mine\'s better',
+                        'Good job holding the level, but I\'m higher',
+                        'Progress in the streak, but mine\'s more top tier',
+                        'Decent consistency, but mine\'s cooler',
+                        'Good, but my average\'s lower',
+                        'Consistency\'s growing, but I\'m better',
+                        'A decent streak, but I\'m more consistent',
+                        'A good Ao12, mine\'s lower',
+                        'Progress is visible, but I\'m more consistent',
+                        'Not bad, but my average\'s more top tier',
+                        'A good streak, but mine\'s steadier',
+                        'Consistent, but mine\'s even better'
+                        ],
+                        worse_average: [
+                        'Hm, I don\'t get slumps like that',
+                        'The streak dropped… but I stay consistent',
+                        'I wouldn\'t have let that happen',
+                        'That\'s exactly why I\'m always ahead',
+                        'I don\'t lose it in a situation like that',
+                        'A streak failure… but I hold my level',
+                        'I don\'t get drops like that',
+                        'That\'s why I\'m better',
+                        'I\'d have kept my consistency',
+                        'The streak dropped, mine\'s steady',
+                        'I don\'t allow myself that',
+                        'That\'s the difference between us',
+                        'I don\'t get spikes like that',
+                        'A failure… but I\'m always consistent',
+                        'I wouldn\'t have let it drop',
+                        'That\'s exactly why I win',
+                        'My streak stays steady',
+                        'A streak failure, but I hold up',
+                        'That doesn\'t happen to me',
+                        'That\'s why I\'m more consistent',
+                        'I wouldn\'t have let it fall',
+                        'The streak failed, mine\'s solid',
+                        'I hold my level, always',
+                        'That\'s the difference',
+                        'I don\'t get slumps like that',
+                        'A failure… but I\'m consistent',
+                        'I wouldn\'t have lost my consistency',
+                        'That\'s exactly why I\'m ahead',
+                        'My streak has no failures',
+                        'I don\'t allow that kind of thing'
+                        ],
+                        plus_two: [
+                        'A penalty? I wouldn\'t have let that happen',
+                        'That\'s exactly why I\'m ahead',
+                        '+2… my finish is clean',
+                        'I\'d have solved it penalty-free',
+                        'Sloppiness… I\'m precise',
+                        'That\'s why I\'m better',
+                        'A penalty… I manage without them',
+                        'I wouldn\'t have blown the finish',
+                        '+2… I don\'t get those',
+                        'That\'s the difference',
+                        'I always finish clean',
+                        'You got a penalty, I\'m precise',
+                        'I wouldn\'t have let that happen',
+                        'That\'s exactly why I win',
+                        '+2… my accuracy is higher',
+                        'I don\'t blow the finish',
+                        'A penalty… I\'m careful',
+                        'That\'s why I\'m more consistent',
+                        'I don\'t get misses like that',
+                        '+2… I go penalty-free',
+                        'I\'d have finished clean',
+                        'That\'s the difference between us',
+                        'You got a penalty, I\'m always precise',
+                        'I don\'t allow myself that',
+                        '+2… my precision is higher',
+                        'I wouldn\'t have ruined the finish',
+                        'That\'s exactly why I\'m better',
+                        'A penalty… my solves are clean',
+                        'I always finish carefully',
+                        '+2… I don\'t get misses like that'
+                        ],
+                        dnf: [
+                        'A DNF? I\'d have finished it',
+                        'That\'s exactly why I win',
+                        'I don\'t give up',
+                        'A DNF… I don\'t get those',
+                        'I\'d have seen it through to the finish',
+                        'That\'s the difference',
+                        'A DNF? I always finish',
+                        'I don\'t abandon attempts',
+                        'That\'s exactly why I\'m better',
+                        'A DNF… I\'m consistent',
+                        'I wouldn\'t have given up',
+                        'That\'s exactly why I\'m ahead',
+                        'A DNF? Mine are always complete',
+                        'I always see it through',
+                        'That\'s the difference between us',
+                        'A DNF… I never give up',
+                        'I\'d have finished it',
+                        'That\'s exactly why I win',
+                        'A DNF? My consistency is higher',
+                        'I don\'t abandon solves',
+                        'That\'s why I\'m better',
+                        'A DNF… everything of mine is complete',
+                        'I see it through to the end',
+                        'That\'s the difference',
+                        'A DNF? I don\'t give up',
+                        'I always finish my attempts',
+                        'That\'s exactly why I\'m more consistent',
+                        'A DNF… my consistency is higher',
+                        'I don\'t allow myself to quit',
+                        'That\'s exactly why I always win'
+                        ],
+                        delete: [
+                        'Deleting it? I\'d have kept it and accepted the result',
+                        'I\'m not afraid of my times',
+                        'Deleting… I accept everything',
+                        'I wouldn\'t have hidden it',
+                        'That\'s the difference between us',
+                        'Deleting? I\'m honest with myself',
+                        'I accept any result',
+                        'That\'s why I\'m stronger',
+                        'Deleting… I keep everything',
+                        'I\'m not afraid of the stats',
+                        'That\'s the difference',
+                        'Deleting? I don\'t hide',
+                        'I accept the truth',
+                        'That\'s exactly why I\'m better',
+                        'Deleting… I\'m honest',
+                        'I don\'t hide my failures',
+                        'That\'s why I win',
+                        'Deleting? My stats are clean',
+                        'I\'m not afraid of the data',
+                        'That\'s the difference between us',
+                        'Deleting… I accept it',
+                        'I leave everything as it is',
+                        'That\'s exactly why I\'m stronger',
+                        'Deleting? I don\'t hide it',
+                        'I\'m honest about my stats',
+                        'That\'s why I\'m better',
+                        'Deleting… I accept it all',
+                        'I don\'t hide my results',
+                        'That\'s the difference',
+                        'Deleting? I face the truth head-on'
+                        ],
+                        neutral: [
+                        'An ordinary solve… mine\'s more consistent',
+                        'Standard… but mine\'s steadier',
+                        'Fine… mine\'s better',
+                        'An ordinary level, mine\'s higher',
+                        'A standard attempt, mine\'s cleaner',
+                        'Fine, but I\'m more consistent',
+                        'An ordinary solve, mine\'s more efficient',
+                        'Standard, but my level\'s higher',
+                        'Turned out fine, but mine\'s better',
+                        'An ordinary attempt, mine\'s steadier',
+                        'A standard solve, mine\'s faster',
+                        'Fine, but my pace is higher',
+                        'An ordinary result, but I\'m more consistent',
+                        'Standard, but my efficiency\'s better',
+                        'Turned out fine, but mine\'s cleaner',
+                        'An ordinary solve, but my level\'s higher',
+                        'A standard attempt, but mine\'s steadier',
+                        'Fine, but my speed\'s higher',
+                        'An ordinary result, mine\'s better',
+                        'Turned out standard, but I\'m more consistent',
+                        'Fine, but my pace is faster',
+                        'An ordinary solve, mine\'s more efficient',
+                        'A standard attempt, mine\'s cleaner',
+                        'Turned out fine, but mine\'s better',
+                        'An ordinary level, mine\'s higher',
+                        'Standard, but my consistency\'s better',
+                        'Fine, but mine\'s more efficient',
+                        'An ordinary solve, my result\'s higher',
+                        'A standard attempt, mine\'s steadier',
+                        'Turned out fine, but my speed\'s better',
+                        'An ordinary result, mine\'s more consistent',
+                        'Standard, but my pace is faster',
+                        'Fine, but my solve\'s cleaner',
+                        'An ordinary attempt, mine\'s more efficient',
+                        'Turned out standard, but mine\'s better'
+                        ]
+                    }
+                };
+
             } // end of constructor
 
             setMood(mood) {
@@ -1918,8 +3737,9 @@
                     category = 'slow_time';
                 }
 
-                // Get comments from current mood
-                const moodComments = this.moods[this.currentMood];
+                // Get comments from current mood, in the current UI language (falls
+                // back to Russian per-mood if that mood isn't translated yet)
+                const moodComments = this.getMoodBank(this.currentMood);
                 const categoryComments = moodComments[category];
                 let comment;
                 
@@ -1929,6 +3749,18 @@
                 
                 this.lastCommentary = comment;
                 return comment;
+            }
+
+            // Returns the phrase bank for a given mood in the commentary language
+            // (independent from the UI language — falls back to the UI language only
+            // if the person hasn't explicitly picked a commentary language). Falls
+            // back to Russian for any mood not yet present in moodsEn, so commentary
+            // keeps working correctly while translation work is still in progress.
+            getMoodBank(mood) {
+                const s = window.settingsManager?.settings;
+                const lang = s?.commentaryLanguage || s?.language;
+                if (lang === 'en' && this.moodsEn && this.moodsEn[mood]) return this.moodsEn[mood];
+                return this.moods[mood];
             }
 
             show(context) {
@@ -1995,8 +3827,9 @@
                 honestModeLabel: 'Honest Mode',
                 hmModalTitle: 'Honest Mode',
                 hmDesc: "While active, solves can't be deleted or edited (+2/DNF still work). Pick how long the honest run should last.",
-                hmActiveDesc: 'Honest Mode is running. Solves are locked until it ends.',
+                hmActiveDesc: "Honest Mode is running. Solves are locked until it ends — it can't be stopped early.",
                 hmMinutesLabel: 'Duration (minutes)',
+                hmCloseLabel: 'Close',
                 honestModeLocked: "This solve is locked by Honest Mode and can't be edited or deleted until it ends.",
                 
                 // Settings
@@ -2051,6 +3884,7 @@
                 inspectionDescription: 'Tap Space to start 15-second inspection before solve',
                 
                 moodSilent: 'Silent',
+                commentaryLangLabel: 'Commentary Language',
                 dataManagement: 'Data Management',
                 resetSession: 'Reset Session',
                 resetConfirm: 'Are you sure? This will delete all solves in the current session.',
@@ -2066,6 +3900,13 @@
                 progressChart: 'Progress Over Time',
                 singles: 'Singles',
                 timeDistribution: 'Time Distribution',
+                penaltyPieTitle: 'Clean vs Penalties',
+                disciplinePieTitle: 'Solves by Puzzle',
+                subsessionPieTitle: 'Solves by Subsession',
+                pieClean: 'Clean',
+                piePlusTwo: '+2',
+                pieDnf: 'DNF',
+                pieRegularSolves: 'Regular',
                 sessionDetails: 'Session Details',
                 bestSolve: 'Best Solve',
                 worstSolve: 'Worst Solve',
@@ -2147,7 +3988,9 @@
                 autoExportFormatLabel: 'Format',
                 autoExportFolderDesc: 'Saves straight to a folder, no download prompt',
                 autoExportFolderSet: 'Saving to: {folder}',
-                autoExportFolderUnset: 'No folder selected — files will go to Downloads'
+                autoExportFolderUnset: 'No folder selected — files will go to Downloads',
+                autoExportChooseBtn: 'Choose Folder',
+                autoExportReverifyBtn: 'Re-verify Access'
             },
             ru: {
                 // Header
@@ -2195,8 +4038,9 @@
                 honestModeLabel: 'Честный режим',
                 hmModalTitle: 'Честный режим',
                 hmDesc: 'Пока активен, сборки нельзя удалить или отредактировать (+2/DNF по-прежнему работают). Выбери, сколько продлится честный забег.',
-                hmActiveDesc: 'Честный режим активен. Сборки заблокированы до его окончания.',
+                hmActiveDesc: 'Честный режим активен. Сборки заблокированы до его окончания — досрочно остановить нельзя.',
                 hmMinutesLabel: 'Длительность (в минутах)',
+                hmCloseLabel: 'Закрыть',
                 honestModeLocked: 'Эта попытка заблокирована честным режимом — редактирование и удаление станут доступны после его окончания.',
                 
                 // Settings
@@ -2250,6 +4094,7 @@
                 voiceInspectionDesc: 'Объявляет "8 секунд" и "12 секунд" во время осмотра, как судья на соревнованиях WCA',
                 voiceInspectionUnsupported: 'Этот браузер не поддерживает синтез речи, поэтому голосовые предупреждения тут не будут слышны.',
                 moodSilent: 'Молчун',
+                commentaryLangLabel: 'Язык комментариев',
                 dataManagement: 'Управление данными',
                 resetSession: 'Сбросить сессию',
                 resetConfirm: 'Вы уверены? Это удалит все сборки текущей сессии.',
@@ -2265,6 +4110,13 @@
                 progressChart: 'Прогресс со временем',
                 singles: 'Сборки',
                 timeDistribution: 'Распределение времени',
+                penaltyPieTitle: 'Чисто и штрафы',
+                disciplinePieTitle: 'Сборки по головоломкам',
+                subsessionPieTitle: 'Сборки по подсессиям',
+                pieClean: 'Чисто',
+                piePlusTwo: '+2',
+                pieDnf: 'DNF',
+                pieRegularSolves: 'Обычные',
                 sessionDetails: 'Детали сессии',
                 bestSolve: 'Лучшая сборка',
                 worstSolve: 'Худшая сборка',
@@ -2346,7 +4198,9 @@
                 autoExportFormatLabel: 'Формат',
                 autoExportFolderDesc: 'Сохраняет прямо в папку, без диалога скачивания',
                 autoExportFolderSet: 'Сохраняется в: {folder}',
-                autoExportFolderUnset: 'Папка не выбрана — файлы будут уходить в Загрузки'
+                autoExportFolderUnset: 'Папка не выбрана — файлы будут уходить в Загрузки',
+                autoExportChooseBtn: 'Выбрать папку',
+                autoExportReverifyBtn: 'Обновить доступ'
             }
         };
 
@@ -2381,7 +4235,8 @@
                     autoExportEvery: 10,      // export every N solves
                     autoExportFormat: 'firecube',
                     autoExportUseFolder: false, // desktop only — write straight to a chosen folder
-                    voiceInspectionEnabled: false // speaks "8 seconds"/"12 seconds" during inspection, like a WCA judge
+                    voiceInspectionEnabled: false, // speaks "8 seconds"/"12 seconds" during inspection, like a WCA judge
+                    commentaryLanguage: null // null = follow UI language; 'ru'/'en' = pinned independent of it
                 };
                 
                 this.loadSettings();
@@ -2423,8 +4278,8 @@
                 const importExportDataBtn = document.querySelector('#importExportDataBtn');
                 if (exportJsonBtn) exportJsonBtn.textContent = t.exportJSON;
                 if (exportCsvBtn) exportCsvBtn.textContent = t.exportCSV;
-                if (importExportBtn) importExportBtn.textContent = `📤 ${t.importExport}`;
-                if (importExportDataBtn) importExportDataBtn.textContent = t.importExport;
+                if (importExportBtn) importExportBtn.textContent = `📤 ${t.importExport || 'Import / Export'}`;
+                if (importExportDataBtn) importExportDataBtn.textContent = t.importExport || 'Import / Export';
 
                 // Import/Export modal
                 const ieModalTitle = document.querySelector('#ieModalTitle');
@@ -2452,6 +4307,9 @@
                 if (hmDesc) hmDesc.textContent = t.hmDesc;
                 if (hmActiveDesc) hmActiveDesc.textContent = t.hmActiveDesc;
                 if (hmMinutesLabel) hmMinutesLabel.textContent = t.hmMinutesLabel;
+
+                const honestModeCloseActive = document.getElementById('honestModeCloseActive');
+                if (honestModeCloseActive) honestModeCloseActive.textContent = t.hmCloseLabel;
                 if (window.timer && window.timer._updateHonestModeBtn) window.timer._updateHonestModeBtn();
                 
                 // Left column
@@ -2496,6 +4354,9 @@
                 if (moodLabels[2]) moodLabels[2].textContent = t.moodTrainer;
                 if (moodLabels[3]) moodLabels[3].textContent = t.moodEnemy;
                 if (moodLabels[4]) moodLabels[4].textContent = t.moodSilent;
+
+                const commentaryLangLabel = document.getElementById('commentaryLangLabel');
+                if (commentaryLangLabel) commentaryLangLabel.textContent = t.commentaryLangLabel;
                 
                 const settingsButtons = document.querySelectorAll('#settingsOverlay .settings-button');
                 if (settingsButtons[0]) settingsButtons[0].textContent = t.exportJSON;
@@ -2601,6 +4462,9 @@
                 _st('st-stat-trend',        t.trendTitle);
                 _st('st-stat-heatmap',      t.heatmapTitle);
                 _st('st-stat-subsessions',  t.subsessionsTitle);
+                _st('st-stat-penalty-pie',    t.penaltyPieTitle);
+                _st('st-stat-discipline-pie', t.disciplinePieTitle);
+                _st('st-stat-subsession-pie', t.subsessionPieTitle);
 
                 // Subsession modal
                 _st('subsessionModalTitleEl',  t.subsessionModalTitle);
@@ -2771,6 +4635,12 @@
                     } else {
                         card.classList.remove('active');
                     }
+                });
+
+                // Update commentary language segmented control
+                const commentaryLang = this.settings.commentaryLanguage || this.settings.language || 'ru';
+                document.querySelectorAll('[data-clang]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.clang === commentaryLang);
                 });
 
                 // Update inspection toggle
@@ -3856,6 +5726,16 @@
                     });
                 });
 
+                // Commentary Language — independent from the UI language
+                document.querySelectorAll('[data-clang]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.settings.commentaryLanguage = btn.dataset.clang;
+                        document.querySelectorAll('[data-clang]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.saveSettings();
+                    });
+                });
+
                 // Language Selector (New Settings)
                 document.querySelectorAll('.lang-btn-new').forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -4030,8 +5910,12 @@
                         const t = window.timer._ieT ? window.timer._ieT() : {};
                         if (handle) {
                             folderStatus.textContent = (t.autoExportFolderSet || 'Saving to: {folder}').replace('{folder}', handle.name);
+                            folderStatus.classList.add('is-set');
+                            if (chooseFolderBtn) chooseFolderBtn.textContent = '📁 ' + (t.autoExportReverifyBtn || 'Re-verify Access');
                         } else {
                             folderStatus.textContent = t.autoExportFolderUnset || 'No folder selected — files will go to Downloads';
+                            folderStatus.classList.remove('is-set');
+                            if (chooseFolderBtn) chooseFolderBtn.textContent = '📁 ' + (t.autoExportChooseBtn || 'Choose Folder');
                         }
                     });
                 }
@@ -4062,16 +5946,39 @@
                 if (chooseFolderBtn && supportsFolderPicker) {
                     chooseFolderBtn.addEventListener('click', async () => {
                         try {
-                            const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                            if (window.timer) await window.timer._saveAutoExportDirHandle(handle);
+                            // If a folder was already picked, try re-confirming write
+                            // access on the SAME handle first. Chrome often resets the
+                            // write-permission grant back to "ask" between browser
+                            // sessions (even though the folder itself is remembered),
+                            // which is why auto-export can silently fall back to the
+                            // browser's normal "where do you want to save" prompt.
+                            // requestPermission() here runs inside a real click, so it's
+                            // allowed to actually show the (much smaller) one-time
+                            // access prompt instead of us needing to pick the folder
+                            // again from scratch.
+                            const existing = window.timer ? await window.timer._getAutoExportDirHandle() : null;
+                            let handle = existing;
+
+                            if (existing) {
+                                const perm = await existing.requestPermission({ mode: 'readwrite' });
+                                if (perm !== 'granted') handle = null; // denied — fall through to picking a new folder
+                            }
+
+                            if (!handle) {
+                                handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                                if (window.timer) await window.timer._saveAutoExportDirHandle(handle);
+                            }
+
                             this.settings.autoExportUseFolder = true;
                             this.saveSettings();
                             if (folderStatus) {
                                 const t = window.timer?._ieT ? window.timer._ieT() : {};
                                 folderStatus.textContent = (t.autoExportFolderSet || 'Saving to: {folder}').replace('{folder}', handle.name);
+                                folderStatus.classList.add('is-set');
+                                chooseFolderBtn.textContent = '📁 ' + (t.autoExportReverifyBtn || 'Re-verify Access');
                             }
                         } catch (e) {
-                            // User cancelled the picker — nothing to do.
+                            // User cancelled the picker/permission prompt — nothing to do.
                         }
                     });
                 }
@@ -4519,6 +6426,15 @@
                             return;
                         }
 
+                        // A bare number like "1700" is technically valid (1700
+                        // seconds = 28:20), but that's an unusual single-solve goal
+                        // and often means someone meant to type something shorter.
+                        // Double-check before saving instead of silently accepting it.
+                        if (enabled && parsed && parsed.time > 300) {
+                            const confirmMsg = `That's ${this.formatTime(parsed.time)} (${Math.round(parsed.time)} seconds). Is that really your goal time?`;
+                            if (!confirm(confirmMsg)) return;
+                        }
+
                         const s = window.settingsManager.settings;
                         s.targetTimeEnabled = enabled;
                         if (parsed) s.targetTime = parsed.time;
@@ -4567,9 +6483,9 @@
                 const honestModeStart = document.getElementById('honestModeStart');
                 if (honestModeStart) {
                     honestModeStart.addEventListener('click', () => {
-                        const parsed = this._parseGoalTimeInput(honestModeMinutesInput.value);
+                        const parsed = this._parseHonestModeMinutes(honestModeMinutesInput.value);
                         if (!parsed || parsed.time <= 0) {
-                            alert('Enter how many minutes Honest Mode should run for.');
+                            alert('Enter how many minutes Honest Mode should run for (up to 300).');
                             return;
                         }
                         this.startHonestMode(parsed.time);
@@ -4577,12 +6493,11 @@
                     });
                 }
 
-                const honestModeStop = document.getElementById('honestModeStop');
-                if (honestModeStop) {
-                    honestModeStop.addEventListener('click', () => {
-                        this.endHonestMode();
-                        closeHonestModeModal();
-                    });
+                // Just closes the modal — Honest Mode itself can't be stopped early,
+                // that would defeat the point. It only ends when the timer runs out.
+                const honestModeCloseActive = document.getElementById('honestModeCloseActive');
+                if (honestModeCloseActive) {
+                    honestModeCloseActive.addEventListener('click', closeHonestModeModal);
                 }
             }
 
@@ -4978,6 +6893,7 @@
                 if (window.sessionsManager) {
                     window.sessionsManager.populateSolveHistory();
                     window.sessionsManager.renderSubsessionStats();
+                    window.sessionsManager.renderSubsessionPie();
                 }
                 this._updateHonestModeBtn();
                 this._startHonestModeTicker();
@@ -5309,6 +7225,9 @@
                 this.renderTrend();
                 this.renderHeatmap();
                 this.renderSubsessionStats();
+                this.renderPenaltyPie();
+                this.renderDisciplinePie();
+                this.renderSubsessionPie();
 
                 // Show modal
                 document.getElementById('statisticsOverlay').classList.add('visible');
@@ -5799,6 +7718,156 @@
                         }
                     }
                 });
+            }
+
+            // Shared helper for the three pie/doughnut charts below. `entries` is
+            // [{label, value, color}]; zero-value entries are dropped so the chart
+            // and legend only ever show categories that actually occurred.
+            _renderPieChart(canvasId, legendId, chartVarKey, entries) {
+                const canvasEl = document.getElementById(canvasId);
+                const legendEl = document.getElementById(legendId);
+                if (!canvasEl) return;
+
+                if (window[chartVarKey] && typeof window[chartVarKey].destroy === 'function') {
+                    window[chartVarKey].destroy();
+                }
+
+                const filtered = entries.filter(e => e.value > 0);
+                const total = filtered.reduce((sum, e) => sum + e.value, 0);
+
+                if (total === 0) {
+                    if (legendEl) legendEl.innerHTML = '';
+                    return;
+                }
+
+                const ctx = canvasEl.getContext('2d');
+                window[chartVarKey] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: filtered.map(e => e.label),
+                        datasets: [{
+                            data: filtered.map(e => e.value),
+                            backgroundColor: filtered.map(e => e.color),
+                            borderColor: document.body.classList.contains('light-theme') ? '#ffffff' : '#141928',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '62%',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                titleFont: { family: 'Manrope' },
+                                bodyFont: { family: 'Manrope' },
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const pct = Math.round((ctx.parsed / total) * 100);
+                                        return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (legendEl) {
+                    legendEl.innerHTML = filtered.map(e => {
+                        const pct = Math.round((e.value / total) * 100);
+                        return `
+                            <div class="pie-chart-legend-item">
+                                <span class="pie-chart-legend-dot" style="background:${e.color}"></span>
+                                <span>${e.label}</span>
+                                <span class="pie-chart-legend-value">${e.value} (${pct}%)</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Chart 1: how many solves were clean vs +2 vs DNF, current session.
+            renderPenaltyPie() {
+                const t = (window.settingsManager?.settings?.language === 'ru')
+                    ? window.translations?.ru : window.translations?.en;
+
+                let clean = 0, plusTwo = 0, dnf = 0;
+                for (const s of this.solves) {
+                    if (s.dnf) dnf++;
+                    else if (s.penalty) plusTwo++;
+                    else clean++;
+                }
+
+                this._renderPieChart('penaltyPieCanvas', 'penaltyPieLegend', 'penaltyPieChart', [
+                    { label: t?.pieClean || 'Clean', value: clean, color: '#22c55e' },
+                    { label: t?.piePlusTwo || '+2', value: plusTwo, color: '#f59e0b' },
+                    { label: t?.pieDnf || 'DNF', value: dnf, color: '#ef4444' }
+                ]);
+            }
+
+            // Chart 2: how many solves went to each puzzle/discipline, across ALL
+            // sessions (a session is one discipline, so this aggregates session solve
+            // counts grouped by each session's discipline).
+            renderDisciplinePie() {
+                const disciplineColors = {
+                    '3x3': '#4a9eff', '2x2': '#22c55e', '4x4': '#f59e0b', '5x5': '#ef4444',
+                    '6x6': '#a855f7', '7x7': '#ec4899', 'pyraminx': '#14b8a6',
+                    'skewb': '#eab308', 'megaminx': '#f97316'
+                };
+
+                const counts = {};
+                for (const key of Object.keys(this.sessions)) {
+                    const session = this.sessions[key];
+                    const disc = session.discipline || '3x3';
+                    counts[disc] = (counts[disc] || 0) + (session.solves ? session.solves.length : 0);
+                }
+
+                const entries = Object.entries(counts).map(([disc, count]) => ({
+                    label: disc,
+                    value: count,
+                    color: disciplineColors[disc] || '#8899aa'
+                }));
+
+                const block = document.getElementById('disciplinePieBlock');
+                const hasMultiple = entries.filter(e => e.value > 0).length > 0;
+                if (block) block.style.display = hasMultiple ? '' : 'none';
+
+                this._renderPieChart('disciplinePieCanvas', 'disciplinePieLegend', 'disciplinePieChart', entries);
+            }
+
+            // Chart 3: how many of the current session's solves fall into each
+            // subsession (reusing each subsession's own color), plus a remainder
+            // slice for solves that aren't tagged into any subsession at all.
+            renderSubsessionPie() {
+                const session = this.sessions[this.currentSessionId];
+                const subsessions = session?.subsessions || [];
+                const block = document.getElementById('subsessionPieBlock');
+                if (!block) return;
+
+                if (subsessions.length === 0) {
+                    block.style.display = 'none';
+                    return;
+                }
+                block.style.display = '';
+
+                const t = (window.settingsManager?.settings?.language === 'ru')
+                    ? window.translations?.ru : window.translations?.en;
+
+                const taggedIds = new Set(subsessions.flatMap(ss => ss.solveIds));
+                const entries = subsessions.map(ss => ({
+                    label: ss.name,
+                    value: ss.solveIds.length,
+                    color: ss.color
+                }));
+
+                const untagged = (session.solves || []).filter(s => !taggedIds.has(s.id)).length;
+                entries.push({
+                    label: t?.pieRegularSolves || 'Regular',
+                    value: untagged,
+                    color: '#5b6478'
+                });
+
+                this._renderPieChart('subsessionPieCanvas', 'subsessionPieLegend', 'subsessionPieChart', entries);
             }
 
             renderTrend() {
@@ -6362,6 +8431,7 @@
                 this._selectedSolveIndices = new Set();
                 this.populateSolveHistory();
                 this.renderSubsessionStats();
+                this.renderSubsessionPie();
                 // Recalculate averages immediately (exclude takes effect right away)
                 this.updateUI();
             }
@@ -6500,7 +8570,7 @@
                 const cards = [];
                 if (includeBest) {
                     cards.push({label:'BEST SINGLE', value:best!==null?this.formatTime(best):'—', color:'#3b6ea5'});
-                    cards.push({label:'BEST AO5',    value:ao5!==null?this.formatTime(ao5):'—',   color:'#b07d28'});
+                    cards.push({label:'CURRENT AO5', value:ao5!==null?this.formatTime(ao5):'—',   color:'#b07d28'});
                 }
                 if (includeTrend && trendData) {
                     const sign = trendData.direction==='up'?'−':trendData.direction==='down'?'+':'~';
@@ -6813,6 +8883,7 @@
                         session.subsessions = session.subsessions.filter(ss => ss.id !== ssid);
                         this.saveSessions();
                         this.renderSubsessionStats();
+                        this.renderSubsessionPie();
                         const historySection = document.getElementById('solveHistorySection');
                         if (historySection && historySection.style.display !== 'none') {
                             this.populateSolveHistory();
@@ -7450,6 +9521,25 @@
 
                 if (totalSeconds === null || isNaN(totalSeconds) || totalSeconds <= 0) return null;
                 return { dnf: false, time: totalSeconds };
+            }
+
+            // Honest Mode's duration field is in MINUTES, not seconds — this needs
+            // its own parser rather than reusing _parseGoalTimeInput (which used to
+            // be shared here and caused real confusion: a bare "1700" would be read
+            // as 1700 seconds by that parser, then treated as 1700 MINUTES by
+            // startHonestMode, i.e. nearly 28 hours). A bare number here is always
+            // whole minutes; "mm:ss" style input isn't meaningful for a duration
+            // field, so it isn't supported.
+            _parseHonestModeMinutes(input) {
+                if (input === null) return null;
+                const str = input.trim().replace(',', '.');
+                if (str === '') return null;
+
+                const n = parseFloat(str);
+                if (isNaN(n) || n <= 0) return null;
+                if (n > 300) return null; // sanity cap: 5 hours is already generous for one session
+
+                return { time: n };
             }
 
             editSolve() {

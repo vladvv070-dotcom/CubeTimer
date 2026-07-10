@@ -91,9 +91,9 @@
             border-bottom: 1px solid rgba(74, 158, 255, 0.1);
             padding: 0 2rem;
             height: 70px;
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -512,17 +512,15 @@
         }
 
         /* ─── Target Time & Honest Mode pills ─── */
-        /* A normal flex child (not absolutely centered) so it can never overlap the
-           logo or the session dropdown/buttons — its available space is whatever's
-           left between them, which flexbox always respects. Absolute dead-centering
-           in the whole header used to drift into the dropdown on narrower windows
-           or with long session names. */
+        /* Sits in the middle grid column of .header (auto 1fr auto), so it's
+           genuinely centered in the leftover space between the logo and the
+           session dropdown/buttons — and can never overlap either, regardless of
+           window width or how long the current session's name is. */
         .header-pills {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            flex: 1;
             min-width: 0;
             padding: 0 0.5rem;
         }
@@ -1046,6 +1044,38 @@
             color: var(--text-secondary);
             margin-top: 0.25rem;
             line-height: 1.4;
+        }
+
+        /* Auto-Export folder picker: a self-contained block instead of a cramped
+           side-by-side row, so the description text has room to wrap normally. */
+        .autoexport-folder-block {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .autoexport-folder-block .setting-description {
+            margin-top: 0;
+        }
+
+        .autoexport-folder-status {
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.4rem;
+            margin-bottom: 0.85rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .autoexport-folder-status.is-set {
+            color: #4ade80;
+        }
+
+        .autoexport-folder-block .data-btn {
+            width: 100%;
+            margin-bottom: 0;
         }
 
         /* Language Buttons */
@@ -2659,6 +2689,41 @@
 
         .histogram-container {
             height: 200px;
+        }
+
+        .pie-chart-container {
+            height: 180px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pie-chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .pie-chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .pie-chart-legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .pie-chart-legend-value {
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
         /* Light theme adjustments for Statistics */
