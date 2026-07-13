@@ -7974,3 +7974,201 @@
                 order: 3 !important;
             }
         }
+
+/* ===== Fire Timer dropdown menu ===== */
+.logo-section { display: flex; align-items: center; gap: 6px; position: relative; }
+.fire-menu { position: relative; }
+.fire-menu-btn {
+    background: transparent; border: none; cursor: pointer;
+    color: inherit; opacity: 0.7; font-size: 14px; padding: 4px 6px;
+}
+.fire-menu-btn:hover { opacity: 1; }
+.fire-menu-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); left: 0;
+    min-width: 200px; background: var(--card-bg, #1e1e2e);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 6px; z-index: 500;
+}
+.fire-menu-dropdown.visible { display: block; }
+.fire-menu-item {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: transparent; border: none; color: inherit; text-align: left;
+    padding: 9px 10px; border-radius: 7px; cursor: pointer; font-size: 14px;
+}
+.fire-menu-item:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+.fire-menu-item-disabled { opacity: 0.45; cursor: not-allowed; position: relative; }
+.fire-menu-soon {
+    margin-left: auto; font-size: 10px; text-transform: uppercase;
+    background: rgba(255,255,255,0.12); padding: 2px 6px; border-radius: 999px;
+}
+.fire-menu-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 6px 4px; }
+
+/* ===== Algs Trainer modal ===== */
+.algs-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 1000; align-items: center; justify-content: center;
+}
+.algs-overlay.visible { display: flex; }
+.algs-modal {
+    background: var(--card-bg, #1e1e2e); border-radius: 16px;
+    width: min(720px, 92vw); max-height: 86vh; overflow-y: auto;
+    padding: 20px 24px 28px; position: relative;
+}
+.algs-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+}
+.algs-modal-title { font-size: 18px; font-weight: 600; margin: 0; }
+.algs-back-btn, .algs-modal-close {
+    background: transparent; border: none; color: inherit; cursor: pointer;
+    font-size: 14px; opacity: 0.7; padding: 4px 8px;
+}
+.algs-back-btn:hover, .algs-modal-close:hover { opacity: 1; }
+.algs-modal-close { font-size: 22px; }
+
+.algs-step-hidden { display: none !important; }
+.algs-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.algs-card {
+    position: relative; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+    padding: 22px 12px; cursor: pointer; color: inherit;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: transform .15s ease, background .15s ease;
+}
+.algs-card:hover:not(:disabled) { background: rgba(255,255,255,0.09); transform: translateY(-2px); }
+.algs-card-icon { font-size: 26px; }
+.algs-card-label { font-weight: 600; font-size: 15px; }
+.algs-card-sub { font-size: 11px; opacity: 0.6; }
+.algs-card-locked { opacity: 0.45; cursor: not-allowed; }
+.algs-card-soon {
+    position: absolute; top: 8px; right: 8px; font-size: 9px; text-transform: uppercase;
+    background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 999px;
+}
+
+.algs-step-fullscreen { width: 100%; }
+.algs-list-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.algs-list-count { font-size: 12px; opacity: 0.65; }
+.algs-cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px;
+    max-height: 58vh; overflow-y: auto; padding-right: 4px;
+}
+.algs-alg-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px;
+}
+.algs-alg-card-head { display: flex; justify-content: space-between; align-items: center; }
+.algs-alg-card-name { font-weight: 600; font-size: 13px; }
+.algs-alg-card-group { font-size: 10px; opacity: 0.55; }
+.algs-alg-card-formula { font-family: monospace; font-size: 12px; line-height: 1.4; opacity: 0.9; word-break: break-word; }
+.header-pills { visibility: hidden !important; pointer-events: none !important; }
+.algs-alg-card-learned { accent-color: #4caf50; }
+
+/* No emoji icons on puzzle/method/set cards — just big text */
+.algs-card-icon { display: none; }
+.algs-card-label { font-size: 22px; }
+
+/* Fullscreen modal once past step 1 (method/stage selection onward) */
+.algs-modal.algs-fullscreen {
+    width: 100vw; height: 100vh; max-height: 100vh;
+    border-radius: 0; display: flex; flex-direction: column;
+}
+.algs-modal.algs-fullscreen #algsStep2,
+.algs-modal.algs-fullscreen #algsStep3 {
+    flex: 1; display: flex; flex-direction: column;
+}
+.algs-modal.algs-fullscreen #algsStep2 .algs-grid,
+.algs-modal.algs-fullscreen #algsStep3 .algs-grid {
+    flex: 1; align-content: center;
+}
+.algs-modal.algs-fullscreen #algsStep4 { flex: 1; display: flex; flex-direction: column; }
+.algs-modal.algs-fullscreen #algsStepPractice { flex: 1; display: flex; flex-direction: column; }
+
+/* ===== Redesigned alg list: one algorithm per row, diagram on the right ===== */
+.algs-cards-grid { display: flex; flex-direction: column; gap: 10px; max-height: none; flex: 1; overflow-y: auto; }
+.algs-alg-card {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+    gap: 20px; padding: 16px 20px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+}
+.algs-alg-card-left { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+.algs-alg-card-name { font-weight: 700; font-size: 20px; }
+.algs-alg-card-formula { font-family: monospace; font-size: 15px; opacity: 0.85; white-space: normal; word-break: break-word; }
+.algs-alg-card-footer { display: flex; align-items: center; gap: 16px; margin-top: 4px; }
+.algs-alg-card-learned-wrap { display: flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+.algs-alg-card-learned { width: 18px; height: 18px; accent-color: #4caf50; cursor: pointer; }
+.algs-alg-practice-row-btn {
+    background: rgba(76,175,80,0.15); color: #4caf50; border: 1px solid rgba(76,175,80,0.4);
+    border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.algs-alg-practice-row-btn:hover { background: rgba(76,175,80,0.28); }
+.algs-alg-diagram { flex-shrink: 0; width: 150px; height: 150px; }
+
+/* ===== Algs Trainer: toolbar + practice/drilling view ===== */
+.algs-list-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.algs-toolbar-check { display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: 0.75; margin-left: auto; }
+.algs-practice-btn {
+    background: #4caf50; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.algs-practice-btn:hover { background: #43a047; }
+
+.algs-practice-wrap {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; text-align: center; padding: 20px;
+}
+.algs-practice-scramble { font-family: monospace; font-size: 20px; opacity: 0.85; max-width: 640px; }
+.algs-practice-timer { font-size: 72px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.algs-practice-timer.running { color: #4caf50; }
+.algs-practice-hint { font-size: 13px; opacity: 0.55; }
+.algs-practice-case { font-size: 15px; opacity: 0.8; }
+.algs-practice-stats { font-size: 12px; opacity: 0.6; display: flex; gap: 18px; }
+
+/* ===== Algs Trainer: phased practice (warning / metronome / drill) ===== */
+.algs-phase { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.algs-phase0-wrap { max-width: 520px; text-align: center; display: flex; flex-direction: column; gap: 24px; padding: 20px; }
+.algs-phase0-text { font-size: 18px; line-height: 1.5; opacity: 0.9; }
+.algs-phase0-btns { display: flex; gap: 12px; justify-content: center; }
+.algs-phase-btn-primary {
+    background: #4caf50; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+}
+.algs-phase-btn-primary:hover { background: #43a047; }
+.algs-phase-btn-secondary {
+    background: rgba(255,255,255,0.08); color: inherit; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px; padding: 12px 26px; font-size: 15px; cursor: pointer;
+}
+.algs-phase-btn-secondary:hover { background: rgba(255,255,255,0.15); }
+
+.algs-metronome-wrap { text-align: center; display: flex; flex-direction: column; gap: 20px; }
+.algs-metronome-move { font-size: 140px; font-weight: 800; font-family: monospace; line-height: 1; }
+.algs-metronome-progress { font-size: 14px; opacity: 0.6; }
+
+.algs-finish-btn { margin-top: 10px; }
+
+/* ===== F2L: group headers, precondition badge, slot badge ===== */
+.algs-group-header {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    opacity: 0.55; margin: 14px 4px 2px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.algs-group-header:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+.algs-alg-card-precond {
+    font-size: 11px; color: #ffb74d; opacity: 0.9;
+}
+.algs-f2l-badge {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 22px; opacity: 0.5; border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 10px;
+}
+
+/* F2L diagram: wrapper + small target-slot label */
+.algs-diagram-wrap { position: relative; width: 100%; height: 100%; }
+.algs-diagram-wrap .algs-diagram-svg { width: 100%; height: 100%; }
+.algs-diagram-slot-label {
+    position: absolute; bottom: -2px; right: 2px; font-size: 11px; font-weight: 700;
+    opacity: 0.7; background: rgba(0,0,0,0.35); padding: 1px 5px; border-radius: 5px;
+}
+
+.algs-metronome-controls { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
+.algs-metronome-controls .algs-phase-btn-secondary { padding: 8px 16px; font-size: 13px; }

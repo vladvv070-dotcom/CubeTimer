@@ -11461,3 +11461,1033 @@
             // Init export image UI
             timer.initExportImageUI();
         });
+
+
+
+// ===================== Algs Trainer: algorithm database =====================
+// FireCube Timer — Algs Trainer algorithm database
+// Source: CubeSkills OLL/PLL sheets (Feliks Zemdegs & Andy Klise)
+// 57 OLL + 21 PLL = 78 verified cases.
+// Each entry: id, name, group, prob (as shown on sheet), alg (suggested algorithm)
+
+const OLL = [
+  // All Edges Oriented Correctly
+  { id: 'OLL21', name: 'OCLL1',  group: 'All Edges Oriented Correctly', prob: '1/108', alg: "R U2 R' U' R U R' U' R U' R'" },
+  { id: 'OLL22', name: 'OCLL2',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "R U2' R2' U' R2 U' R2' U2' R" },
+  { id: 'OLL23', name: 'OCLL3',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "R2 D R' U2 R D' R' U2 R'" },
+  { id: 'OLL24', name: 'OCLL4',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "r U R' U' r' F R F'" },
+  { id: 'OLL25', name: 'OCLL5',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "y F' r U R' U' r' F R" },
+  { id: 'OLL26', name: 'OCLL6',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "R U2 R' U' R U' R'" },
+  { id: 'OLL27', name: 'OCLL7',  group: 'All Edges Oriented Correctly', prob: '1/54',  alg: "R U R' U R U2' R'" },
+
+  // T-Shapes
+  { id: 'OLL33', name: 'T1', group: 'T-Shapes', prob: '1/54', alg: "R U R' U' R' F R F'" },
+  { id: 'OLL45', name: 'T2', group: 'T-Shapes', prob: '1/54', alg: "F R U R' U' F'" },
+
+  // Squares
+  { id: 'OLL5',  name: 'S1', group: 'Squares', prob: '1/54', alg: "r' U2' R U R' U r" },
+  { id: 'OLL6',  name: 'S2', group: 'Squares', prob: '1/54', alg: "r U2 R' U' R U' r'" },
+
+  // C-Shapes
+  { id: 'OLL34', name: 'C1', group: 'C-Shapes', prob: '1/54', alg: "R U R2' U' R' F R U R U' F'" },
+  { id: 'OLL46', name: 'C2', group: 'C-Shapes', prob: '1/54', alg: "R' U' R' F R F' U R" },
+
+  // W-Shapes
+  { id: 'OLL36', name: 'W1', group: 'W-Shapes', prob: '1/54', alg: "R' U' R U' R' U R U l U' R' U x" },
+  { id: 'OLL38', name: 'W2', group: 'W-Shapes', prob: '1/54', alg: "R U R' U R U' R' U' R' F R F'" },
+
+  // Corners Correct, Edges Flipped
+  { id: 'OLL28', name: 'E1', group: 'Corners Correct, Edges Flipped', prob: '1/54',  alg: "r U R' U' M U R U' R'" },
+  { id: 'OLL57', name: 'E2', group: 'Corners Correct, Edges Flipped', prob: '1/108', alg: "R U R' U' M' U R U' r'" },
+
+  // P-Shapes
+  { id: 'OLL31', name: 'P1', group: 'P-Shapes', prob: '1/54', alg: "R' U' F U R U' R' F' R" },
+  { id: 'OLL32', name: 'P2', group: 'P-Shapes', prob: '1/54', alg: "R U B' U' R' U R B R'" },
+  { id: 'OLL43', name: 'P3', group: 'P-Shapes', prob: '1/54', alg: "y R' U' F' U F R" },
+  { id: 'OLL44', name: 'P4', group: 'P-Shapes', prob: '1/54', alg: "f R U R' U' f'" },
+
+  // I-Shapes
+  { id: 'OLL51', name: 'I1', group: 'I-Shapes', prob: '1/54',  alg: "f R U R' U' R U R' U' f'" },
+  { id: 'OLL52', name: 'I2', group: 'I-Shapes', prob: '1/54',  alg: "R' U' R U' R' U y' R' U R B" },
+  { id: 'OLL55', name: 'I3', group: 'I-Shapes', prob: '1/108', alg: "y R' F R U R U' R2' F' R2 U' R' U R U R'" },
+  { id: 'OLL56', name: 'I4', group: 'I-Shapes', prob: '1/108', alg: "r' U' r U' R' U R U' R' U R r' U r" },
+
+  // Fish Shapes
+  { id: 'OLL9',  name: 'F1', group: 'Fish Shapes', prob: '1/54', alg: "R U R' U' R' F R2 U R' U' F'" },
+  { id: 'OLL10', name: 'F2', group: 'Fish Shapes', prob: '1/54', alg: "R U R' U R' F R F' R U2' R'" },
+  { id: 'OLL35', name: 'F3', group: 'Fish Shapes', prob: '1/54', alg: "R U2' R2' F R F' R U2' R'" },
+  { id: 'OLL37', name: 'F4', group: 'Fish Shapes', prob: '1/54', alg: "F R U' R' U' R U R' F'" },
+
+  // Knight Move Shapes
+  { id: 'OLL13', name: 'K1', group: 'Knight Move Shapes', prob: '1/54', alg: "r U' r' U' r U r' y' R' U R" },
+  { id: 'OLL14', name: 'K2', group: 'Knight Move Shapes', prob: '1/54', alg: "R' F R U R' F' R F U' F'" },
+  { id: 'OLL15', name: 'K3', group: 'Knight Move Shapes', prob: '1/54', alg: "r' U' r R' U' R U r' U r" },
+  { id: 'OLL16', name: 'K4', group: 'Knight Move Shapes', prob: '1/54', alg: "r U r' R U R' U' r U' r'" },
+
+  // Awkward Shapes
+  { id: 'OLL29', name: 'A1', group: 'Awkward Shapes', prob: '1/54', alg: "y R U R' U' R U' R' F' U' F R U R'" },
+  { id: 'OLL30', name: 'A2', group: 'Awkward Shapes', prob: '1/54', alg: "y' F U R U2' R' U' R U2' R' U' F'" },
+  { id: 'OLL41', name: 'A3', group: 'Awkward Shapes', prob: '1/54', alg: "R U R' U R U2' R' F R U R' U' F'" },
+  { id: 'OLL42', name: 'A4', group: 'Awkward Shapes', prob: '1/54', alg: "R' U' R U' R' U2 R F R U R' U' F'" },
+
+  // L-Shapes
+  { id: 'OLL47', name: 'L1', group: 'L-Shapes', prob: '1/54', alg: "F' L' U' L U L' U' L U F" },
+  { id: 'OLL48', name: 'L2', group: 'L-Shapes', prob: '1/54', alg: "F R U R' U' R U R' U' F'" },
+  { id: 'OLL49', name: 'L3', group: 'L-Shapes', prob: '1/54', alg: "r U' r2' U r2 U r2' U' r" },
+  { id: 'OLL50', name: 'L4', group: 'L-Shapes', prob: '1/54', alg: "r' U r2 U' r2' U' r2 U r'" },
+  { id: 'OLL53', name: 'L5', group: 'L-Shapes', prob: '1/54', alg: "r' U' R U' R' U R U' R' U2 r" },
+  { id: 'OLL54', name: 'L6', group: 'L-Shapes', prob: '1/54', alg: "r U R' U R U' R' U R U2' r'" },
+
+  // Lightning Bolts
+  { id: 'OLL7',  name: 'B1', group: 'Lightning Bolts', prob: '1/54', alg: "r U R' U R U2' r'" },
+  { id: 'OLL8',  name: 'B2', group: 'Lightning Bolts', prob: '1/54', alg: "r' U' R U' R' U2 r" },
+  { id: 'OLL11', name: 'B3', group: 'Lightning Bolts', prob: '1/54', alg: "r' R2 U R' U R U2 R' U M'" },
+  { id: 'OLL12', name: 'B4', group: 'Lightning Bolts', prob: '1/54', alg: "M' R' U' R U' R' U2 R U' M" },
+  { id: 'OLL39', name: 'B5', group: 'Lightning Bolts', prob: '1/54', alg: "L F' L' U' L U F U' L'" },
+  { id: 'OLL40', name: 'B6', group: 'Lightning Bolts', prob: '1/54', alg: "R' F R U R' U' F' U R" },
+
+  // No Edges Flipped Correctly
+  { id: 'OLL1',  name: 'O1', group: 'No Edges Flipped Correctly', prob: '1/108', alg: "R U2' R2' F R F' U2' R' F R F'" },
+  { id: 'OLL2',  name: 'O2', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "F R U R' U' F' f R U R' U' f'" },
+  { id: 'OLL3',  name: 'O3', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "f R U R' U' f' U' F R U R' U' F'" },
+  { id: 'OLL4',  name: 'O4', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "f R U R' U' f' U F R U R' U' F'" },
+  { id: 'OLL17', name: 'O5', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "R U R' U R' F R F' U2' R' F R F'" },
+  { id: 'OLL18', name: 'O6', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "y R U2' R2' F R F' U2' M' U R U' r'" },
+  { id: 'OLL19', name: 'O7', group: 'No Edges Flipped Correctly', prob: '1/54',  alg: "M U R U R' U' M' R' F R F'" },
+  { id: 'OLL20', name: 'O8', group: 'No Edges Flipped Correctly', prob: '1/216', alg: "M U R U R' U' M2' U R U' r'" },
+];
+
+const PLL = [
+  // Permutations of Edges Only
+  { id: 'PLLUb', name: 'Ub', group: 'Permutations of Edges Only', prob: '1/18', alg: "R2 U R U R' U' R' U' R' U R'" },
+  { id: 'PLLUa', name: 'Ua', group: 'Permutations of Edges Only', prob: '1/18', alg: "R U' R U R U R U' R' U' R2" },
+  { id: 'PLLZ',  name: 'Z',  group: 'Permutations of Edges Only', prob: '1/36', alg: "M2' U M2' U M' U2 M2' U2 M' U2" },
+  { id: 'PLLH',  name: 'H',  group: 'Permutations of Edges Only', prob: '1/72', alg: "M2' U M2' U2 M2' U M2'" },
+
+  // Permutations of Corners Only
+  { id: 'PLLAa', name: 'Aa', group: 'Permutations of Corners Only', prob: '1/18', alg: "x R' U R' D2 R U' R' D2 R2 x'" },
+  { id: 'PLLAb', name: 'Ab', group: 'Permutations of Corners Only', prob: '1/18', alg: "x R2' D2 R U R' D2 R U' R x'" },
+  { id: 'PLLE',  name: 'E',  group: 'Permutations of Corners Only', prob: '1/36', alg: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+
+  // Swap One Set of Adjacent Corners
+  { id: 'PLLRa', name: 'Ra', group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R U' R' U' R U R D R' U' R D' R' U2 R' U'" },
+  { id: 'PLLRb', name: 'Rb', group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R' U2 R U2' R' F R U R' U' R' F' R2 U'" },
+  { id: 'PLLJa', name: 'Ja', group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R' U L' U2 R U' R' U2 R L U'" },
+  { id: 'PLLJb', name: 'Jb', group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R U R' F' R U R' U' R' F R2 U' R' U'" },
+  { id: 'PLLT',  name: 'T',  group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R U R' U' R' F R2 U' R' U' R U R' F'" },
+  { id: 'PLLF',  name: 'F',  group: 'Swap One Set of Adjacent Corners', prob: '1/18', alg: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R" },
+
+  // Swap One Set of Diagonal Corners
+  { id: 'PLLV', name: 'V', group: 'Swap One Set of Diagonal Corners', prob: '1/18', alg: "R' U R' U' y R' F' R2 U' R' U R' F R F" },
+  { id: 'PLLY', name: 'Y', group: 'Swap One Set of Diagonal Corners', prob: '1/18', alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
+  { id: 'PLLNa', name: 'Na', group: 'Swap One Set of Diagonal Corners', prob: '1/72', alg: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'" },
+  { id: 'PLLNb', name: 'Nb', group: 'Swap One Set of Diagonal Corners', prob: '1/72', alg: "R' U R U' R' F' U' F R U R' F R' F' R U' R" },
+
+  // G Permutations (Double cycles)
+  { id: 'PLLGa', name: 'Ga', group: 'G Permutations (Double cycles)', prob: '1/18', alg: "R2 U R' U R' U' R U' R2 D U' R' U R D' U" },
+  { id: 'PLLGb', name: 'Gb', group: 'G Permutations (Double cycles)', prob: '1/18', alg: "F' U' F R2 u R' U R U' R u' R2 U'" },
+  { id: 'PLLGc', name: 'Gc', group: 'G Permutations (Double cycles)', prob: '1/18', alg: "R2 U' R U' R U R' U R2 D' U R U' R' D U'" },
+  { id: 'PLLGd', name: 'Gd', group: 'G Permutations (Double cycles)', prob: '1/18', alg: "D' R U R' U' D R2 U' R U' R' U R' U R2 U" },
+];
+
+const F2L = [
+  { id: "F2L_FR_Basic1", slot: "FR", slotName: "Front-Right", group: "Basic", groupName: "Basic Inserts", name: "FR: Basic Insert 1", alg: "U R U' R'", precondition: null },
+  { id: "F2L_FR_Basic2", slot: "FR", slotName: "Front-Right", group: "Basic", groupName: "Basic Inserts", name: "FR: Basic Insert 2", alg: "y' R' U' R", precondition: null },
+  { id: "F2L_FR_Basic3", slot: "FR", slotName: "Front-Right", group: "Basic", groupName: "Basic Inserts", name: "FR: Basic Insert 3", alg: "y L' U' L", precondition: null },
+  { id: "F2L_FR_Case1_a", slot: "FR", slotName: "Front-Right", group: "Case1", groupName: "Case 1", name: "FR: Case 1 Option A", alg: "U' R U' R' U y' R' U' R", precondition: null },
+  { id: "F2L_FR_Case1_b", slot: "FR", slotName: "Front-Right", group: "Case1", groupName: "Case 1", name: "FR: Case 1 Option B", alg: "y' U R' U' R U' R' U' R", precondition: null },
+  { id: "F2L_FR_Case1_c", slot: "FR", slotName: "Front-Right", group: "Case1", groupName: "Case 1", name: "FR: Case 1 Option C", alg: "U' R U2 R' U y' R' U' R", precondition: null },
+  { id: "F2L_FR_Case1_d", slot: "FR", slotName: "Front-Right", group: "Case1", groupName: "Case 1", name: "FR: Case 1 Option D", alg: "U' R U2 R' d R' U' R", precondition: null },
+  { id: "F2L_FR_Case1_e", slot: "FR", slotName: "Front-Right", group: "Case1", groupName: "Case 1", name: "FR: Case 1 Option E", alg: "y' U R' U R U' R' U' R", precondition: null },
+  { id: "F2L_FR_Case2_a", slot: "FR", slotName: "Front-Right", group: "Case2", groupName: "Case 2", name: "FR: Case 2 Option A", alg: "U' R U R' U2 R U' R'", precondition: null },
+  { id: "F2L_FR_Case2_b", slot: "FR", slotName: "Front-Right", group: "Case2", groupName: "Case 2", name: "FR: Case 2 Option B", alg: "U' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_FR_Case3_a", slot: "FR", slotName: "Front-Right", group: "Case3", groupName: "Case 3", name: "FR: Case 3 Option A", alg: "U R U2 R' U R U' R'", precondition: null },
+  { id: "F2L_FR_Case3_b", slot: "FR", slotName: "Front-Right", group: "Case3", groupName: "Case 3", name: "FR: Case 3 Option B", alg: "U2 R U R' U R U' R'", precondition: null },
+  { id: "F2L_FR_Case3_c", slot: "FR", slotName: "Front-Right", group: "Case3", groupName: "Case 3", name: "FR: Case 3 Option C", alg: "R U' R' U2 R U R'", precondition: null },
+  { id: "F2L_FR_Case3_d", slot: "FR", slotName: "Front-Right", group: "Case3", groupName: "Case 3", name: "FR: Case 3 Option D", alg: "y' U R' U' R U2 R' U R", precondition: null },
+  { id: "F2L_FR_Case3_e", slot: "FR", slotName: "Front-Right", group: "Case3", groupName: "Case 3", name: "FR: Case 3 Option E", alg: "d R' U' R U2 R' U R", precondition: null },
+  { id: "F2L_FR_IncConn_a", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected A", alg: "y' R' U R U2 y R U R'", precondition: null },
+  { id: "F2L_FR_IncConn_b", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected B", alg: "R U R' U2 R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FR_IncConn_c", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected C", alg: "R U' R' U2 y' R' U' R", precondition: null },
+  { id: "F2L_FR_IncConn_d", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected D", alg: "U F R U R' U' F' R U R'", precondition: null },
+  { id: "F2L_FR_IncConn_e", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected E", alg: "R U2 R' U' R U R'", precondition: null },
+  { id: "F2L_FR_IncConn_f", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected F", alg: "y' R' U2 R U R' U' R", precondition: null },
+  { id: "F2L_FR_IncConn_g", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected G", alg: "U R U' R' U' R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FR_IncConn_h", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected H", alg: "y' U' R' U R U R' U R U' R' U R", precondition: null },
+  { id: "F2L_FR_IncConn_i", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected I", alg: "R U R' U2 R U R' U' R U R'", precondition: null },
+  { id: "F2L_FR_IncConn_j", slot: "FR", slotName: "Front-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FR: Incorrectly Connected J", alg: "F R U R' U' F' R U' R'", precondition: null },
+  { id: "F2L_FR_CornerIn_a", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U A", alg: "U' F' R U R' U' R' F R", precondition: null },
+  { id: "F2L_FR_CornerIn_b", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U B", alg: "R' F' R U R U' R' F", precondition: null },
+  { id: "F2L_FR_CornerIn_c", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U C", alg: "U R U' R' U' F' U F", precondition: null },
+  { id: "F2L_FR_CornerIn_d", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U D", alg: "U R U' R' F R' F' R", precondition: null },
+  { id: "F2L_FR_CornerIn_e", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U E", alg: "R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FR_CornerIn_f", slot: "FR", slotName: "Front-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FR: Corner in Place, Edge in U F", alg: "y' R' U' R U R' U' R", precondition: null },
+  { id: "F2L_FR_EdgeIn_a", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U A", alg: "R' F R F' U R U' R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_b", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U B", alg: "R U' R' U y' R' U R", precondition: null },
+  { id: "F2L_FR_EdgeIn_c", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U C", alg: "U' R' F R F' R U' R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_d", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U D", alg: "y' R' U R U' R' U R", precondition: null },
+  { id: "F2L_FR_EdgeIn_e", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U E", alg: "R U R' U' R U R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_f", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U F", alg: "U R U' R' U R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_g", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U G", alg: "U' R U' R' U2 R U' R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_h", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U H", alg: "U R U R' U2 R U R'", precondition: null },
+  { id: "F2L_FR_EdgeIn_i", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U I", alg: "U' R U R' d R' U' R", precondition: null },
+  { id: "F2L_FR_EdgeIn_j", slot: "FR", slotName: "Front-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FR: Edge in Place, Corner in U J", alg: "U F' U' F U' R U R'", precondition: null },
+  { id: "F2L_FR_BothIn_a", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place A", alg: "R U' R' d R' U2 R U2 R' U R", precondition: null },
+  { id: "F2L_FR_BothIn_b", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place B", alg: "R U' R' U' R U R' U2 R U' R'", precondition: null },
+  { id: "F2L_FR_BothIn_c", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place C", alg: "R U' R' U R U2 R' U R U' R'", precondition: null },
+  { id: "F2L_FR_BothIn_d", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place D", alg: "R U R' U' R U2 R' U' R U R'", precondition: null },
+  { id: "F2L_FR_BothIn_e", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place E", alg: "R U R' U2 R U' R' U R U R'", precondition: null },
+  { id: "F2L_FR_BothIn_f", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place F", alg: "F' U F U2 R U R' U R U' R'", precondition: null },
+  { id: "F2L_FR_BothIn_g", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place G", alg: "R U R' U' R U' R' U2 y' R' U' R", precondition: null },
+  { id: "F2L_FR_BothIn_h", slot: "FR", slotName: "Front-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "FR: Edge & Corner in Place H", alg: "R U' R' F R U R' U' F' R U' R'", precondition: null },
+  { id: "F2L_BR_Basic1", slot: "BR", slotName: "Back-Right", group: "Basic", groupName: "Basic Inserts", name: "BR: Basic Insert 1", alg: "y U R U' R'", precondition: null },
+  { id: "F2L_BR_Basic2", slot: "BR", slotName: "Back-Right", group: "Basic", groupName: "Basic Inserts", name: "BR: Basic Insert 2", alg: "y' U L U' L'", precondition: null },
+  { id: "F2L_BR_Basic3", slot: "BR", slotName: "Back-Right", group: "Basic", groupName: "Basic Inserts", name: "BR: Basic Insert 3", alg: "R' U' R", precondition: null },
+  { id: "F2L_BR_Case1_a", slot: "BR", slotName: "Back-Right", group: "Case1", groupName: "Case 1", name: "BR: Case 1 Option A", alg: "U' R' U R", precondition: null },
+  { id: "F2L_BR_Case1_b", slot: "BR", slotName: "Back-Right", group: "Case1", groupName: "Case 1", name: "BR: Case 1 Option B", alg: "y R U R'", precondition: null },
+  { id: "F2L_BR_Case1_c", slot: "BR", slotName: "Back-Right", group: "Case1", groupName: "Case 1", name: "BR: Case 1 Option C", alg: "y' L U L'", precondition: null },
+  { id: "F2L_BR_Case1_d", slot: "BR", slotName: "Back-Right", group: "Case1", groupName: "Case 1", name: "BR: Case 1 Option D", alg: "U R' U' R U' R' U' R", precondition: null },
+  { id: "F2L_BR_Case1_e", slot: "BR", slotName: "Back-Right", group: "Case1", groupName: "Case 1", name: "BR: Case 1 Option E", alg: "U R' U R U' y R U R'", precondition: null },
+  { id: "F2L_BR_Case2_a", slot: "BR", slotName: "Back-Right", group: "Case2", groupName: "Case 2", name: "BR: Case 2 Option A", alg: "y U' R U R' U2 R U' R'", precondition: null },
+  { id: "F2L_BR_Case2_b", slot: "BR", slotName: "Back-Right", group: "Case2", groupName: "Case 2", name: "BR: Case 2 Option B", alg: "U r' U R U' R' U' r", precondition: null },
+  { id: "F2L_BR_Case3_a", slot: "BR", slotName: "Back-Right", group: "Case3", groupName: "Case 3", name: "BR: Case 3 Option A", alg: "U R' U' R U2 R' U R", precondition: null },
+  { id: "F2L_BR_Case3_b", slot: "BR", slotName: "Back-Right", group: "Case3", groupName: "Case 3", name: "BR: Case 3 Option B", alg: "y U' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_BR_Case3_c", slot: "BR", slotName: "Back-Right", group: "Case3", groupName: "Case 3", name: "BR: Case 3 Option C", alg: "U R' U2 R U2 R' U R", precondition: null },
+  { id: "F2L_BR_Case3_d", slot: "BR", slotName: "Back-Right", group: "Case3", groupName: "Case 3", name: "BR: Case 3 Option D", alg: "y U R U2 R' U R U' R'", precondition: null },
+  { id: "F2L_BR_Case3_e", slot: "BR", slotName: "Back-Right", group: "Case3", groupName: "Case 3", name: "BR: Case 3 Option E", alg: "y U2 R U R' U R U' R'", precondition: null },
+  { id: "F2L_BR_IncConn_a", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Incorrectly Connected A", alg: "U' R' U2 R U' R' U R", precondition: null },
+  { id: "F2L_BR_IncConn_b", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Incorrectly Connected B", alg: "U2 R' U' R U' R' U R", precondition: null },
+  { id: "F2L_BR_IncConn_c", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Incorrectly Connected C", alg: "R' F' U2 F R", precondition: null },
+  { id: "F2L_BR_IncConn_d", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Incorrectly Connected D", alg: "R' U R U2 y R U R'", precondition: null },
+  { id: "F2L_BR_IncConn_e", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Incorrectly Connected E", alg: "R2 F R F' R U2 R' U R", precondition: null },
+  { id: "F2L_BR_CornerIn_a", slot: "BR", slotName: "Back-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BR: Corner in Place, Edge in U A", alg: "y R U2 R' U' R U R'", precondition: null },
+  { id: "F2L_BR_CornerIn_b", slot: "BR", slotName: "Back-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BR: Corner in Place, Edge in U B", alg: "R' U' R U' y R U' R' U R U' R'", precondition: null },
+  { id: "F2L_BR_CornerIn_c", slot: "BR", slotName: "Back-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BR: Corner in Place, Edge in U C", alg: "U R' U2 R y R U2 R' U R U' R'", precondition: null },
+  { id: "F2L_BR_CornerIn_d", slot: "BR", slotName: "Back-Right", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BR: Corner in Place, Edge in U D", alg: "U' R' U R y U R U' R'", precondition: null },
+  { id: "F2L_BR_EdgeIn_a", slot: "BR", slotName: "Back-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BR: Edge in Place, Corner in U A", alg: "y R U' R' U R U' R'", precondition: null },
+  { id: "F2L_BR_EdgeIn_b", slot: "BR", slotName: "Back-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BR: Edge in Place, Corner in U B", alg: "R' U2 R' F R F' R", precondition: null },
+  { id: "F2L_BR_EdgeIn_c", slot: "BR", slotName: "Back-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BR: Edge in Place, Corner in U C", alg: "y R U' R' U2 y' R' U' R", precondition: null },
+  { id: "F2L_BR_EdgeIn_d", slot: "BR", slotName: "Back-Right", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BR: Edge in Place, Corner in U D", alg: "U R U' R' U R' U' R", precondition: "FR" },
+  { id: "F2L_BR_EdgeIn_e", slot: "BR", slotName: "Back-Right", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BR: Edge in Place, Corner in U E", alg: "R' U2 R U R' U' R", precondition: null },
+  { id: "F2L_BR_BothIn_a", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place A", alg: "U' R' U R U R' U R U' R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_b", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place B", alg: "y F R U R' U' F' R U' R'", precondition: null },
+  { id: "F2L_BR_BothIn_c", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place C", alg: "y U R U' R' U' F' U F", precondition: null },
+  { id: "F2L_BR_BothIn_d", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place D", alg: "y U R U' R' F R' F' R", precondition: null },
+  { id: "F2L_BR_BothIn_e", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place E", alg: "R' U R U' R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_f", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place F", alg: "R' U' R U R' U' R", precondition: null },
+  { id: "F2L_BR_BothIn_g", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place G", alg: "R' U R' F R F' R", precondition: null },
+  { id: "F2L_BR_BothIn_h", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place H", alg: "R' U R U' y R U' R'", precondition: null },
+  { id: "F2L_BR_BothIn_i", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place I", alg: "y R U R' U' R U R'", precondition: null },
+  { id: "F2L_BR_BothIn_j", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place J", alg: "U' R' U R U' R' U R U' R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_k", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place K", alg: "U' R' U' R U2 R' U' R", precondition: null },
+  { id: "F2L_BR_BothIn_l", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place L", alg: "U R' U R U2 R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_m", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place M", alg: "y U' R U R' d R' U' R", precondition: null },
+  { id: "F2L_BR_BothIn_n", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place N", alg: "U R' U' R y U' R U R'", precondition: null },
+  { id: "F2L_BR_BothIn_o", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place O", alg: "R' U R d' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_BR_BothIn_p", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place P", alg: "R' U R U' R' U2 R U' R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_q", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place Q", alg: "R' U R U2 y R U R' U R U' R'", precondition: null },
+  { id: "F2L_BR_BothIn_r", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place R", alg: "R' U' R U R' U2 R U R' U' R", precondition: null },
+  { id: "F2L_BR_BothIn_s", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place S", alg: "R' U R U R' U' R U2 R' U R", precondition: null },
+  { id: "F2L_BR_BothIn_t", slot: "BR", slotName: "Back-Right", group: "BothIn", groupName: "Edge and Corner in Place", name: "BR: Edge & Corner in Place T", alg: "R' U R U R' U R U' y R U R'", precondition: null },
+  { id: "F2L_FL_Basic1", slot: "FL", slotName: "Front-Left", group: "Basic", groupName: "Basic Inserts", name: "FL: Basic Insert 1", alg: "y' U R U' R'", precondition: null },
+  { id: "F2L_FL_Basic2", slot: "FL", slotName: "Front-Left", group: "Basic", groupName: "Basic Inserts", name: "FL: Basic Insert 2", alg: "y U L U' L'", precondition: null },
+  { id: "F2L_FL_Basic3", slot: "FL", slotName: "Front-Left", group: "Basic", groupName: "Basic Inserts", name: "FL: Basic Insert 3", alg: "L' U' L", precondition: null },
+  { id: "F2L_FL_Case1_a", slot: "FL", slotName: "Front-Left", group: "Case1", groupName: "Case 1", name: "FL: Case 1 Option A", alg: "U' L' U L", precondition: null },
+  { id: "F2L_FL_Case1_b", slot: "FL", slotName: "Front-Left", group: "Case1", groupName: "Case 1", name: "FL: Case 1 Option B", alg: "y' R U R'", precondition: null },
+  { id: "F2L_FL_Case1_c", slot: "FL", slotName: "Front-Left", group: "Case1", groupName: "Case 1", name: "FL: Case 1 Option C", alg: "y L U L'", precondition: null },
+  { id: "F2L_FL_Case1_d", slot: "FL", slotName: "Front-Left", group: "Case1", groupName: "Case 1", name: "FL: Case 1 Option D", alg: "U L' U' L U' L' U' L", precondition: null },
+  { id: "F2L_FL_Case1_e", slot: "FL", slotName: "Front-Left", group: "Case1", groupName: "Case 1", name: "FL: Case 1 Option E", alg: "U L' U L U' y' R U R'", precondition: null },
+  { id: "F2L_FL_Case2_a", slot: "FL", slotName: "Front-Left", group: "Case2", groupName: "Case 2", name: "FL: Case 2 Option A", alg: "y' U' R U R' U2 R U' R'", precondition: null },
+  { id: "F2L_FL_Case2_b", slot: "FL", slotName: "Front-Left", group: "Case2", groupName: "Case 2", name: "FL: Case 2 Option B", alg: "L U L' y' U R U' R'", precondition: "BL" },
+  { id: "F2L_FL_Case2_c", slot: "FL", slotName: "Front-Left", group: "Case2", groupName: "Case 2", name: "FL: Case 2 Option C", alg: "U L' U' L U2 L' U L", precondition: null },
+  { id: "F2L_FL_Case2_d", slot: "FL", slotName: "Front-Left", group: "Case2", groupName: "Case 2", name: "FL: Case 2 Option D", alg: "y' U' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_FL_Case2_e", slot: "FL", slotName: "Front-Left", group: "Case2", groupName: "Case 2", name: "FL: Case 2 Option E", alg: "U L' U2 L U2 L' U L", precondition: null },
+  { id: "F2L_FL_Case3_a", slot: "FL", slotName: "Front-Left", group: "Case3", groupName: "Case 3", name: "FL: Case 3 Option A", alg: "y' U R U2 R' U R U' R'", precondition: null },
+  { id: "F2L_FL_Case3_b", slot: "FL", slotName: "Front-Left", group: "Case3", groupName: "Case 3", name: "FL: Case 3 Option B", alg: "U' L' U2 L U' L' U L", precondition: null },
+  { id: "F2L_FL_Case3_c", slot: "FL", slotName: "Front-Left", group: "Case3", groupName: "Case 3", name: "FL: Case 3 Option C", alg: "F R U2 R' F'", precondition: null },
+  { id: "F2L_FL_Case3_d", slot: "FL", slotName: "Front-Left", group: "Case3", groupName: "Case 3", name: "FL: Case 3 Option D", alg: "U2 L' U' L U' L' U L", precondition: null },
+  { id: "F2L_FL_IncConn_a", slot: "FL", slotName: "Front-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FL: Incorrectly Connected A", alg: "L' U L U2 y' R U R'", precondition: null },
+  { id: "F2L_FL_IncConn_b", slot: "FL", slotName: "Front-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FL: Incorrectly Connected B", alg: "y' R U2 R' U' R U R'", precondition: null },
+  { id: "F2L_FL_IncConn_c", slot: "FL", slotName: "Front-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FL: Incorrectly Connected C", alg: "y' U R U' R' U' R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FL_IncConn_d", slot: "FL", slotName: "Front-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FL: Incorrectly Connected D", alg: "y' R U R' U2 R U R' U' R U R'", precondition: null },
+  { id: "F2L_FL_CornerIn_a", slot: "FL", slotName: "Front-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FL: Corner in Place, Edge in U A", alg: "U' L' U L d R U' R'", precondition: null },
+  { id: "F2L_FL_CornerIn_b", slot: "FL", slotName: "Front-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FL: Corner in Place, Edge in U B", alg: "y' R U' R' U R U' R'", precondition: null },
+  { id: "F2L_FL_CornerIn_c", slot: "FL", slotName: "Front-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "FL: Corner in Place, Edge in U C", alg: "L' U' L U L' U' L", precondition: null },
+  { id: "F2L_FL_EdgeIn_a", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U A", alg: "L' U L U' y' R U' R'", precondition: null },
+  { id: "F2L_FL_EdgeIn_b", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U B", alg: "y' R U' R' U2 y' R' U' R", precondition: null },
+  { id: "F2L_FL_EdgeIn_c", slot: "FL", slotName: "Front-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "FL: Edge in Place, Corner in U C", alg: "U' R U' R' U' L' U' L", precondition: "FR" },
+  { id: "F2L_FL_EdgeIn_d", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U D", alg: "L' U2 L U L' U' L", precondition: null },
+  { id: "F2L_FL_EdgeIn_e", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U E", alg: "U' L' U L U L' U L U' L' U L", precondition: null },
+  { id: "F2L_FL_EdgeIn_f", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U F", alg: "y' F R U R' U' F' R U' R'", precondition: null },
+  { id: "F2L_FL_EdgeIn_g", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U G", alg: "y' U R U' R' U' F' U F", precondition: null },
+  { id: "F2L_FL_EdgeIn_h", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U H", alg: "y' U R U' R' F R' F' R", precondition: null },
+  { id: "F2L_FL_EdgeIn_i", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U I", alg: "L' U L U' L' U L", precondition: null },
+  { id: "F2L_FL_EdgeIn_j", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U J", alg: "y' R U R' U' R U R'", precondition: null },
+  { id: "F2L_FL_EdgeIn_k", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U K", alg: "r U' r' F r U' r' F", precondition: null },
+  { id: "F2L_FL_EdgeIn_l", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U L", alg: "U' L' U L U' L' U L U' L' U L", precondition: null },
+  { id: "F2L_FL_EdgeIn_m", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U M", alg: "U' L' U' L U2 L' U' L", precondition: null },
+  { id: "F2L_FL_EdgeIn_n", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U N", alg: "U L' U L U2 L' U L", precondition: null },
+  { id: "F2L_FL_EdgeIn_o", slot: "FL", slotName: "Front-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "FL: Edge in Place, Corner in U O", alg: "y' U' R U R' d R' U' R", precondition: null },
+  { id: "F2L_FL_BothIn_a", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place A", alg: "U L' U L y' U' R U R'", precondition: null },
+  { id: "F2L_FL_BothIn_b", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place B", alg: "L' U L U' y' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_FL_BothIn_c", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place C", alg: "L' U L U' L' U2 L U' L' U L", precondition: null },
+  { id: "F2L_FL_BothIn_d", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place D", alg: "L' U' L U L' U2 L U L' U' L", precondition: null },
+  { id: "F2L_FL_BothIn_e", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place E", alg: "L' U L U L' U' L U2 L' U L", precondition: null },
+  { id: "F2L_FL_BothIn_f", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place F", alg: "L' U L U L' U L U' y L U L'", precondition: null },
+  { id: "F2L_FL_BothIn_g", slot: "FL", slotName: "Front-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "FL: Edge & Corner in Place G", alg: "L' U L F R U2 R' F'", precondition: null },
+  { id: "F2L_BL_Basic1", slot: "BL", slotName: "Back-Left", group: "Basic", groupName: "Basic Inserts", name: "BL: Basic Insert 1", alg: "U L U' L'", precondition: null },
+  { id: "F2L_BL_Basic2", slot: "BL", slotName: "Back-Left", group: "Basic", groupName: "Basic Inserts", name: "BL: Basic Insert 2", alg: "y U' R' U R", precondition: null },
+  { id: "F2L_BL_Basic3", slot: "BL", slotName: "Back-Left", group: "Basic", groupName: "Basic Inserts", name: "BL: Basic Insert 3", alg: "y' U' L' U L", precondition: null },
+  { id: "F2L_BL_Basic4", slot: "BL", slotName: "Back-Left", group: "Basic", groupName: "Basic Inserts", name: "BL: Basic Insert 4", alg: "y R' U' R", precondition: null },
+  { id: "F2L_BL_Basic5", slot: "BL", slotName: "Back-Left", group: "Basic", groupName: "Basic Inserts", name: "BL: Basic Insert 5", alg: "L U L'", precondition: null },
+  { id: "F2L_BL_Case1_a", slot: "BL", slotName: "Back-Left", group: "Case1", groupName: "Case 1", name: "BL: Case 1 Option A", alg: "y U R' U' R U' R' U' R", precondition: null },
+  { id: "F2L_BL_Case1_b", slot: "BL", slotName: "Back-Left", group: "Case1", groupName: "Case 1", name: "BL: Case 1 Option B", alg: "U' L U L' U L U L'", precondition: null },
+  { id: "F2L_BL_Case1_c", slot: "BL", slotName: "Back-Left", group: "Case1", groupName: "Case 1", name: "BL: Case 1 Option C", alg: "y R U2 R2 U' R2 U' R'", precondition: null },
+  { id: "F2L_BL_Case1_d", slot: "BL", slotName: "Back-Left", group: "Case1", groupName: "Case 1", name: "BL: Case 1 Option D", alg: "y U R' U R U' R' U' R", precondition: null },
+  { id: "F2L_BL_Case2_a", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option A", alg: "U' L U L' U2 L U' L'", precondition: null },
+  { id: "F2L_BL_Case2_b", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option B", alg: "L' U2 L2 U L2 U L", precondition: null },
+  { id: "F2L_BL_Case2_c", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option C", alg: "U' L U' L' U L U L'", precondition: null },
+  { id: "F2L_BL_Case2_d", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option D", alg: "y U R' U' R U2 R' U R", precondition: null },
+  { id: "F2L_BL_Case2_e", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option E", alg: "U' L U2 L' U2 L U' L'", precondition: null },
+  { id: "F2L_BL_Case2_f", slot: "BL", slotName: "Back-Left", group: "Case2", groupName: "Case 2", name: "BL: Case 2 Option F", alg: "y U R' U2 R U2 R' U R", precondition: null },
+  { id: "F2L_BL_Case3_a", slot: "BL", slotName: "Back-Left", group: "Case3", groupName: "Case 3", name: "BL: Case 3 Option A", alg: "U L U2 L' U L U' L'", precondition: null },
+  { id: "F2L_BL_Case3_b", slot: "BL", slotName: "Back-Left", group: "Case3", groupName: "Case 3", name: "BL: Case 3 Option B", alg: "y U' R' U2 R U' R' U R", precondition: null },
+  { id: "F2L_BL_Case3_c", slot: "BL", slotName: "Back-Left", group: "Case3", groupName: "Case 3", name: "BL: Case 3 Option C", alg: "y' F R U2 R' F'", precondition: null },
+  { id: "F2L_BL_Case3_d", slot: "BL", slotName: "Back-Left", group: "Case3", groupName: "Case 3", name: "BL: Case 3 Option D", alg: "y U2 R' U' R U' R' U R", precondition: null },
+  { id: "F2L_BL_Case3_e", slot: "BL", slotName: "Back-Left", group: "Case3", groupName: "Case 3", name: "BL: Case 3 Option E", alg: "y R' F' U2 F R", precondition: null },
+  { id: "F2L_BL_IncConn_a", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected A", alg: "y R' U R U2 y R U R'", precondition: null },
+  { id: "F2L_BL_IncConn_b", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected B", alg: "U' L' U L U' L U' L'", precondition: "FL" },
+  { id: "F2L_BL_IncConn_c", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected C", alg: "L U' L' U2 y R' U' R", precondition: null },
+  { id: "F2L_BL_IncConn_d", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected D", alg: "L U2 L' U' L U L'", precondition: null },
+  { id: "F2L_BL_IncConn_e", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected E", alg: "y R' U2 R U R' U' R", precondition: null },
+  { id: "F2L_BL_IncConn_f", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected F", alg: "U L U' L' U' L U' L' U L U' L'", precondition: null },
+  { id: "F2L_BL_IncConn_g", slot: "BL", slotName: "Back-Left", group: "IncConn", groupName: "Incorrectly Connected Pieces", name: "BL: Incorrectly Connected G", alg: "y U' R' U R U R' U R U' R' U R", precondition: null },
+  { id: "F2L_BL_CornerIn_a", slot: "BL", slotName: "Back-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BL: Corner in Place, Edge in U A", alg: "y' U' L' U L d R U' R'", precondition: null },
+  { id: "F2L_BL_CornerIn_b", slot: "BL", slotName: "Back-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BL: Corner in Place, Edge in U B", alg: "L U' L' U L U' L'", precondition: null },
+  { id: "F2L_BL_CornerIn_c", slot: "BL", slotName: "Back-Left", group: "CornerIn", groupName: "Corner in Place, Edge in U Face", name: "BL: Corner in Place, Edge in U C", alg: "y R' U' R U R' U' R", precondition: null },
+  { id: "F2L_BL_EdgeIn_a", slot: "BL", slotName: "Back-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BL: Edge in Place, Corner in U A", alg: "y R' U R' F R F' R", precondition: null },
+  { id: "F2L_BL_EdgeIn_b", slot: "BL", slotName: "Back-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BL: Edge in Place, Corner in U B", alg: "U' L U' L' U2 L U' L'", precondition: null },
+  { id: "F2L_BL_EdgeIn_c", slot: "BL", slotName: "Back-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BL: Edge in Place, Corner in U C", alg: "U2 L U L' d' R' U R", precondition: null },
+  { id: "F2L_BL_EdgeIn_d", slot: "BL", slotName: "Back-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BL: Edge in Place, Corner in U D", alg: "U L U' L' d' R' U R", precondition: null },
+  { id: "F2L_BL_EdgeIn_e", slot: "BL", slotName: "Back-Left", group: "EdgeIn", groupName: "Edge in Place, Corner in U Face", name: "BL: Edge in Place, Corner in U E", alg: "y R' U R U' R' U R", precondition: null },
+  { id: "F2L_BL_BothIn_a", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place A", alg: "L U L' U' L U L'", precondition: null },
+  { id: "F2L_BL_BothIn_b", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place B", alg: "U L U' L' U L U' L' U L U' L'", precondition: null },
+  { id: "F2L_BL_BothIn_c", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place C", alg: "U L U L' U2 L U L'", precondition: null },
+  { id: "F2L_BL_BothIn_d", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place D", alg: "y U2 R' U R d L U L'", precondition: null },
+  { id: "F2L_BL_BothIn_e", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place E", alg: "y R' U R d' R U2 R' U2 R U' R'", precondition: null },
+  { id: "F2L_BL_BothIn_f", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place F", alg: "L U L' U' L U2 L' U' L U L'", precondition: null },
+  { id: "F2L_BL_BothIn_g", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place G", alg: "L U' L' U L U2 L' U L U' L'", precondition: null },
+  { id: "F2L_BL_BothIn_h", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place H", alg: "L U' L' d' U' R' U' R U' R' U R", precondition: null },
+  { id: "F2L_BL_BothIn_i", slot: "BL", slotName: "Back-Left", group: "BothIn", groupName: "Edge and Corner in Place", name: "BL: Edge & Corner in Place I", alg: "y R' U R U2 y R U R' U R U' R'", precondition: null },
+];
+
+
+
+// ===================== Algs Trainer: cube-state diagram engine =====================
+// Uses the embedded cubejs engine (cube-engine.js, loaded before this file) to compute
+// the true last-layer state for each algorithm and render an accurate SVG diagram in
+// the classic CubeSkills style: yellow 3x3 grid + a 12-segment colored border ring
+// (3 rounded segments per side — 2 corner stickers + 1 edge sticker) + arrows for any
+// corner/edge permutation (PLL). OLL algs never permute, so they render with no arrows.
+// ===================== Algs Trainer: translations =====================
+const ALGS_I18N = {
+    en: {
+        modalTitle: 'Algs Trainer', chooseMethod: 'Choose method', chooseSet: 'Choose set',
+        algorithms: 'Algorithms', practicePrefix: 'Practice: ',
+        soon: 'Soon', learned: 'Learned', practiceThis: '▶ Practice this',
+        onlyNotLearned: 'only not-learned', practiceBtn: '▶ Practice',
+        learnedCount: (n, total) => `${n} / ${total} learned`,
+        pressSpaceStart: 'Press Space to start', pressSpaceStop: 'Press Space to stop',
+        pressSpaceNext: 'Press Space for next', tapStart: 'Tap to start', tapStop: 'Tap to stop', tapNext: 'Tap for next',
+        solves: 'Solves', avg: 'Avg', best: 'Best',
+        cycle: (c) => `Cycle ${c} / 10`,
+        warningText: (name) => `Mastering this algorithm will take about 10 focused minutes. Ready to succeed? Let's go! (${name})`,
+        finish: 'Finish', back: 'Back', continueBtn: 'Continue', done: 'Done',
+        metroPrev: '⏮ Prev', metroPause: '⏸ Pause', metroResume: '▶ Resume', metroSkip: 'Skip ⏭',
+        congrats: (min, solves, avg) => `Congratulations! You mastered it in ${min} minutes! Solves: ${solves}, avg: ${avg}s`,
+        sessionComplete: (solves, avg) => `Session complete! Solves: ${solves}, avg: ${avg}s`,
+    },
+    ru: {
+        modalTitle: 'Тренер алгоритмов', chooseMethod: 'Выберите метод', chooseSet: 'Выберите раздел',
+        algorithms: 'Алгоритмы', practicePrefix: 'Тренировка: ',
+        soon: 'Скоро', learned: 'Выучено', practiceThis: '▶ Тренировать',
+        onlyNotLearned: 'только невыученные', practiceBtn: '▶ Тренировка',
+        learnedCount: (n, total) => `${n} / ${total} выучено`,
+        pressSpaceStart: 'Пробел — старт', pressSpaceStop: 'Пробел — стоп',
+        pressSpaceNext: 'Пробел — дальше', tapStart: 'Тапни, чтобы начать', tapStop: 'Тапни, чтобы остановить', tapNext: 'Тапни для следующего',
+        solves: 'Решено', avg: 'Средн.', best: 'Лучшее',
+        cycle: (c) => `Цикл ${c} / 10`,
+        warningText: (name) => `На освоение этого алгоритма уйдёт около 10 минут концентрации. Готовы? Поехали! (${name})`,
+        finish: 'Завершить', back: 'Назад', continueBtn: 'Продолжить', done: 'Готово',
+        metroPrev: '⏮ Назад', metroPause: '⏸ Пауза', metroResume: '▶ Продолжить', metroSkip: 'Пропустить ⏭',
+        congrats: (min, solves, avg) => `Поздравляем! Вы освоили его за ${min} мин! Решено: ${solves}, среднее: ${avg}с`,
+        sessionComplete: (solves, avg) => `Сессия завершена! Решено: ${solves}, среднее: ${avg}с`,
+    },
+};
+function algsT() {
+    return (window.settingsManager?.settings?.language === 'ru') ? ALGS_I18N.ru : ALGS_I18N.en;
+}
+function isMobileDevice() {
+    return ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+}
+
+const AlgsDiagram = (function() {
+    const SOLVED = 'UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB';
+    const COLOR = { U: '#FFEB3B', R: '#FF8C00', F: '#009E60', D: '#E8E8E8', L: '#C41E3A', B: '#1E5AA8' };
+    function normalizeAlg(alg) {
+        return alg.replace(/2'/g, '2');
+    }
+    function invertAlg(alg) {
+        return normalizeAlg(alg).trim().split(/\s+/).reverse().map(mv => {
+            const face = mv[0];
+            const mod = mv.slice(1);
+            if (mod === "'") return face;
+            if (mod === '2') return face + '2';
+            return face + "'";
+        }).join(' ');
+    }
+
+    // U-grid position (col,row) for each U facelet index 0-8
+    const U_COL = [0,1,2,0,1,2,0,1,2];
+    const U_ROW = [0,0,0,1,1,1,2,2,2];
+    function cellCenter(uIdx) { return [50 + 20 * U_COL[uIdx], 50 + 20 * U_ROW[uIdx]]; }
+
+    // corner position id (0..3, URF/UFL/ULB/UBR) -> U facelet index
+    const CORNER_U_IDX = [8, 6, 0, 2];
+    // edge position id (0..3, UR/UF/UL/UB) -> U facelet index
+    const EDGE_U_IDX = [5, 7, 3, 1];
+
+    // 12 border segments, [x, y, w, h, facelet-index], reading each side left-to-right / top-to-bottom.
+    // Derived directly from cubejs's cornerFacelet/edgeFacelet tables (see cube-engine.js).
+    const BORDER = [
+        // top: ULB-back(47), UB-back(46), UBR-back(45)
+        [40, 22, 18, 10, 47], [61, 22, 18, 10, 46], [82, 22, 18, 10, 45],
+        // right: UBR-right(11), UR-right(10), URF-right(9)
+        [108, 40, 10, 18, 11], [108, 61, 10, 18, 10], [108, 82, 10, 18, 9],
+        // bottom: URF-front(20), UF-front(19), UFL-front(18)
+        [82, 108, 18, 10, 20], [61, 108, 18, 10, 19], [40, 108, 18, 10, 18],
+        // left: UFL-left(38), UL-left(37), ULB-left(36)
+        [22, 82, 10, 18, 38], [22, 61, 10, 18, 37], [22, 40, 10, 18, 36],
+    ];
+
+    function svgRect(x, y, w, h, color) {
+        return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${color}"/>`;
+    }
+    function svgArrow(x1, y1, x2, y2, id) {
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111111" stroke-width="2.5" marker-end="url(#${id})" opacity="0.85"/>`;
+    }
+
+    // ===== Isometric F2L cube diagram (top + front + right faces) =====
+    // Standard axes: a = toward R, b = toward F, c = toward D.
+    const ISO_S = 22;
+    const ISO_AX = Math.cos(Math.PI / 6), ISO_AY = -Math.sin(Math.PI / 6);
+    const ISO_BX = -Math.cos(Math.PI / 6), ISO_BY = -Math.sin(Math.PI / 6);
+    const ISO_OX = 130, ISO_OY = 100;
+    function isoPt(x, y, z) {
+        return [ISO_OX + (x * ISO_AX + y * ISO_BX) * ISO_S, ISO_OY + (x * ISO_AY + y * ISO_BY) * ISO_S + z * ISO_S];
+    }
+    function isoPoly(pts) { return pts.map(p => p.join(',')).join(' '); }
+    // Net rotation needed so the algorithm's slot always ends up rendered at the
+    // canonical Front-Right corner (where the visible F and R faces meet).
+    const SLOT_REFRAME_Y = { FR: 0, BR: 1, BL: 2, FL: 3 };
+
+    function renderIsoF2L(entry) {
+        let c, str;
+        try {
+            c = Cube.fromString(SOLVED);
+            c.move(invertAlg(entry.alg));
+            const k = SLOT_REFRAME_Y[entry.slot] || 0;
+            if (k === 1) c.move('y');
+            else if (k === 2) c.move('y2');
+            else if (k === 3) c.move("y'");
+            str = c.asString();
+        } catch (e) {
+            return '<div class="algs-diagram-fallback">?</div>';
+        }
+        let svg = `<svg viewBox="0 20 260 190" class="algs-diagram-svg" xmlns="http://www.w3.org/2000/svg">`;
+        // TOP face (U): row = yi, col = xi
+        for (let xi = 0; xi < 3; xi++) for (let yi = 0; yi < 3; yi++) {
+            const idx = 0 + yi * 3 + xi;
+            const poly = [isoPt(xi,yi,0), isoPt(xi+1,yi,0), isoPt(xi+1,yi+1,0), isoPt(xi,yi+1,0)];
+            svg += `<polygon points="${isoPoly(poly)}" fill="${COLOR[str[idx]]||'#999'}" stroke="#111" stroke-width="1"/>`;
+        }
+        // FRONT face (F): row = zi, col = xi, at y=3. Bottom-right (xi=2,zi=2) = target slot.
+        for (let xi = 0; xi < 3; xi++) for (let zi = 0; zi < 3; zi++) {
+            const isTarget = (xi === 2 && zi === 2);
+            const idx = 18 + zi * 3 + xi;
+            const color = isTarget ? '#ffffff' : (COLOR[str[idx]] || '#999');
+            const poly = [isoPt(xi,3,zi), isoPt(xi+1,3,zi), isoPt(xi+1,3,zi+1), isoPt(xi,3,zi+1)];
+            svg += `<polygon points="${isoPoly(poly)}" fill="${color}" stroke="#111" stroke-width="1"/>`;
+        }
+        // RIGHT face (R): row = zi, col = (2-yi), at x=3. Bottom-left (yi=2,zi=2) = target slot.
+        for (let yi = 0; yi < 3; yi++) for (let zi = 0; zi < 3; zi++) {
+            const isTarget = (yi === 2 && zi === 2);
+            const idx = 9 + zi * 3 + (2 - yi);
+            const color = isTarget ? '#ffffff' : (COLOR[str[idx]] || '#999');
+            const poly = [isoPt(3,yi,zi), isoPt(3,yi+1,zi), isoPt(3,yi+1,zi+1), isoPt(3,yi,zi+1)];
+            svg += `<polygon points="${isoPoly(poly)}" fill="${color}" stroke="#111" stroke-width="1"/>`;
+        }
+        svg += '</svg>';
+        return svg;
+    }
+
+    function render(entry) {
+        if (entry.slot) return renderIsoF2L(entry);
+        if (!window.Cube) return '<div class="algs-diagram-fallback">3D</div>';
+        let c, str, json;
+        try {
+            c = Cube.fromString(SOLVED);
+            c.move(invertAlg(entry.alg));
+            str = c.asString();
+            json = c.toJSON();
+        } catch (e) {
+            return '<div class="algs-diagram-fallback">?</div>';
+        }
+        // F2L: this diagram shows where the corner+edge pair currently sits in the top
+        // layer before insertion (not a last-layer solved-state check like OLL/PLL).
+        // (last-layer top-view diagram for OLL/PLL only — F2L uses renderIsoF2L above)
+
+        let svg = `<svg viewBox="0 0 140 140" class="algs-diagram-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arr-${entry.id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="#111111"/>
+                </marker>
+            </defs>`;
+
+        // 3x3 grid (real colors from the pre-alg / recognition state)
+        for (let i = 0; i < 9; i++) {
+            const col = U_COL[i], row = U_ROW[i];
+            const color = COLOR[str[i]] || '#999';
+            svg += svgRect(40 + 20 * col, 40 + 20 * row, 20, 20, color);
+        }
+        // 12-segment border ring
+        for (const [x, y, w, h, idx] of BORDER) {
+            svg += svgRect(x, y, w, h, COLOR[str[idx]] || '#999');
+        }
+
+        // arrows for any corner/edge permutation (PLL)
+        for (let i = 0; i < 4; i++) {
+            if (json.cp[i] !== i) {
+                const [x1,y1] = cellCenter(CORNER_U_IDX[i]);
+                const [x2,y2] = cellCenter(CORNER_U_IDX[json.cp[i]]);
+                svg += svgArrow(x1, y1, x2, y2, 'arr-' + entry.id);
+            }
+        }
+        for (let i = 0; i < 4; i++) {
+            if (json.ep[i] !== i) {
+                const [x1,y1] = cellCenter(EDGE_U_IDX[i]);
+                const [x2,y2] = cellCenter(EDGE_U_IDX[json.ep[i]]);
+                svg += svgArrow(x1, y1, x2, y2, 'arr-' + entry.id);
+            }
+        }
+
+        svg += '</svg>';
+        return svg;
+    }
+
+    return { render, invertAlg };
+})();
+
+// ===================== Algs Trainer: modal / step logic =====================
+(function() {
+    const LS_KEY = 'algsTrainerLearned';
+    const STATS_KEY = 'algsTrainerStats';
+    function getLearned() {
+        try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; }
+    }
+    function setLearned(obj) {
+        localStorage.setItem(LS_KEY, JSON.stringify(obj));
+    }
+    function getStats() {
+        try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch(e) { return {}; }
+    }
+    function setStats(obj) {
+        localStorage.setItem(STATS_KEY, JSON.stringify(obj));
+    }
+
+    const overlay = document.getElementById('algsOverlay');
+    const modal = overlay ? overlay.querySelector('.algs-modal') : null;
+    const backBtn = document.getElementById('algsBackBtn');
+    const closeBtn = document.getElementById('algsModalClose');
+    const titleEl = document.getElementById('algsModalTitle');
+    const steps = {
+        1: document.getElementById('algsStep1'),
+        2: document.getElementById('algsStep2'),
+        3: document.getElementById('algsStep3'),
+        '3b': document.getElementById('algsStep3b'),
+        4: document.getElementById('algsStep4'),
+        5: document.getElementById('algsStepPractice'),
+    };
+    let stepHistory = ['1'];
+    let currentSet = null;
+    let currentSlot = null;
+    let practiceActive = false;
+
+    function showStep(key, pushHistory = true) {
+        key = String(key);
+        if (pushHistory) {
+            if (stepHistory[stepHistory.length - 1] !== key) stepHistory.push(key);
+        }
+        Object.keys(steps).forEach(k => {
+            steps[k].classList.toggle('algs-step-hidden', k !== key);
+        });
+        backBtn.style.visibility = stepHistory.length <= 1 ? 'hidden' : 'visible';
+        modal.classList.toggle('algs-fullscreen', key !== '1');
+        const T = algsT();
+        const setLabel = currentSet === 'F2L' && currentSlot ? `F2L · ${currentSlot}` : (currentSet || T.algorithms);
+        const titles = {1: T.modalTitle, 2: T.chooseMethod, 3: T.chooseSet, '3b': T.chooseSet, 4: setLabel, 5: T.practicePrefix + setLabel};
+        titleEl.textContent = titles[key];
+        practiceActive = (key === '5');
+        if (key !== '5') Practice.stop();
+    }
+
+    function goBack() {
+        if (stepHistory.length <= 1) return;
+        stepHistory.pop();
+        const prev = stepHistory[stepHistory.length - 1];
+        showStep(prev, false);
+    }
+
+    function applyAlgsStaticI18n() {
+        const T = algsT();
+        document.querySelectorAll('#algsOverlay [data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (T[key]) el.textContent = T[key];
+        });
+    }
+
+    function openAlgs() {
+        overlay.classList.add('visible');
+        applyAlgsStaticI18n();
+        stepHistory = ['1'];
+        showStep('1', false);
+    }
+    function closeAlgs() {
+        overlay.classList.remove('visible');
+        Practice.stop();
+    }
+
+    document.getElementById('fireMenuAlgsTrainer')?.addEventListener('click', () => {
+        document.getElementById('fireMenuDropdown')?.classList.remove('visible');
+        openAlgs();
+    });
+    closeBtn?.addEventListener('click', closeAlgs);
+    overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeAlgs(); });
+    backBtn?.addEventListener('click', goBack);
+
+    steps[1]?.querySelectorAll('.algs-card[data-puzzle]').forEach(card => {
+        card.addEventListener('click', () => showStep('2'));
+    });
+    steps[2]?.querySelectorAll('.algs-card[data-method]').forEach(card => {
+        card.addEventListener('click', () => showStep('3'));
+    });
+    steps[3]?.querySelectorAll('.algs-card[data-set]').forEach(card => {
+        card.addEventListener('click', () => {
+            currentSet = card.dataset.set;
+            if (currentSet === 'F2L') {
+                showStep('3b');
+            } else {
+                currentSlot = null;
+                renderAlgList(currentSet);
+                showStep('4');
+            }
+        });
+    });
+    steps['3b']?.querySelectorAll('.algs-card[data-slot]').forEach(card => {
+        card.addEventListener('click', () => {
+            currentSlot = card.dataset.slot;
+            renderAlgList(currentSet);
+            showStep('4');
+        });
+    });
+
+    function renderAlgList(setName) {
+        const T = algsT();
+        const grid = document.getElementById('algsCardsGrid');
+        const countEl = document.getElementById('algsListCount');
+        let data;
+        if (setName === 'OLL') data = OLL;
+        else if (setName === 'PLL') data = PLL;
+        else data = F2L.filter(e => e.slot === currentSlot);
+
+        const learned = getLearned();
+        grid.innerHTML = '';
+        let learnedCount = 0;
+        let lastGroup = null;
+        data.forEach(entry => {
+            if (learned[entry.id]) learnedCount++;
+            if (entry.groupName && entry.groupName !== lastGroup) {
+                lastGroup = entry.groupName;
+                const header = document.createElement('div');
+                header.className = 'algs-group-header';
+                header.textContent = lastGroup;
+                grid.appendChild(header);
+            }
+            const card = document.createElement('div');
+            card.className = 'algs-alg-card';
+            const precondBadge = entry.precondition
+                ? `<div class="algs-alg-card-precond">⚠ ${entry.precondition} slot must be empty</div>` : '';
+            card.innerHTML = `
+                <div class="algs-alg-card-left">
+                    <div class="algs-alg-card-name">${entry.name}</div>
+                    <div class="algs-alg-card-formula">${entry.alg}</div>
+                    ${precondBadge}
+                    <div class="algs-alg-card-footer">
+                        <label class="algs-alg-card-learned-wrap">
+                            <input type="checkbox" class="algs-alg-card-learned" data-id="${entry.id}" ${learned[entry.id] ? 'checked' : ''}>
+                            <span>${T.learned}</span>
+                        </label>
+                        <button class="algs-alg-practice-row-btn" data-practice-id="${entry.id}">${T.practiceThis}</button>
+                    </div>
+                </div>
+                <div class="algs-alg-diagram">${AlgsDiagram.render(entry)}</div>
+            `;
+            grid.appendChild(card);
+        });
+        countEl.textContent = T.learnedCount(learnedCount, data.length);
+        grid.querySelectorAll('.algs-alg-card-learned').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const l = getLearned();
+                l[cb.dataset.id] = cb.checked;
+                setLearned(l);
+                renderAlgList(setName);
+            });
+        });
+        grid.querySelectorAll('.algs-alg-practice-row-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const entry = data.find(e => e.id === btn.dataset.practiceId);
+                if (!entry) return;
+                Practice.startSingle(setName, entry);
+                showStep(5);
+            });
+        });
+    }
+
+    // ===== Practice / drilling (step 5) =====
+    const Practice = (function() {
+        const phase0El = document.getElementById('algsPhase0');
+        const phase1El = document.getElementById('algsPhase1');
+        const phase2El = document.getElementById('algsPhase2');
+        const phaseDoneEl = document.getElementById('algsPhaseDone');
+        const phase0Text = document.getElementById('algsPhase0Text');
+        const phase0Continue = document.getElementById('algsPhase0Continue');
+        const phase0Back = document.getElementById('algsPhase0Back');
+        const metroMoveEl = document.getElementById('algsMetronomeMove');
+        const metroProgressEl = document.getElementById('algsMetronomeProgress');
+        const algTextEl = document.getElementById('algsPracticeScramble');
+        const timerEl = document.getElementById('algsPracticeTimer');
+        const hintEl = document.getElementById('algsPracticeHint');
+        const caseEl = document.getElementById('algsPracticeCase');
+        const statsEl = document.getElementById('algsPracticeStats');
+        const finishBtn = document.getElementById('algsFinishPractice');
+        const doneText = document.getElementById('algsPhaseDoneText');
+        const doneClose = document.getElementById('algsPhaseDoneClose');
+
+        let mode = 'single'; // 'single' = Scenario A (metronome then drill) | 'pool' = Scenario B (drill only, mixed)
+        let pool = [];
+        let current = null;
+        let running = false;
+        let startTs = 0;
+        let rafId = null;
+        let sessionCount = 0;
+        let sessionTotal = 0;
+        let sessionBest = null;
+        let trainingStartTs = 0;
+        let metroTimeoutId = null;
+
+        function showPhase(el) {
+            [phase0El, phase1El, phase2El, phaseDoneEl].forEach(p => p.classList.toggle('algs-step-hidden', p !== el));
+        }
+
+        function pickCase() {
+            let choices = pool;
+            if (choices.length > 1 && current) {
+                choices = choices.filter(e => e.id !== current.id);
+            }
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        function translate(key) {
+            const T = algsT();
+            const mobile = isMobileDevice();
+            const map = {
+                practiceHintStart: mobile ? T.tapStart : T.pressSpaceStart,
+                practiceHintStop: mobile ? T.tapStop : T.pressSpaceStop,
+                practiceHintNext: mobile ? T.tapNext : T.pressSpaceNext,
+            };
+            return map[key];
+        }
+
+        function nextDrillCase() {
+            current = pickCase();
+            if (!current) return;
+            algTextEl.textContent = current.alg;
+            caseEl.textContent = current.name + ' · ' + current.group;
+            timerEl.textContent = '0.00';
+            timerEl.classList.remove('running');
+            hintEl.textContent = translate('practiceHintStart');
+        }
+
+        function tick() {
+            const elapsed = (performance.now() - startTs) / 1000;
+            timerEl.textContent = elapsed.toFixed(2);
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function startTimer() {
+            if (running || !current) return;
+            running = true;
+            startTs = performance.now();
+            timerEl.classList.add('running');
+            hintEl.textContent = translate('practiceHintStop');
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function stopTimer() {
+            if (!running) return;
+            running = false;
+            cancelAnimationFrame(rafId);
+            const elapsed = (performance.now() - startTs) / 1000;
+            timerEl.textContent = elapsed.toFixed(2);
+            timerEl.classList.remove('running');
+            hintEl.textContent = translate('practiceHintNext');
+
+            sessionCount++;
+            sessionTotal += elapsed;
+            if (sessionBest === null || elapsed < sessionBest) sessionBest = elapsed;
+
+            const stats = getStats();
+            const s = stats[current.id] || { count: 0, total: 0, best: null };
+            s.count++;
+            s.total += elapsed;
+            if (s.best === null || elapsed < s.best) s.best = elapsed;
+            stats[current.id] = s;
+            setStats(stats);
+
+            const learned = getLearned();
+            if (!learned[current.id]) {
+                learned[current.id] = true;
+                setLearned(learned);
+            }
+
+            renderStats();
+        }
+
+        function renderStats() {
+            const avg = sessionCount ? (sessionTotal / sessionCount).toFixed(2) : '--';
+            const T = algsT();
+            statsEl.innerHTML = `<span>${T.solves}: ${sessionCount}</span><span>${T.avg}: ${avg}</span><span>${T.best}: ${sessionBest !== null ? sessionBest.toFixed(2) : '--'}</span>`;
+        }
+
+        // ----- Phase 1: metronome (10 full cycles through the algorithm, accelerating every 2 cycles) -----
+        const metroPrevBtn = document.getElementById('algsMetroPrev');
+        const metroPauseBtn = document.getElementById('algsMetroPause');
+        const metroSkipBtn = document.getElementById('algsMetroSkip');
+        let metroMoves = [];
+        let metroDelayByCycle = [4000, 4000, 3000, 3000, 2000, 2000, 1000, 1000, 1000, 1000];
+        let metroPos = 0; // linear index across all cycles: cycle = floor(pos/moves.length)+1
+        let metroEntry = null;
+        let metroPaused = false;
+
+        function metroCycleOf(pos) { return Math.floor(pos / metroMoves.length) + 1; }
+
+        function metroRenderCurrent() {
+            const moveIdx = metroPos % metroMoves.length;
+            const cycle = metroCycleOf(metroPos);
+            metroMoveEl.textContent = metroMoves[moveIdx];
+            metroProgressEl.textContent = algsT().cycle(Math.min(cycle, 10));
+        }
+
+        function metroScheduleNext() {
+            if (metroPaused) return;
+            const cycle = metroCycleOf(metroPos);
+            if (cycle > 10) {
+                showPhase(phase2El);
+                beginDrillSingle(metroEntry);
+                return;
+            }
+            metroRenderCurrent();
+            const delay = metroDelayByCycle[Math.min(cycle, 10) - 1];
+            metroTimeoutId = setTimeout(() => {
+                metroPos++;
+                metroScheduleNext();
+            }, delay);
+        }
+
+        function runMetronome(entry) {
+            metroEntry = entry;
+            metroMoves = entry.alg.trim().split(/\s+/);
+            metroPos = 0;
+            metroPaused = false;
+            metroPauseBtn.textContent = algsT().metroPause;
+            metroScheduleNext();
+        }
+
+        metroPauseBtn?.addEventListener('click', () => {
+            metroPaused = !metroPaused;
+            metroPauseBtn.textContent = metroPaused ? algsT().metroResume : algsT().metroPause;
+            if (metroTimeoutId) clearTimeout(metroTimeoutId);
+            if (!metroPaused) metroScheduleNext();
+        });
+        metroPrevBtn?.addEventListener('click', () => {
+            if (metroTimeoutId) clearTimeout(metroTimeoutId);
+            metroPos = Math.max(0, metroPos - 1);
+            metroPaused = true;
+            metroPauseBtn.textContent = algsT().metroResume;
+            metroRenderCurrent();
+        });
+        metroSkipBtn?.addEventListener('click', () => {
+            if (metroTimeoutId) clearTimeout(metroTimeoutId);
+            showPhase(phase2El);
+            beginDrillSingle(metroEntry);
+        });
+
+        function beginDrillSingle(entry) {
+            pool = [entry];
+            current = null;
+            sessionCount = 0; sessionTotal = 0; sessionBest = null;
+            renderStats();
+            nextDrillCase();
+        }
+
+        function handleTimerToggle() {
+            if (!current) return;
+            if (!running) {
+                if (timerEl.textContent !== '0.00' && hintEl.textContent === translate('practiceHintNext')) {
+                    nextDrillCase();
+                } else {
+                    startTimer();
+                }
+            } else {
+                stopTimer();
+            }
+        }
+
+        function onKeyDown(e) {
+            if (!practiceActive || e.code !== 'Space') return;
+            if (phase2El.classList.contains('algs-step-hidden')) return; // only active during Phase 2
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.repeat) return;
+            handleTimerToggle();
+        }
+        // Capture phase so this fires BEFORE the main app timer's spacebar handler.
+        document.addEventListener('keydown', onKeyDown, true);
+
+        // Mobile/touch: no physical spacebar, so tapping anywhere in the drill area
+        // (except the Finish button) starts/stops the timer, same as Space on desktop.
+        phase2El?.addEventListener('click', (e) => {
+            if (!practiceActive || phase2El.classList.contains('algs-step-hidden')) return;
+            if (e.target.closest('#algsFinishPractice')) return;
+            handleTimerToggle();
+        });
+
+        function formatMinutes(ms) {
+            return (ms / 60000).toFixed(1);
+        }
+
+        // Scenario A: single algorithm — warning -> metronome (10 cycles) -> drill
+        function startSingle(setName, entry) {
+            mode = 'single';
+            trainingStartTs = performance.now();
+            phase0Text.textContent = algsT().warningText(entry.name);
+            showPhase(phase0El);
+            phase0Continue.onclick = () => {
+                showPhase(phase1El);
+                runMetronome(entry);
+            };
+        }
+
+        // Scenario B: mixed pool of checked/selected algorithms — straight to drill, no metronome, no scramble.
+        function start(setName, unlearnedOnly) {
+            mode = 'pool';
+            const data = setName === 'OLL' ? OLL : PLL;
+            const learned = getLearned();
+            pool = unlearnedOnly ? data.filter(e => !learned[e.id]) : data.slice();
+            if (pool.length === 0) pool = data.slice();
+            sessionCount = 0; sessionTotal = 0; sessionBest = null;
+            current = null;
+            showPhase(phase2El);
+            renderStats();
+            nextDrillCase();
+        }
+
+        finishBtn?.addEventListener('click', () => {
+            running = false;
+            if (rafId) cancelAnimationFrame(rafId);
+            if (metroTimeoutId) clearTimeout(metroTimeoutId);
+            const totalMin = mode === 'single' ? formatMinutes(performance.now() - trainingStartTs) : null;
+            const T = algsT();
+            const avgStr = sessionCount ? (sessionTotal/sessionCount).toFixed(2) : '--';
+            doneText.textContent = totalMin
+                ? T.congrats(totalMin, sessionCount, avgStr)
+                : T.sessionComplete(sessionCount, avgStr);
+            showPhase(phaseDoneEl);
+        });
+        doneClose?.addEventListener('click', () => {
+            showStepRef && showStepRef(4);
+        });
+        phase0Back?.addEventListener('click', () => {
+            showStepRef && showStepRef(4);
+        });
+
+        function stop() {
+            running = false;
+            if (rafId) cancelAnimationFrame(rafId);
+            if (metroTimeoutId) clearTimeout(metroTimeoutId);
+        }
+
+        let showStepRef = null;
+        function setShowStepRef(fn) { showStepRef = fn; }
+
+        return { start, startSingle, stop, setShowStepRef };
+    })();
+    Practice.setShowStepRef(showStep);
+
+    document.getElementById('algsStartPractice')?.addEventListener('click', () => {
+        if (!currentSet) return;
+        const unlearnedOnly = document.getElementById('algsPracticeUnlearnedOnly')?.checked;
+        Practice.start(currentSet, unlearnedOnly);
+        showStep(5);
+    });
+})();
+
+// ===================== Fire Menu dropdown toggle =====================
+(function() {
+    const btn = document.getElementById('fireMenuBtn');
+    const dropdown = document.getElementById('fireMenuDropdown');
+    if (!btn || !dropdown) return;
+    function translateDropdown() {
+        const T = algsT();
+        const map = {
+            fireMenuTargetTime: T === ALGS_I18N.ru ? 'Целевое время' : 'Target Time',
+            fireMenuHonestMode: T === ALGS_I18N.ru ? 'Честный режим' : 'Honest Mode',
+            fireMenuAlgsTrainer: T === ALGS_I18N.ru ? 'Тренер алгоритмов' : 'Algs Trainer',
+            fireMenuMultiplayer: T === ALGS_I18N.ru ? 'Мультиплеер' : 'Multiplayer',
+            fireMenuSoon: T.soon,
+        };
+        document.querySelectorAll('.fire-menu-dropdown [data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (map[key]) el.textContent = map[key];
+        });
+    }
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        translateDropdown();
+        dropdown.classList.toggle('visible');
+        btn.setAttribute('aria-expanded', dropdown.classList.contains('visible'));
+    });
+    document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && e.target !== btn) {
+            dropdown.classList.remove('visible');
+        }
+    });
+    document.getElementById('fireMenuTargetTime')?.addEventListener('click', () => {
+        dropdown.classList.remove('visible');
+        document.getElementById('targetTimeBtn')?.click();
+    });
+    document.getElementById('fireMenuHonestMode')?.addEventListener('click', () => {
+        dropdown.classList.remove('visible');
+        document.getElementById('honestModeBtn')?.click();
+    });
+})();
