@@ -7981,21 +7981,25 @@
 .fire-menu-btn {
     background: transparent; border: none; cursor: pointer;
     color: inherit; opacity: 0.7; font-size: 14px; padding: 4px 6px;
+    transition: var(--transition); border-radius: 6px;
 }
-.fire-menu-btn:hover { opacity: 1; }
+.fire-menu-btn:hover { opacity: 1; transform: translateY(1px); background: rgba(255,255,255,0.06); }
 .fire-menu-dropdown {
-    display: none; position: absolute; top: calc(100% + 8px); left: 0;
-    min-width: 200px; background: var(--card-bg, #1e1e2e);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 6px; z-index: 500;
+    position: absolute; top: calc(100% + 8px); left: 0;
+    min-width: 200px; background: var(--bg-primary);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-lg); padding: 6px; z-index: 500;
+    opacity: 0; transform: translateY(-6px) scale(0.97); pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.fire-menu-dropdown.visible { display: block; }
+.fire-menu-dropdown.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
 .fire-menu-item {
     display: flex; align-items: center; gap: 10px; width: 100%;
     background: transparent; border: none; color: inherit; text-align: left;
     padding: 9px 10px; border-radius: 7px; cursor: pointer; font-size: 14px;
+    font-family: 'Anybody', sans-serif; transition: var(--transition);
 }
-.fire-menu-item:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
+.fire-menu-item:hover:not(:disabled) { background: rgba(74, 158, 255, 0.12); transform: translateX(2px); }
 .fire-menu-item-disabled { opacity: 0.45; cursor: not-allowed; position: relative; }
 .fire-menu-soon {
     margin-left: auto; font-size: 10px; text-transform: uppercase;
@@ -8005,43 +8009,66 @@
 
 /* ===== Algs Trainer modal ===== */
 .algs-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 1000; align-items: center; justify-content: center;
+    display: flex; position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
-.algs-overlay.visible { display: flex; }
+.algs-overlay.visible { opacity: 1; pointer-events: all; }
 .algs-modal {
-    background: var(--card-bg, #1e1e2e); border-radius: 16px;
-    width: min(720px, 92vw); max-height: 86vh; overflow-y: auto;
+    background: var(--bg-primary); border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg); width: min(720px, 92vw); max-height: 86vh; overflow-y: auto;
     padding: 20px 24px 28px; position: relative;
+    transform: scale(0.92); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.algs-overlay.visible .algs-modal { transform: scale(1); }
 .algs-modal-header {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 18px;
 }
-.algs-modal-title { font-size: 18px; font-weight: 600; margin: 0; }
+.algs-modal-title {
+    font-family: 'Anybody', sans-serif; font-size: 19px; font-weight: 700; margin: 0;
+    letter-spacing: 0.01em;
+}
 .algs-back-btn, .algs-modal-close {
     background: transparent; border: none; color: inherit; cursor: pointer;
-    font-size: 14px; opacity: 0.7; padding: 4px 8px;
+    font-size: 14px; opacity: 0.65; padding: 6px 10px; border-radius: 8px;
+    transition: var(--transition);
 }
-.algs-back-btn:hover, .algs-modal-close:hover { opacity: 1; }
+.algs-back-btn:hover, .algs-modal-close:hover {
+    opacity: 1; background: rgba(255,255,255,0.08); transform: translateY(-1px);
+}
 .algs-modal-close { font-size: 22px; }
 
 .algs-step-hidden { display: none !important; }
+.algs-step {
+    animation: algsStepIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes algsStepIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 .algs-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
 }
+.algs-grid-2x2 { grid-template-columns: repeat(2, 1fr); }
 .algs-card {
-    position: relative; background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+    position: relative; background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius-sm);
     padding: 22px 12px; cursor: pointer; color: inherit;
     display: flex; flex-direction: column; align-items: center; gap: 6px;
-    transition: transform .15s ease, background .15s ease;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
 }
-.algs-card:hover:not(:disabled) { background: rgba(255,255,255,0.09); transform: translateY(-2px); }
+.algs-card:hover:not(:disabled) {
+    background: var(--bg-card-hover); transform: translateY(-3px);
+    box-shadow: var(--shadow-md); border-color: rgba(74, 158, 255, 0.35);
+}
+.algs-card:active:not(:disabled) { transform: translateY(-1px); }
 .algs-card-icon { font-size: 26px; }
-.algs-card-label { font-weight: 600; font-size: 15px; }
+.algs-card-label { font-family: 'Anybody', sans-serif; font-weight: 700; font-size: 22px; }
 .algs-card-sub { font-size: 11px; opacity: 0.6; }
-.algs-card-locked { opacity: 0.45; cursor: not-allowed; }
+.algs-card-locked { opacity: 0.4; cursor: not-allowed; }
+.algs-card-locked:hover { transform: none; box-shadow: var(--shadow-sm); border-color: rgba(255,255,255,0.08); }
 .algs-card-soon {
     position: absolute; top: 8px; right: 8px; font-size: 9px; text-transform: uppercase;
     background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 999px;
@@ -8054,20 +8081,10 @@
     display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px;
     max-height: 58vh; overflow-y: auto; padding-right: 4px;
 }
-.algs-alg-card {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 6px;
-}
-.algs-alg-card-head { display: flex; justify-content: space-between; align-items: center; }
-.algs-alg-card-name { font-weight: 600; font-size: 13px; }
-.algs-alg-card-group { font-size: 10px; opacity: 0.55; }
-.algs-alg-card-formula { font-family: monospace; font-size: 12px; line-height: 1.4; opacity: 0.9; word-break: break-word; }
 .header-pills { visibility: hidden !important; pointer-events: none !important; }
-.algs-alg-card-learned { accent-color: #4caf50; }
 
 /* No emoji icons on puzzle/method/set cards — just big text */
 .algs-card-icon { display: none; }
-.algs-card-label { font-size: 22px; }
 
 /* Fullscreen modal once past step 1 (method/stage selection onward) */
 .algs-modal.algs-fullscreen {
@@ -8090,66 +8107,97 @@
 .algs-alg-card {
     display: flex; flex-direction: row; align-items: center; justify-content: space-between;
     gap: 20px; padding: 16px 20px;
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.algs-alg-card:hover {
+    background: var(--bg-card-hover); transform: translateY(-2px);
+    box-shadow: var(--shadow-md); border-color: rgba(74, 158, 255, 0.25);
 }
 .algs-alg-card-left { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
-.algs-alg-card-name { font-weight: 700; font-size: 20px; }
-.algs-alg-card-formula { font-family: monospace; font-size: 15px; opacity: 0.85; white-space: normal; word-break: break-word; }
+.algs-alg-card-name { font-family: 'Anybody', sans-serif; font-weight: 700; font-size: 20px; }
+.algs-alg-card-formula { font-family: 'JetBrains Mono', monospace; font-size: 15px; opacity: 0.85; white-space: normal; word-break: break-word; }
 .algs-alg-card-footer { display: flex; align-items: center; gap: 16px; margin-top: 4px; }
 .algs-alg-card-learned-wrap { display: flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
-.algs-alg-card-learned { width: 18px; height: 18px; accent-color: #4caf50; cursor: pointer; }
-.algs-alg-practice-row-btn {
-    background: rgba(76,175,80,0.15); color: #4caf50; border: 1px solid rgba(76,175,80,0.4);
-    border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+.algs-alg-card-learned {
+    width: 19px; height: 19px; accent-color: var(--accent-success); cursor: pointer;
+    transition: transform 0.15s ease;
 }
-.algs-alg-practice-row-btn:hover { background: rgba(76,175,80,0.28); }
-.algs-alg-diagram { flex-shrink: 0; width: 150px; height: 150px; }
+.algs-alg-card-learned:hover { transform: scale(1.15); }
+.algs-alg-practice-row-btn {
+    background: rgba(74, 222, 128, 0.12); color: var(--accent-success);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+    font-family: 'Anybody', sans-serif; transition: var(--transition);
+}
+.algs-alg-practice-row-btn:hover {
+    background: rgba(74, 222, 128, 0.22); transform: translateY(-2px); box-shadow: var(--shadow-sm);
+}
+.algs-alg-practice-row-btn:active { transform: translateY(0); }
+.algs-alg-diagram { flex-shrink: 0; width: 150px; height: 150px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
 
 /* ===== Algs Trainer: toolbar + practice/drilling view ===== */
 .algs-list-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
 .algs-toolbar-check { display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: 0.75; margin-left: auto; }
 .algs-practice-btn {
-    background: #4caf50; color: #fff; border: none; border-radius: 8px;
-    padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent-success), #22c55e); color: #06210f; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: 'Anybody', sans-serif; box-shadow: var(--shadow-sm); transition: var(--transition);
 }
-.algs-practice-btn:hover { background: #43a047; }
+.algs-practice-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.algs-practice-btn:active { transform: translateY(0); }
 
 .algs-practice-wrap {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 14px; text-align: center; padding: 20px;
 }
-.algs-practice-scramble { font-family: monospace; font-size: 20px; opacity: 0.85; max-width: 640px; }
-.algs-practice-timer { font-size: 72px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.algs-practice-timer.running { color: #4caf50; }
+.algs-practice-scramble { font-family: 'JetBrains Mono', monospace; font-size: 20px; opacity: 0.85; max-width: 640px; }
+.algs-practice-timer {
+    font-size: 72px; font-weight: 700; font-variant-numeric: tabular-nums;
+    font-family: 'Anybody', sans-serif; transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+.algs-practice-timer.running { color: var(--accent-success); text-shadow: 0 0 24px rgba(74, 222, 128, 0.45); }
 .algs-practice-hint { font-size: 13px; opacity: 0.55; }
 .algs-practice-case { font-size: 15px; opacity: 0.8; }
 .algs-practice-stats { font-size: 12px; opacity: 0.6; display: flex; gap: 18px; }
 
 /* ===== Algs Trainer: phased practice (warning / metronome / drill) ===== */
 .algs-phase { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.algs-phase0-wrap { max-width: 520px; text-align: center; display: flex; flex-direction: column; gap: 24px; padding: 20px; }
+.algs-phase0-wrap { max-width: 520px; text-align: center; display: flex; flex-direction: column; gap: 24px; padding: 20px; animation: algsStepIn 0.4s ease; }
 .algs-phase0-text { font-size: 18px; line-height: 1.5; opacity: 0.9; }
 .algs-phase0-btns { display: flex; gap: 12px; justify-content: center; }
 .algs-phase-btn-primary {
-    background: #4caf50; color: #fff; border: none; border-radius: 10px;
-    padding: 12px 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+    background: linear-gradient(135deg, var(--accent-success), #22c55e); color: #06210f; border: none; border-radius: 10px;
+    padding: 12px 26px; font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: 'Anybody', sans-serif; box-shadow: var(--shadow-sm); transition: var(--transition);
 }
-.algs-phase-btn-primary:hover { background: #43a047; }
+.algs-phase-btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.algs-phase-btn-primary:active { transform: translateY(0); }
 .algs-phase-btn-secondary {
-    background: rgba(255,255,255,0.08); color: inherit; border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06); color: inherit; border: 1px solid rgba(255,255,255,0.15);
     border-radius: 10px; padding: 12px 26px; font-size: 15px; cursor: pointer;
+    font-family: 'Anybody', sans-serif; transition: var(--transition);
 }
-.algs-phase-btn-secondary:hover { background: rgba(255,255,255,0.15); }
+.algs-phase-btn-secondary:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.algs-phase-btn-secondary:active { transform: translateY(0); }
 
 .algs-metronome-wrap { text-align: center; display: flex; flex-direction: column; gap: 20px; }
-.algs-metronome-move { font-size: 140px; font-weight: 800; font-family: monospace; line-height: 1; }
+.algs-metronome-move {
+    font-size: 140px; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1;
+    text-shadow: var(--shadow-md);
+    animation: algsMovePop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes algsMovePop {
+    from { opacity: 0.3; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
 .algs-metronome-progress { font-size: 14px; opacity: 0.6; }
 
 .algs-finish-btn { margin-top: 10px; }
 
 /* ===== F2L: group headers, precondition badge, slot badge ===== */
 .algs-group-header {
-    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    font-family: 'Anybody', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
     opacity: 0.55; margin: 14px 4px 2px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);
 }
 .algs-group-header:first-child { border-top: none; margin-top: 0; padding-top: 0; }

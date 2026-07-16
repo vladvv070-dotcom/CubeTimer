@@ -1122,7 +1122,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.18.7</div>
+    <div class="version-display">1.18.10</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu" style="display:none;">
@@ -1273,7 +1273,7 @@
 
         <!-- Step 2: method -->
         <div class="algs-step algs-step-hidden" id="algsStep2">
-            <div class="algs-grid">
+            <div class="algs-grid algs-grid-2x2">
                 <button class="algs-card" data-method="cfop">
                     <div class="algs-card-label">CFOP</div>
                 </button>
@@ -1281,9 +1281,34 @@
                     <div class="algs-card-label">Roux</div>
                     <span class="algs-card-soon" data-i18n="soon">Soon</span>
                 </button>
-                <button class="algs-card algs-card-locked" disabled>
+                <button class="algs-card" data-method="zz">
                     <div class="algs-card-label">ZZ</div>
+                </button>
+                <button class="algs-card algs-card-locked" disabled>
+                    <div class="algs-card-label">Petrus</div>
                     <span class="algs-card-soon" data-i18n="soon">Soon</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2b: ZZ variant (only shown when ZZ is chosen) -->
+        <div class="algs-step algs-step-hidden" id="algsStep2b">
+            <div class="algs-grid algs-grid-2x2">
+                <button class="algs-card algs-card-locked" disabled>
+                    <div class="algs-card-label">Beginner ZZ</div>
+                    <span class="algs-card-soon" data-i18n="soon">Soon</span>
+                </button>
+                <button class="algs-card algs-card-locked" disabled>
+                    <div class="algs-card-label">Simplified A</div>
+                    <span class="algs-card-soon" data-i18n="soon">Soon</span>
+                </button>
+                <button class="algs-card algs-card-locked" disabled>
+                    <div class="algs-card-label">Simplified B</div>
+                    <span class="algs-card-soon" data-i18n="soon">Soon</span>
+                </button>
+                <button class="algs-card" data-method="zz-full">
+                    <div class="algs-card-label">Full ZZ</div>
+                    <div class="algs-card-sub" id="algsFullZZCount">472 / 472 cases</div>
                 </button>
             </div>
         </div>
