@@ -2053,7 +2053,7 @@
         }
 
         // Timer Logic
-        class CubeTimer {
+        class NextCubeProTimer {
             constructor() {
                 this.time = 0;
                 this.isRunning = false;
@@ -4640,7 +4640,7 @@
                 ctx.textBaseline='alphabetic';
                 ctx.font=`700 ${Math.round(55*s)}px Georgia,serif`;
                 ctx.fillStyle='#2b2519';
-                ctx.fillText('CUBE TIMER',x,y+Math.round(50*s));
+                ctx.fillText('NEXT CUBE PRO',x,y+Math.round(50*s));
                 ctx.font=`400 ${Math.round(24*s)}px 'Inter',sans-serif`;
                 ctx.fillStyle='#9a8060';
                 ctx.fillText(dateStr,x,y+Math.round(50*s)+Math.round(34*s));
@@ -4706,7 +4706,7 @@
                 this._exportStamp(ctx,w-pad-sR,h-pad-sR,sR);
                 ctx.font=`400 ${Math.round(w*0.019)}px 'Inter',sans-serif`;
                 ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
-                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.38));
+                ctx.fillText('Made with Next Cube Pro',pad,h-Math.round(pad*.38));
             }
 
             _exportWide(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData}) {
@@ -4738,7 +4738,7 @@
                 this._exportStamp(ctx,w-pad*.6-sR,h-pad*.6-sR,sR);
                 ctx.font=`400 ${Math.round(h*0.022)}px 'Inter',sans-serif`;
                 ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
-                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.28));
+                ctx.fillText('Made with Next Cube Pro',pad,h-Math.round(pad*.28));
             }
 
             _roundRect(ctx,x,y,w,h,r) {
@@ -5874,7 +5874,7 @@
                 overlay.classList.add('visible');
             }
 
-            // ─── FireCube Timer (JSON) — our own native format ──────────────
+            // ─── Next Cube Pro (JSON) — our own native format ──────────────
             _parseFireCubeJson(text) {
                 const data = JSON.parse(text);
                 const parsedSessions = [];
@@ -6487,7 +6487,7 @@
                 const t = this._ieT();
 
                 const parsersAndLabels = {
-                    firecube: { label: 'FireCube Timer', parse: (txt, name) => this._parseFireCubeJson(txt) },
+                    firecube: { label: 'Next Cube Pro', parse: (txt, name) => this._parseFireCubeJson(txt) },
                     cstimer: { label: 'csTimer', parse: (txt, name) => this._parseCstimerTxt(txt) },
                     lastcubex: { label: 'Last Cube X', parse: (txt, name) => this._parseLastCubeXCsv(txt) },
                     cubedesk: { label: 'CubeDesk', parse: (txt, name) => this._parseCubeDeskTxt(txt) },
@@ -7048,7 +7048,7 @@
         }
 
         // ══════════════════════════════════════════════════════════════
-        // WCA-Compatible Scramble Engine  (CubeTimer 0.9.1)
+        // WCA-Compatible Scramble Engine  (Next Cube Pro 0.9.1)
         // Inspired by TNoodle architecture — strategy pattern per discipline
         // ══════════════════════════════════════════════════════════════
 
@@ -7348,7 +7348,7 @@
                 };
             }
 
-            // Public API — used by CubeTimer.generateScramble()
+            // Public API — used by NextCubeProTimer.generateScramble()
             static getScramble(discipline) {
                 const strategy = this.STRATEGIES[discipline] || WCA_3x3;
                 const raw = strategy.generate();
@@ -7384,7 +7384,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const commentary = new CommentarySystem();
             const settingsManager = new SettingsManager();
-            const timer = new CubeTimer();
+            const timer = new NextCubeProTimer();
             const hotkeyManager = new HotkeyManager();
             
             // Make globally accessible

@@ -5,7 +5,7 @@
    ============================================================ */
 
 // ===================== Algs Trainer: algorithm database =====================
-// FireCube Timer — Algs Trainer algorithm database
+// Next Cube Pro — Algs Trainer algorithm database
 // Source: CubeSkills OLL/PLL sheets (Feliks Zemdegs & Andy Klise)
 // 57 OLL + 21 PLL = 78 verified cases.
 // Each entry: id, name, group, prob (as shown on sheet), alg (suggested algorithm)
