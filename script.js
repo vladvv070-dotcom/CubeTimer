@@ -3766,16 +3766,44 @@
             show(context) {
                 const comment = this.getCommentary(context);
                 const html = comment.replace(/\n/g, '<br>');
-                
+
                 // Desktop commentary (left panel)
                 this.commentaryElement.classList.remove('updating');
                 void this.commentaryElement.offsetWidth; // Force reflow
                 this.commentaryElement.classList.add('updating');
-                this.commentaryElement.innerHTML = html;
 
-                // Mobile commentary (below timer, ≤768px only)
-                const mobileEl = document.getElementById('mobileCommentaryText');
-                if (mobileEl) mobileEl.innerHTML = html;
+                this._typeCommentary(html);
+            }
+
+            // Types the commentary out character-by-character with a blinking
+            // cursor, like someone is typing it live. Tags (e.g. <br>) are
+            // inserted atomically so markup never gets split mid-tag.
+            _typeCommentary(html) {
+                if (this._typeTimer) {
+                    clearTimeout(this._typeTimer);
+                    this._typeTimer = null;
+                }
+
+                const tokens = html.match(/<[^>]+>|[^<]/g) || [];
+                this.commentaryElement.innerHTML = '';
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                this.commentaryElement.appendChild(cursor);
+
+                let i = 0;
+                const typeNext = () => {
+                    if (i < tokens.length) {
+                        cursor.insertAdjacentHTML('beforebegin', tokens[i]);
+                        i++;
+                        const delay = 18 + Math.random() * 28;
+                        this._typeTimer = setTimeout(typeNext, delay);
+                    } else {
+                        this._typeTimer = setTimeout(() => {
+                            if (cursor && cursor.parentNode) cursor.remove();
+                        }, 500);
+                    }
+                };
+                typeNext();
             }
         }
 
@@ -3790,7 +3818,12 @@
                 // Timer
                 timerHint: 'Space to start/stop',
                 timerHintMouse: 'Click to start/stop',
+                timerHintTouch: 'Tap to start/stop',
                 newBest: 'New',
+                newBestSingle: 'NEW BEST SINGLE!',
+                newBestAo5: 'NEW BEST AO5!',
+                newBestAo12: 'NEW BEST AO12!',
+                newBestAo100: 'NEW BEST AO100!',
                 
                 // Controls
                 dnf: 'DNF',
@@ -4001,7 +4034,12 @@
                 // Timer
                 timerHint: 'Пробел для старта/стопа',
                 timerHintMouse: 'Клик для старта/стопа',
+                timerHintTouch: 'Тап для старта/стопа',
                 newBest: 'Новый',
+                newBestSingle: 'НОВЫЙ ЛУЧШИЙ СИНГЛ!',
+                newBestAo5: 'НОВЫЙ ЛУЧШИЙ AO5!',
+                newBestAo12: 'НОВЫЙ ЛУЧШИЙ AO12!',
+                newBestAo100: 'НОВЫЙ ЛУЧШИЙ AO100!',
                 
                 // Controls
                 dnf: 'DNF',
@@ -4257,9 +4295,14 @@
                 if (sessionsBtn) sessionsBtn.textContent = t.sessions;
                 if (settingsBtn) settingsBtn.textContent = t.settings;
                 
-                // Timer hint (reflects Mouse Start setting)
+                // Timer hint (reflects Mouse Start setting / touch devices)
                 const timerHint = document.querySelector('.timer-hint');
-                if (timerHint) timerHint.textContent = this.settings.mouseStart ? t.timerHintMouse : t.timerHint;
+                if (timerHint) {
+                    const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+                    timerHint.textContent = this.settings.mouseStart
+                        ? t.timerHintMouse
+                        : (isTouch ? (t.timerHintTouch || t.timerHintMouse) : t.timerHint);
+                }
                 
                 // Control buttons
                 const dnfBtn = document.querySelector('#dnfBtn');
@@ -5890,14 +5933,12 @@
                 const everyInput = document.getElementById('autoExportEveryInput');
                 const formatSelect = document.getElementById('autoExportFormatSelect');
                 const folderRow = document.getElementById('autoExportFolderRow');
-                const mobileNote = document.getElementById('autoExportMobileNote');
                 const chooseFolderBtn = document.getElementById('autoExportChooseFolderBtn');
                 const folderStatus = document.getElementById('autoExportFolderStatus');
                 if (!toggle) return;
 
                 const supportsFolderPicker = typeof window.showDirectoryPicker === 'function';
                 if (folderRow) folderRow.style.display = supportsFolderPicker ? 'block' : 'none';
-                if (mobileNote) mobileNote.style.display = supportsFolderPicker ? 'none' : 'block';
 
                 // Restore current state into the UI
                 toggle.classList.toggle('active', !!this.settings.autoExportEnabled);
@@ -6152,7 +6193,8 @@
                 
                 this.timerDisplay = document.getElementById('timerDisplay');
                 this.solvesList = document.getElementById('solvesList');
-                this.newBestIndicator = document.getElementById('newBestIndicator');
+                this.titleStrip = document.getElementById('titleStrip');
+                this.recordTitle = document.getElementById('recordTitle');
                 
                 this.initEventListeners();
                 this.generateScramble();
@@ -6281,43 +6323,30 @@
                     }
                 });
 
-                // Touch control for mobile
-                const timerArea = document.querySelector('.center-column');
-                if (timerArea) {
-                    let touchStarted = false;
+                // Touch control (mobile) — tap/hold to start/stop, mirrors spacebar behavior
+                const touchArea = document.querySelector('.center-column');
+                if (touchArea) {
+                    let touchActive = false;
 
-                    // Don't hijack taps on interactive elements sitting inside the
-                    // timer area (currently: the mobile Target Time pill).
-                    const isInteractiveTarget = (e) => !!e.target.closest('.target-time-btn, button, a, select, input');
-
-                    timerArea.addEventListener('touchstart', (e) => {
-                        if (isInteractiveTarget(e)) return;
-                        // Prevent default to stop scrolling
+                    touchArea.addEventListener('touchstart', (e) => {
+                        if (e.target.closest('.target-time-btn, button, a, select, input, .new-scramble-btn')) return;
                         e.preventDefault();
-                        touchStarted = true;
+                        touchActive = true;
                         this.handleSpaceDown();
                     }, { passive: false });
 
-                    timerArea.addEventListener('touchend', (e) => {
-                        if (touchStarted) {
-                            e.preventDefault();
-                            touchStarted = false;
-                            this.handleSpaceUp();
-                        }
-                    }, { passive: false });
-
-                    timerArea.addEventListener('touchcancel', (e) => {
-                        if (touchStarted) {
-                            e.preventDefault();
-                            touchStarted = false;
-                            this.handleSpaceUp();
-                        }
-                    }, { passive: false });
-
-                    // Prevent context menu on long press
-                    timerArea.addEventListener('contextmenu', (e) => {
-                        if (isInteractiveTarget(e)) return;
+                    touchArea.addEventListener('touchend', (e) => {
+                        if (!touchActive) return;
                         e.preventDefault();
+                        touchActive = false;
+                        this.handleSpaceUp();
+                    }, { passive: false });
+
+                    touchArea.addEventListener('touchcancel', () => {
+                        if (touchActive && !this.isRunning) {
+                            touchActive = false;
+                            this.handleSpaceUp();
+                        }
                     });
                 }
 
@@ -6388,7 +6417,6 @@
 
                 // ── Target Time ──
                 const targetTimeBtn = document.getElementById('targetTimeBtn');
-                const targetTimeBtnMobile = document.getElementById('targetTimeBtnMobile');
                 const targetTimeOverlay = document.getElementById('targetTimeOverlay');
                 const targetTimeToggle = document.getElementById('targetTimeToggle');
                 const targetTimeInput = document.getElementById('targetTimeInput');
@@ -6402,7 +6430,6 @@
                 };
 
                 if (targetTimeBtn) targetTimeBtn.addEventListener('click', openTargetTimeModal);
-                if (targetTimeBtnMobile) targetTimeBtnMobile.addEventListener('click', openTargetTimeModal);
 
                 if (targetTimeToggle) {
                     targetTimeToggle.addEventListener('click', () => {
@@ -6447,7 +6474,6 @@
 
                 // ── Honest Mode ──
                 const honestModeBtn = document.getElementById('honestModeBtn');
-                const honestModeBtnMobile = document.getElementById('honestModeBtnMobile');
                 const honestModeOverlay = document.getElementById('honestModeOverlay');
                 const hmIdleState = document.getElementById('hmIdleState');
                 const hmActiveState = document.getElementById('hmActiveState');
@@ -6473,7 +6499,6 @@
                 };
 
                 if (honestModeBtn) honestModeBtn.addEventListener('click', openHonestModeModal);
-                if (honestModeBtnMobile) honestModeBtnMobile.addEventListener('click', openHonestModeModal);
 
                 const closeHonestModeModal = () => honestModeOverlay.classList.remove('visible');
 
@@ -6515,14 +6540,11 @@
                 display.textContent = `${m}:${String(s).padStart(2, '0')}`;
             }
 
-            // Refreshes both Target Time pill instances (header on desktop, above the
-            // timer on mobile — only one is visible at a time via CSS) and the goal
-            // label near the timer, to reflect current settings.
+            // Refreshes the Target Time pill and the goal label near the timer,
+            // to reflect current settings.
             _updateTargetTimeBtn() {
                 const btn = document.getElementById('targetTimeBtn');
                 const label = document.getElementById('targetTimeBtnLabel');
-                const btnMobile = document.getElementById('targetTimeBtnMobile');
-                const labelMobile = document.getElementById('targetTimeBtnLabelMobile');
                 const goalLabel = document.getElementById('targetTimeGoalLabel');
 
                 const s = window.settingsManager?.settings;
@@ -6532,11 +6554,10 @@
 
                 const text = isSet ? this.formatTime(s.targetTime) : (t.targetTimeLabel || 'Target Time');
 
-                [[btn, label], [btnMobile, labelMobile]].forEach(([b, l]) => {
-                    if (!b || !l) return;
-                    l.textContent = text;
-                    b.classList.toggle('active', !!isSet);
-                });
+                if (btn && label) {
+                    label.textContent = text;
+                    btn.classList.toggle('active', !!isSet);
+                }
 
                 if (goalLabel) {
                     if (isSet) {
@@ -6933,13 +6954,11 @@
                 }, 1000);
             }
 
-            // Refreshes both Honest Mode pill instances (header + mobile) to reflect
-            // the CURRENTLY SELECTED session's state — call this on session switch too.
+            // Refreshes the Honest Mode pill to reflect the CURRENTLY SELECTED
+            // session's state — call this on session switch too.
             _updateHonestModeBtn() {
                 const btn = document.getElementById('honestModeBtn');
                 const label = document.getElementById('honestModeBtnLabel');
-                const btnMobile = document.getElementById('honestModeBtnMobile');
-                const labelMobile = document.getElementById('honestModeBtnLabelMobile');
 
                 const session = this.sessions[this.currentSessionId];
                 const lang = window.settingsManager?.settings?.language || 'en';
@@ -6956,11 +6975,10 @@
                     text = t.honestModeLabel || 'Honest Mode';
                 }
 
-                [[btn, label], [btnMobile, labelMobile]].forEach(([b, l]) => {
-                    if (!b || !l) return;
-                    l.textContent = text;
-                    b.classList.toggle('active', !!active);
-                });
+                if (btn && label) {
+                    label.textContent = text;
+                    btn.classList.toggle('active', !!active);
+                }
 
                 const overlay = document.getElementById('honestModeOverlay');
                 if (overlay && overlay.classList.contains('visible')) {
@@ -7065,14 +7083,14 @@
                 // Check single best - only if ACTUALLY better
                 const currentBest = this.getBestTime();
                 if (currentBest !== null && (this.previousBest === null || currentBest < this.previousBest)) {
-                    messages.push('New Single Best');
+                    messages.push('single');
                 }
                 
                 // Check Ao5 best - only if we have enough solves and it's better
                 if (this.solves.length >= 5) {
                     const currentBestAo5 = this.getBestAverage(5);
                     if (currentBestAo5 !== null && (this.previousBestAo5 === null || currentBestAo5 < this.previousBestAo5)) {
-                        messages.push('New Ao5 Best');
+                        messages.push('ao5');
                     }
                 }
                 
@@ -7080,7 +7098,7 @@
                 if (this.solves.length >= 12) {
                     const currentBestAo12 = this.getBestAverage(12);
                     if (currentBestAo12 !== null && (this.previousBestAo12 === null || currentBestAo12 < this.previousBestAo12)) {
-                        messages.push('New Ao12 Best');
+                        messages.push('ao12');
                     }
                 }
                 
@@ -7088,7 +7106,7 @@
                 if (this.solves.length >= 100) {
                     const currentBestAo100 = this.getBestAverage(100);
                     if (currentBestAo100 !== null && (this.previousBestAo100 === null || currentBestAo100 < this.previousBestAo100)) {
-                        messages.push('New Ao100 Best');
+                        messages.push('ao100');
                     }
                 }
                 
@@ -7102,23 +7120,36 @@
                 messages.forEach((message, index) => {
                     setTimeout(() => {
                         this.showNewBestIndicator(message);
-                    }, index * 400); // 400ms delay between each message
+                    }, index * 2000); // show each record label for its own 2s window
                 });
             }
 
-            showNewBestIndicator(message) {
-                this.newBestIndicator.textContent = message;
-                this.newBestIndicator.classList.add('visible');
-                
-                // Hide after 1.8 seconds
-                setTimeout(() => {
-                    this.newBestIndicator.classList.remove('visible');
-                }, 1800);
+            showNewBestIndicator(key) {
+                if (!this.titleStrip || !this.recordTitle) return;
+
+                const lang = window.settingsManager?.settings?.language || 'en';
+                const t = translations[lang] || translations.en;
+                const textMap = {
+                    single: t.newBestSingle,
+                    ao5: t.newBestAo5,
+                    ao12: t.newBestAo12,
+                    ao100: t.newBestAo100
+                };
+                const message = textMap[key];
+                if (!message) return;
+
+                this.recordTitle.textContent = message;
+                this.titleStrip.classList.add('showing-record');
+
+                clearTimeout(this._newBestTimeout);
+                this._newBestTimeout = setTimeout(() => {
+                    this.titleStrip.classList.remove('showing-record');
+                }, 2000);
             }
 
             hideNewBestIndicator() {
-                this.newBestIndicator.classList.remove('visible');
-                this.newBestIndicator.textContent = '';
+                clearTimeout(this._newBestTimeout);
+                if (this.titleStrip) this.titleStrip.classList.remove('showing-record');
             }
 
             triggerCommentary() {
@@ -12256,6 +12287,281 @@ const ZZ = [
   { id: "ZZ_T_72", group: "T", groupName: "T", name: "T 72", alg: "F U F' U F2 B' R2 D' F2 U F2 D F2 U' B" },
 ];
 
+const COLL = [
+  { id: "COLL_Sune_1", group: "Sune", groupName: "Sune", name: "Sune 1", alg: "R U R' U R U2 R'" },
+  { id: "COLL_Sune_2", group: "Sune", groupName: "Sune", name: "Sune 2", alg: "R U R' U R U' R D R' U' R D' R2" },
+  { id: "COLL_Sune_3", group: "Sune", groupName: "Sune", name: "Sune 3", alg: "R U R' U R2 D R' U2 R D' R2" },
+  { id: "COLL_Sune_4", group: "Sune", groupName: "Sune", name: "Sune 4", alg: "F' R U2 R' U2 R' F2 R U R U' R' F'" },
+  { id: "COLL_Sune_5", group: "Sune", groupName: "Sune", name: "Sune 5", alg: "L' R U R' U' L U2 R U2 R'" },
+  { id: "COLL_Sune_6", group: "Sune", groupName: "Sune", name: "Sune 6", alg: "R U' L' U R' U' L" },
+  { id: "COLL_Antisune_1", group: "Antisune", groupName: "Antisune", name: "Antisune 1", alg: "R' U' R U' R' U2 R" },
+  { id: "COLL_Antisune_2", group: "Antisune", groupName: "Antisune", name: "Antisune 2", alg: "R U2 R' U2 L' U R U' R' L" },
+  { id: "COLL_Antisune_3", group: "Antisune", groupName: "Antisune", name: "Antisune 3", alg: "R2 D R' U R D' R' U R' U' R U' R'" },
+  { id: "COLL_Antisune_4", group: "Antisune", groupName: "Antisune", name: "Antisune 4", alg: "R' U L U' R U L'" },
+  { id: "COLL_Antisune_5", group: "Antisune", groupName: "Antisune", name: "Antisune 5", alg: "L' U R U' L U R'" },
+  { id: "COLL_Antisune_6", group: "Antisune", groupName: "Antisune", name: "Antisune 6", alg: "R2 D R' U2 R D' R2 U' R U' R'" },
+  { id: "COLL_Antisune_7", group: "Antisune", groupName: "Antisune", name: "Antisune 7", alg: "R U' R' U2 R U' R' U2 R' D' R U R' D R" },
+  { id: "COLL_T_1", group: "T", groupName: "T", name: "T 1", alg: "r U R' U' r' F R F'" },
+  { id: "COLL_T_2", group: "T", groupName: "T", name: "T 2", alg: "R' F R U R' U' R' F' R2 U' R' U2 R" },
+  { id: "COLL_T_3", group: "T", groupName: "T", name: "T 3", alg: "l' U' L U R U' r' F" },
+  { id: "COLL_T_4", group: "T", groupName: "T", name: "T 4", alg: "F R U R' U' R U' R' U' R U R' F'" },
+  { id: "COLL_T_5", group: "T", groupName: "T", name: "T 5", alg: "R U2 R' U' R U' R2 U2 R U R' U R" },
+  { id: "COLL_T_6", group: "T", groupName: "T", name: "T 6", alg: "R U' R2 D' r U2 r' D R2 U R'" },
+  { id: "COLL_U_1", group: "U", groupName: "U", name: "U 1", alg: "R2 D R' U2 R D' R' U2 R'" },
+  { id: "COLL_U_2", group: "U", groupName: "U", name: "U 2", alg: "R' F R U' R' U' R U R' F' R U R' U' R' F R F' R" },
+  { id: "COLL_U_3", group: "U", groupName: "U", name: "U 3", alg: "R2 D' R U2 R' D R U2 R" },
+  { id: "COLL_U_4", group: "U", groupName: "U", name: "U 4", alg: "R' F2 R U2 R U2 R' F2 R U2 R'" },
+  { id: "COLL_U_5", group: "U", groupName: "U", name: "U 5", alg: "F R U' R' U R U R' U R U' R' F'" },
+  { id: "COLL_U_6", group: "U", groupName: "U", name: "U 6", alg: "R U R' U R U2 R2 U' R U' R' U2 R" },
+  { id: "COLL_U_7", group: "U", groupName: "U", name: "U 7", alg: "R2 D' R U R' D R U R U' R' U' R" },
+  { id: "COLL_L_1", group: "L", groupName: "L", name: "L 1", alg: "F' r U R' U' r' F R" },
+  { id: "COLL_L_2", group: "L", groupName: "L", name: "L 2", alg: "R' U' R U R' F' R U R' U' R' F R2" },
+  { id: "COLL_L_3", group: "L", groupName: "L", name: "L 3", alg: "F R' F' r U R U' r'" },
+  { id: "COLL_L_4", group: "L", groupName: "L", name: "L 4", alg: "R U2 R D R' U2 R D' R2" },
+  { id: "COLL_L_5", group: "L", groupName: "L", name: "L 5", alg: "R' U' R U' R' U R U' R' U R U' R' U2 R" },
+  { id: "COLL_L_6", group: "L", groupName: "L", name: "L 6", alg: "R' U2 R' D' R U2 R' D R2" },
+  { id: "COLL_Pi_1", group: "Pi", groupName: "Pi", name: "Pi 1", alg: "R U2 R2 U' R2 U' R2 U2 R" },
+  { id: "COLL_Pi_2", group: "Pi", groupName: "Pi", name: "Pi 2", alg: "R U R' U' R' F R2 U R' U' R U R' U' F'" },
+  { id: "COLL_Pi_3", group: "Pi", groupName: "Pi", name: "Pi 3", alg: "F U R U' R' U R U' R2 F' R U R U' R'" },
+  { id: "COLL_Pi_4", group: "Pi", groupName: "Pi", name: "Pi 4", alg: "R' F2 R U2 R U2 R' F2 U' R U' R'" },
+  { id: "COLL_Pi_5", group: "Pi", groupName: "Pi", name: "Pi 5", alg: "r U' r' U' r U r' U' x' R2 U' R' U R' x" },
+  { id: "COLL_Pi_6", group: "Pi", groupName: "Pi", name: "Pi 6", alg: "L' U R U' L U' R' U' R U' R'" },
+  { id: "COLL_Pi_7", group: "Pi", groupName: "Pi", name: "Pi 7", alg: "R U R' U F' R U2 R' U2 R' F R" },
+  { id: "COLL_Pi_8", group: "Pi", groupName: "Pi", name: "Pi 8", alg: "F U R U' R' U R U2 R' U' R U R' F'" },
+  { id: "COLL_Pi_9", group: "Pi", groupName: "Pi", name: "Pi 9", alg: "R U D' R U R' D R2 U' R' U' R2 U2 R" },
+  { id: "COLL_Pi_10", group: "Pi", groupName: "Pi", name: "Pi 10", alg: "R U2 R' U' F' R U2 R' U' R U' R' F R U' R'" },
+  { id: "COLL_H_1", group: "H", groupName: "H", name: "H 1", alg: "R U2 R' U' R U R' U' R U' R'" },
+  { id: "COLL_H_2", group: "H", groupName: "H", name: "H 2", alg: "R' U' R U' R' U R U' R' U2 R" },
+  { id: "COLL_H_3", group: "H", groupName: "H", name: "H 3", alg: "F R U R' U' R U R' U' R U R' U' F'" },
+  { id: "COLL_H_4", group: "H", groupName: "H", name: "H 4", alg: "F R U' R' U R U2 R' U' R U R' U' F'" },
+  { id: "COLL_H_5", group: "H", groupName: "H", name: "H 5", alg: "R' F' R U2 R U2 R' F U' R U' R'" },
+];
+
+const OCELL = [
+  { id: "OCELL_H_1", group: "H", groupName: "H", name: "H (Solved)", alg: "R U R' U R U2 R' U' R' U2 R U R' U R" },
+  { id: "OCELL_H_2", group: "H", groupName: "H", name: "H (UF/UB)", alg: "R U2 R2 U2 R' U2 R U2 R' U2 R2 U2 R" },
+  { id: "OCELL_H_3", group: "H", groupName: "H", name: "H (UF/UL)", alg: "R' U2 R U R' U' R U R' U R" },
+  { id: "OCELL_H_4", group: "H", groupName: "H", name: "H (UF/UR)", alg: "R U R' U R U' R' U R U2 R'" },
+  { id: "OCELL_Pi_1", group: "Pi", groupName: "Pi", name: "Pi (Solved)", alg: "R U R2 U' R2 U' R2 U2 R2 U' R' U R U2 R'" },
+  { id: "OCELL_Pi_2", group: "Pi", groupName: "Pi", name: "Pi (UF/UB)", alg: "R U R' U' R' U2 R U R' U R2 U2 R'" },
+  { id: "OCELL_Pi_3", group: "Pi", groupName: "Pi", name: "Pi (UF/UL)", alg: "R U R' U R U2 R2 U2 R U R' U R" },
+  { id: "OCELL_Pi_4", group: "Pi", groupName: "Pi", name: "Pi (UB/UL)", alg: "R U2 R' U' R U' R2 U' R U' R' U2 R" },
+  { id: "OCELL_Pi_5", group: "Pi", groupName: "Pi", name: "Pi (UF/UR)", alg: "R U2 R2 U' R2 U' R2 U2 R" },
+  { id: "OCELL_Pi_6", group: "Pi", groupName: "Pi", name: "Pi (UB/UR)", alg: "R' U2 R2 U R2 U R2 U2 R'" },
+  { id: "OCELL_Headlights_1", group: "Headlights", groupName: "Headlights", name: "Headlights (Solved)", alg: "R2 U R U' R U R2 U' R2 U' R' U R' U' R2" },
+  { id: "OCELL_Headlights_2", group: "Headlights", groupName: "Headlights", name: "Headlights (UF/UB)", alg: "R' U' R U' R' U2 R2 U R' U R U2 R'" },
+  { id: "OCELL_Headlights_3", group: "Headlights", groupName: "Headlights", name: "Headlights (UF/UL)", alg: "R U2 R' U2 R2 U R' U R' U' R U R U2 R2" },
+  { id: "OCELL_Headlights_4", group: "Headlights", groupName: "Headlights", name: "Headlights (UB/UL)", alg: "R U R' U R' U2 R2 U R2 U R2 U' R'" },
+  { id: "OCELL_Headlights_5", group: "Headlights", groupName: "Headlights", name: "Headlights (UF/UR)", alg: "R U' R U' R2 U2 R2 U R U' R2 U' R U2 R" },
+  { id: "OCELL_Headlights_6", group: "Headlights", groupName: "Headlights", name: "Headlights (UB/UR)", alg: "R' U' R U' R U2 R2 U' R2 U' R2 U R" },
+  { id: "OCELL_T_1", group: "T", groupName: "T", name: "T (Solved)", alg: "R U R' U R U2 R' U2 R' U' R U' R' U2 R" },
+  { id: "OCELL_T_2", group: "T", groupName: "T", name: "T (UF/UB)", alg: "R U2 R' U' R U' R2 U2 R U R' U R" },
+  { id: "OCELL_T_3", group: "T", groupName: "T", name: "T (UF/UL)", alg: "R' U' R2 U R2 U R2 U2 R' U R' U R" },
+  { id: "OCELL_T_4", group: "T", groupName: "T", name: "T (UB/UL)", alg: "R U R2 U' R2 U' R2 U2 R U' R U' R'" },
+  { id: "OCELL_T_5", group: "T", groupName: "T", name: "T (UF/UR)", alg: "R U R' U' R2 U2 R' U R' U2 R U2 R U R2" },
+  { id: "OCELL_T_6", group: "T", groupName: "T", name: "T (UB/UR)", alg: "R' U' R U R2 U2 R U' R U2 R' U2 R' U' R2" },
+  { id: "OCELL_Bowtie_1", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (Solved)", alg: "R U R' U R U' R' U R U' R' U R U2 R'" },
+  { id: "OCELL_Bowtie_2", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (UF/UB)", alg: "R' U2 R U R' U R U2 R' U' R U' R' U2 R" },
+  { id: "OCELL_Bowtie_3", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (UF/UL)", alg: "R2 U R' U R' U2 R' U' R' U R2 U R U' R2" },
+  { id: "OCELL_Bowtie_4", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (UB/UL)", alg: "R U' R2 U R U2 R2 U R U2 R U2 R U' R2" },
+  { id: "OCELL_Bowtie_5", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (UB/UR)", alg: "R U R2 U' R2 U' R U2 R U2 R' U2 R2 U2 R" },
+  { id: "OCELL_AntiSune_1", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (Solved)", alg: "R U R' U R' U' R2 U' R2 U2 R" },
+  { id: "OCELL_AntiSune_2", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (UF/UB)", alg: "R U2 R2 U' R' U' R' U R U R2 U' R'" },
+  { id: "OCELL_AntiSune_3", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (UF/UL)", alg: "R U2 R' U' R U' R'" },
+  { id: "OCELL_AntiSune_4", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (UB/UL)", alg: "R2 U' R' U R U R' U2 R' U R2 U R2" },
+  { id: "OCELL_AntiSune_5", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (UF/UR)", alg: "R' U' R U' R' U2 R" },
+  { id: "OCELL_AntiSune_6", group: "AntiSune", groupName: "AntiSune", name: "AntiSune (UB/UR)", alg: "R U2 R2 U2 R2 U R2 U R2 U' R'" },
+  { id: "OCELL_Sune_1", group: "Sune", groupName: "Sune", name: "Sune (Solved)", alg: "R' U' R U' R U R2 U R2 U2 R'" },
+  { id: "OCELL_Sune_2", group: "Sune", groupName: "Sune", name: "Sune (UF/UB)", alg: "R U R' U R2 U R U R2 U' R' U' R2" },
+  { id: "OCELL_Sune_3", group: "Sune", groupName: "Sune", name: "Sune (UF/UL)", alg: "R U R' U R U2 R'" },
+  { id: "OCELL_Sune_4", group: "Sune", groupName: "Sune", name: "Sune (UB/UL)", alg: "R' U2 R2 U2 R2 U' R2 U' R2 U R" },
+  { id: "OCELL_Sune_5", group: "Sune", groupName: "Sune", name: "Sune (UF/UR)", alg: "R' U2 R U R' U R" },
+  { id: "OCELL_Sune_6", group: "Sune", groupName: "Sune", name: "Sune (UB/UR)", alg: "R2 U' R2 U' R U R2 U' R2 U R' U R2" },
+  { id: "OCELL_Bowtie_6", group: "Bowtie", groupName: "Bowtie", name: "Bowtie (UF/UR)", alg: "U R U R2 U' R2 U' R U2 R U2 R' U2 R2 U2 R U'" },
+];
+const CPLL = [
+  { id: "CPLL_Aa", group: "CPLL", groupName: "CPLL", name: "CPLL Aa", alg: "x R' U R' D2 R U' R' D2 R2 x'" },
+  { id: "CPLL_Ab", group: "CPLL", groupName: "CPLL", name: "CPLL Ab", alg: "x R2 D2 R U R' D2 R U' R x'" },
+  { id: "CPLL_E", group: "CPLL", groupName: "CPLL", name: "CPLL E", alg: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+  { id: "CPLL_H", group: "CPLL", groupName: "CPLL", name: "CPLL H", alg: "R2 F2 B2 L2 D L2 B2 F2 R2 U" },
+];
+
+const ZZLL = [
+  { id: "ZZLL_T_1", group: "T", groupName: "T", name: "T1", alg: "U R' D R D' R' D R U R' D' R D R' D' R" },
+  { id: "ZZLL_T_2", group: "T", groupName: "T", name: "T1", alg: "U' R U R' U R U2 R' L' U' L U' L' U2 L" },
+  { id: "ZZLL_T_3", group: "T", groupName: "T", name: "T1", alg: "U' R U R' U R U2 R' U2 R' U' R U' R' U2 R" },
+  { id: "ZZLL_T_4", group: "T", groupName: "T", name: "T1", alg: "R' U R U2 R' U' R U' R U R' U' R' U' R U R U' R'" },
+  { id: "ZZLL_T_5", group: "T", groupName: "T", name: "T1", alg: "U2 R' U2 R U R' U R2 U2 R' U' R U' R'" },
+  { id: "ZZLL_T_6", group: "T", groupName: "T", name: "T1", alg: "R U2 R' U' R U' R2 U2 R U R' U R" },
+  { id: "ZZLL_T_7", group: "T", groupName: "T", name: "T2", alg: "U2 R U' R2 D' r U2 r' D R2 U R'" },
+  { id: "ZZLL_T_8", group: "T", groupName: "T", name: "T2", alg: "R' U R2 D r' U2 r D' R2 U' R" },
+  { id: "ZZLL_T_9", group: "T", groupName: "T", name: "T2", alg: "U R U R D R' U R D' R' U L' U R' U' L" },
+  { id: "ZZLL_T_10", group: "T", groupName: "T", name: "T2", alg: "U r U r' R U R' U' R U R' U' r U' r' F R U R' U' F'" },
+  { id: "ZZLL_T_11", group: "T", groupName: "T", name: "T3", alg: "U2 R' U' R2 U R' F' R U R' U' R' F R2 U' R' U' R' U R" },
+  { id: "ZZLL_T_12", group: "T", groupName: "T", name: "T3", alg: "U2 r U' r U2 R' F R U2 r2 F" },
+  { id: "ZZLL_T_13", group: "T", groupName: "T", name: "T3", alg: "R' U2 R U R' U R F U R U2 R' U R U R' F'" },
+  { id: "ZZLL_T_14", group: "T", groupName: "T", name: "T3", alg: "r' U' l' U2 R U' R' U2 l R U' R' U2 r" },
+  { id: "ZZLL_T_15", group: "T", groupName: "T", name: "T4", alg: "U' l' U2 R' D2 R U2 R' D2 R2 x'" },
+  { id: "ZZLL_T_16", group: "T", groupName: "T", name: "T4", alg: "R' U2 R U' R' F R U R' U' R' F' R U' R" },
+  { id: "ZZLL_T_17", group: "T", groupName: "T", name: "T4", alg: "U2 F R U R' U' R U' R' U' R U R' F'" },
+  { id: "ZZLL_T_18", group: "T", groupName: "T", name: "T4", alg: "U' R U R' U2 R U' R' U2 R U' R2 F' R U R U' R' F" },
+  { id: "ZZLL_T_19", group: "T", groupName: "T", name: "T5", alg: "R U R D R' U' R D' R2" },
+  { id: "ZZLL_T_20", group: "T", groupName: "T", name: "T5", alg: "U' R U R' U' R U' R' L U' R U R' L'" },
+  { id: "ZZLL_T_21", group: "T", groupName: "T", name: "T5", alg: "R' U' R U' R2 F' R U R U' R' F U R U' R' U2 R" },
+  { id: "ZZLL_T_22", group: "T", groupName: "T", name: "T5", alg: "U2 R U R D R' U2 R D' R' U' R' U R U' R' U' R U' R'" },
+  { id: "ZZLL_T_23", group: "T", groupName: "T", name: "T6", alg: "x' U' R' D R U R' D' R x" },
+  { id: "ZZLL_T_24", group: "T", groupName: "T", name: "T6", alg: "R U R' U' R U' R' U' F R U R' U' R' F' R" },
+  { id: "ZZLL_T_25", group: "T", groupName: "T", name: "T6", alg: "U F R U R' U' R U R' U' F' R U R' U' R' F R F'" },
+  { id: "ZZLL_T_26", group: "T", groupName: "T", name: "T6", alg: "R' U2 R F U' R' U R U F' R' U R" },
+  { id: "ZZLL_U_1", group: "U", groupName: "U", name: "U1", alg: "U R U2 R' U' R U' R' U2 R' U2 R U R' U R" },
+  { id: "ZZLL_U_2", group: "U", groupName: "U", name: "U1", alg: "R U R' U' R U' R U2 R2 U' R U R' U' R2 U' R2" },
+  { id: "ZZLL_U_3", group: "U", groupName: "U", name: "U1", alg: "R' U' R U' R' U2 R2 U R' U R U2 R'" },
+  { id: "ZZLL_U_4", group: "U", groupName: "U", name: "U1", alg: "U2 R U R' U R U2 R2 U' R U' R' U2 R" },
+  { id: "ZZLL_U_5", group: "U", groupName: "U", name: "U2", alg: "U' R U2 R2 F R F' M' U' R U' R' U M" },
+  { id: "ZZLL_U_6", group: "U", groupName: "U", name: "U2", alg: "U' R' U2 R F U' R' U R U R' U R U' F'" },
+  { id: "ZZLL_U_7", group: "U", groupName: "U", name: "U2", alg: "F R U' R' U' R U2 R' U' R U' R' U' R U2 R' U' F'" },
+  { id: "ZZLL_U_8", group: "U", groupName: "U", name: "U2", alg: "U r' U' R' F R U r F R U' R' F'" },
+  { id: "ZZLL_U_9", group: "U", groupName: "U", name: "U3", alg: "R U' R' U R U' L U r' F U2 R U2 R2 x" },
+  { id: "ZZLL_U_10", group: "U", groupName: "U", name: "U3", alg: "U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R' U2 R" },
+  { id: "ZZLL_U_11", group: "U", groupName: "U", name: "U3", alg: "U' R' U' R F R2 D' R U R' D R2 U' F'" },
+  { id: "ZZLL_U_12", group: "U", groupName: "U", name: "U3", alg: "U' r U R' U' r' F R U R' U' R F' R' U R" },
+  { id: "ZZLL_U_13", group: "U", groupName: "U", name: "U4", alg: "x R2 U2 R' D2 R U2 R' D2 R' x'" },
+  { id: "ZZLL_U_14", group: "U", groupName: "U", name: "U4", alg: "U2 x R2 D2 R U2 R' D2 R U2 l" },
+  { id: "ZZLL_U_15", group: "U", groupName: "U", name: "U4", alg: "F R U' R' U R U R' U R U' R' F'" },
+  { id: "ZZLL_U_16", group: "U", groupName: "U", name: "U4", alg: "U F' R U R' U' R' F R2 U R' U2 R U R' U2 R U' R'" },
+  { id: "ZZLL_U_17", group: "U", groupName: "U", name: "U5", alg: "R2 D' R U2 R' D R U2 R" },
+  { id: "ZZLL_U_18", group: "U", groupName: "U", name: "U5", alg: "R U' R' D R' U' R D' R2 U R' U' R' U2 R'" },
+  { id: "ZZLL_U_19", group: "U", groupName: "U", name: "U5", alg: "U' R' U R U R' U2 R U2 y R U' R' U2 R U' R'" },
+  { id: "ZZLL_U_20", group: "U", groupName: "U", name: "U5", alg: "U' R' U2 R2 D R' U2 R D' R2 U R U2 R' U2 R" },
+  { id: "ZZLL_U_21", group: "U", groupName: "U", name: "U6", alg: "U2 R2 D R' U2 R D' R' U2 R'" },
+  { id: "ZZLL_U_22", group: "U", groupName: "U", name: "U6", alg: "R' U' R U R U R' U' R' U F R U R U' R' F'" },
+  { id: "ZZLL_U_23", group: "U", groupName: "U", name: "U6", alg: "U' R U' R' U' R U2 R' U2 y' R' U R U2 R' U R" },
+  { id: "ZZLL_U_24", group: "U", groupName: "U", name: "U6", alg: "U' R' U' R U R' U R U2 F R' U R U' F' R' U2 R" },
+  { id: "ZZLL_L_1", group: "L", groupName: "L", name: "L1", alg: "R U2 R' U2 R' U' R U R U' R' U2 R' U2 R" },
+  { id: "ZZLL_L_2", group: "L", groupName: "L", name: "L1", alg: "R U R' U R U' R' U R U' R' U R U2 R'" },
+  { id: "ZZLL_L_3", group: "L", groupName: "L", name: "L1", alg: "U2 R U2 R' U' R U' R' U2 R U R' U R U2 R'" },
+  { id: "ZZLL_L_4", group: "L", groupName: "L", name: "L1", alg: "U2 R U R' U R U2 R' U2 R U2 R' U' R U' R'" },
+  { id: "ZZLL_L_5", group: "L", groupName: "L", name: "L2", alg: "U R' U F' R U R' U' R' F R2 U' R' U' R U R' U' R" },
+  { id: "ZZLL_L_6", group: "L", groupName: "L", name: "L2", alg: "F R U R' U' R' F R2 U' R' U' R U R' F2" },
+  { id: "ZZLL_L_7", group: "L", groupName: "L", name: "L2", alg: "U R U' R' U R U R' U R U' R2 D' R U R' D R" },
+  { id: "ZZLL_L_8", group: "L", groupName: "L", name: "L2", alg: "R' U' R U R' U' R' F R2 U' R' U' R U R' F' U R" },
+  { id: "ZZLL_L_9", group: "L", groupName: "L", name: "L2", alg: "U2 F R U R' U' F' r U r' U R U' R' r U' r'" },
+  { id: "ZZLL_L_10", group: "L", groupName: "L", name: "L2", alg: "U r U r' R U R' U' r U' r' F U R U' R' F'" },
+  { id: "ZZLL_L_11", group: "L", groupName: "L", name: "L3", alg: "U' F' r U R' U' r' F R" },
+  { id: "ZZLL_L_12", group: "L", groupName: "L", name: "L3", alg: "U2 R' U' R U2 R' F' R U R' U' R' F R2 U R' U2 R" },
+  { id: "ZZLL_L_13", group: "L", groupName: "L", name: "L3", alg: "R' F R U R U' R' F' U R U R' U R U' R'" },
+  { id: "ZZLL_L_14", group: "L", groupName: "L", name: "L3", alg: "U F R' F' R U R U' R' F U R U' R' U R U' R' F'" },
+  { id: "ZZLL_L_15", group: "L", groupName: "L", name: "L4", alg: "U2 F R' F' r U R U' r'" },
+  { id: "ZZLL_L_16", group: "L", groupName: "L", name: "L4", alg: "U R U R' U R U R' U' R U R D R' U2 R D' R' U' R'" },
+  { id: "ZZLL_L_17", group: "L", groupName: "L", name: "L4", alg: "U L R U' R' U R L' U R' U R U' R'" },
+  { id: "ZZLL_L_18", group: "L", groupName: "L", name: "L4", alg: "U R' U2 R U R' U' F' R U R' U' R' F R2 U R' U R" },
+  { id: "ZZLL_L_19", group: "L", groupName: "L", name: "L5", alg: "U R' U2 R' D' R U2 R' D R2" },
+  { id: "ZZLL_L_20", group: "L", groupName: "L", name: "L5", alg: "U2 R U2 R U R U' R2 D R' U R D' R U R'" },
+  { id: "ZZLL_L_21", group: "L", groupName: "L", name: "L5", alg: "U R U R' U2 R U R' U2 y' R' U2 R U' R' U' R" },
+  { id: "ZZLL_L_22", group: "L", groupName: "L", name: "L5", alg: "U R' U2 R U2 R' U' R2 D R' U2 R D' R2 U2 R" },
+  { id: "ZZLL_L_23", group: "L", groupName: "L", name: "L6", alg: "U2 R U2 R D R' U2 R D' R2" },
+  { id: "ZZLL_L_24", group: "L", groupName: "L", name: "L6", alg: "U' F R U R' U' R' F' U' R U R U' R' U' R' U R" },
+  { id: "ZZLL_L_25", group: "L", groupName: "L", name: "L6", alg: "U2 R' U' R U2 R' U' R y U2 R U2 R' U R U R'" },
+  { id: "ZZLL_L_26", group: "L", groupName: "L", name: "L6", alg: "U2 R U2 R' U2 R U R2 D' R U2 R' D R2 U2 R'" },
+  { id: "ZZLL_Pi_1", group: "Pi", groupName: "Pi", name: "Pi1", alg: "R' U' R U R U2 R' U' R U' R2 U2 R" },
+  { id: "ZZLL_Pi_2", group: "Pi", groupName: "Pi", name: "Pi1", alg: "R U R' U' R' U2 R U R' U R2 U2 R'" },
+  { id: "ZZLL_Pi_3", group: "Pi", groupName: "Pi", name: "Pi1", alg: "R U R' U' R' U' R U R U R' U' R' U R U' R U' R'" },
+  { id: "ZZLL_Pi_4", group: "Pi", groupName: "Pi", name: "Pi1", alg: "R U2 R' U' R U' R' U' R U2 R' U' R U' R'" },
+  { id: "ZZLL_Pi_5", group: "Pi", groupName: "Pi", name: "Pi2", alg: "F U R' U' R2 U' R2 U2 R U2 R U R' F'" },
+  { id: "ZZLL_Pi_6", group: "Pi", groupName: "Pi", name: "Pi2", alg: "U' R U R' U r' F R F' r U' R' U R U2 R'" },
+  { id: "ZZLL_Pi_7", group: "Pi", groupName: "Pi", name: "Pi2", alg: "R2 D R' U' R D' R' U' R' U R U' R' U' R U' R'" },
+  { id: "ZZLL_Pi_8", group: "Pi", groupName: "Pi", name: "Pi2", alg: "R2 D' R U R' D R U R U' R' U R U R' U R" },
+  { id: "ZZLL_Pi_9", group: "Pi", groupName: "Pi", name: "Pi3", alg: "U' F U R U2 R' U R U R' F' R U2 R' U' R U' R'" },
+  { id: "ZZLL_Pi_10", group: "Pi", groupName: "Pi", name: "Pi3", alg: "r' U' R U' R' U2 r U' R U2 R' U2 R' F R F'" },
+  { id: "ZZLL_Pi_11", group: "Pi", groupName: "Pi", name: "Pi3", alg: "R' U' R U R2 F' R U R U' R' F U' R U R' U R" },
+  { id: "ZZLL_Pi_12", group: "Pi", groupName: "Pi", name: "Pi3", alg: "U' R U2 R2 F R U R U2 R' U' R U2 R' U' F' R U R'" },
+  { id: "ZZLL_Pi_13", group: "Pi", groupName: "Pi", name: "Pi3", alg: "U2 R U2 R' U' R U r' F2 r U2 R' U' r' F r" },
+  { id: "ZZLL_Pi_14", group: "Pi", groupName: "Pi", name: "Pi4", alg: "U R U2 R2 U' R U' R' U2 F R U R U' R' F'" },
+  { id: "ZZLL_Pi_15", group: "Pi", groupName: "Pi", name: "Pi4", alg: "F R U R' U' R' F' R U2 R' U' R2 U' R2 U2 R" },
+  { id: "ZZLL_Pi_16", group: "Pi", groupName: "Pi", name: "Pi4", alg: "U R' U' R L U2 R' U2 R U2 L' U R' U2 R" },
+  { id: "ZZLL_Pi_17", group: "Pi", groupName: "Pi", name: "Pi4", alg: "U F U R U' R' U R U2 R' U' R U R' F'" },
+  { id: "ZZLL_Pi_18", group: "Pi", groupName: "Pi", name: "Pi5", alg: "r' F' r U r U2 r' F2 U' R U R' U' R U' R'" },
+  { id: "ZZLL_Pi_19", group: "Pi", groupName: "Pi", name: "Pi5", alg: "U2 R U2 R' U2 R' F R2 U' R' U2 R U2 R' U' F'" },
+  { id: "ZZLL_Pi_20", group: "Pi", groupName: "Pi", name: "Pi5", alg: "R U R' U' R' F R2 U R' U' R U R' U' F'" },
+  { id: "ZZLL_Pi_21", group: "Pi", groupName: "Pi", name: "Pi5", alg: "U R2 D R' U2 R D' R2 U' R U' R' U R U2 R' U' R U' R'" },
+  { id: "ZZLL_Pi_22", group: "Pi", groupName: "Pi", name: "Pi6", alg: "U' R U R' U R U' R2 F R F' R U' R' F' U F" },
+  { id: "ZZLL_Pi_23", group: "Pi", groupName: "Pi", name: "Pi6", alg: "U' R U R' U R U' R' U F2 r U2 r' U' r' F r" },
+  { id: "ZZLL_Pi_24", group: "Pi", groupName: "Pi", name: "Pi6", alg: "U F U R U2 R' U2 R U R2 F' R U2 R U2 R'" },
+  { id: "ZZLL_Pi_25", group: "Pi", groupName: "Pi", name: "Pi6", alg: "U F U R U' R' U R U' R2 F' R U R U' R'" },
+  { id: "ZZLL_Pi_26", group: "Pi", groupName: "Pi", name: "Pi6", alg: "U R U R' U R U2 R' U' R U R' U R2 D R' U2 R D' R2" },
+  { id: "ZZLL_Pi_27", group: "Pi", groupName: "Pi", name: "Pi6", alg: "R U R' U R U2 R' U' R L' U R' U' L U2 R U2 R'" },
+  { id: "ZZLL_H_1", group: "H", groupName: "H", name: "H1", alg: "R U2 R' U' R U' R' U' R' U' R U' R' U2 R" },
+  { id: "ZZLL_H_2", group: "H", groupName: "H", name: "H1", alg: "R' U2 R U R' U R U R U R' U R U2 R'" },
+  { id: "ZZLL_H_3", group: "H", groupName: "H", name: "H1", alg: "U R U R' U R U' R' U R U' R' U R' U' R2 U' R' U R' U R" },
+  { id: "ZZLL_H_4", group: "H", groupName: "H", name: "H1", alg: "U R U R' U R U2 R' U' R' U2 R U R' U R" },
+  { id: "ZZLL_H_5", group: "H", groupName: "H", name: "H2", alg: "U R U2 R D R' U' R D' R2 U' R' F R U R U' R' F'" },
+  { id: "ZZLL_H_6", group: "H", groupName: "H", name: "H2", alg: "U x' U' R U' R' U R' F2 R U' R U R' U x" },
+  { id: "ZZLL_H_7", group: "H", groupName: "H", name: "H2", alg: "F U R U' R' U R U' R' U R U' R' F'" },
+  { id: "ZZLL_H_8", group: "H", groupName: "H", name: "H2", alg: "U L' U L U' L' U' L U R' U' R U L' U' L U2 R' U' R" },
+  { id: "ZZLL_H_9", group: "H", groupName: "H", name: "H2", alg: "U R U' R' U R U R' U' L U L' U' R U R' U2 L U L'" },
+  { id: "ZZLL_H_10", group: "H", groupName: "H", name: "H3", alg: "U2 R U R' U R U2 R' F R U' R' U' R U2 R' U' F'" },
+  { id: "ZZLL_H_11", group: "H", groupName: "H", name: "H3", alg: "U' R' U' R U' R' U F' R U R' U' R' F R2 U' R' U R" },
+  { id: "ZZLL_H_12", group: "H", groupName: "H", name: "H3", alg: "U' R' U' R U' R U R2 U R2 U L' U R' U' L" },
+  { id: "ZZLL_H_13", group: "H", groupName: "H", name: "H3", alg: "U' R U R' U R' U' R2 U' R2 U' L U' R U L'" },
+  { id: "ZZLL_H_14", group: "H", groupName: "H", name: "H3", alg: "F R U' R' U' R U2 R' U' F' U R U R' U R U2 R'" },
+  { id: "ZZLL_H_15", group: "H", groupName: "H", name: "H3", alg: "U2 R U R' U' L' U2 R U2 R' U L U' r' F2 r" },
+  { id: "ZZLL_H_16", group: "H", groupName: "H", name: "H4", alg: "R' U2 R U' L U2 R' U2 R U2 L' R' U R" },
+  { id: "ZZLL_H_17", group: "H", groupName: "H", name: "H4", alg: "R U2 R' U L' U2 R U2 R' U2 L R U' R'" },
+  { id: "ZZLL_H_18", group: "H", groupName: "H", name: "H4", alg: "U R' U' R U' R' U R U R' F R U R' U' R' F' R2" },
+  { id: "ZZLL_H_19", group: "H", groupName: "H", name: "H4", alg: "U2 F R U R' U' R' F' U2 R U R' U R2 U2 R'" },
+  { id: "ZZLL_H_20", group: "H", groupName: "H", name: "H4", alg: "U F R U' R' U R U2 R' U' R U R' U' F'" },
+  { id: "ZZLL_Sune_1", group: "Sune", groupName: "Sune", name: "S1", alg: "U' R' U R2 U R' U R U2 R U2 R U R' U R2" },
+  { id: "ZZLL_Sune_2", group: "Sune", groupName: "Sune", name: "S1", alg: "U2 R' U' R U' R U R2 U R2 U2 R'" },
+  { id: "ZZLL_Sune_3", group: "Sune", groupName: "Sune", name: "S1", alg: "U' R U R' U' R' U2 R U R U' R' U R' U R" },
+  { id: "ZZLL_Sune_4", group: "Sune", groupName: "Sune", name: "S1", alg: "U' R' U' R U R U R' U' R' U R U R U' R'" },
+  { id: "ZZLL_Sune_5", group: "Sune", groupName: "Sune", name: "S2", alg: "R' U2 R U R' U' R F U' R' U' R U F'" },
+  { id: "ZZLL_Sune_6", group: "Sune", groupName: "Sune", name: "S2", alg: "L' U2 R U' R' U2 L U R U' R' U R U2 R'" },
+  { id: "ZZLL_Sune_7", group: "Sune", groupName: "Sune", name: "S2", alg: "R U R' U' L' U R U' L U' L' U R' U' L" },
+  { id: "ZZLL_Sune_8", group: "Sune", groupName: "Sune", name: "S2", alg: "F R U' R U2 R' U2 R' U' R U2 R' U' R2 U' R2 F'" },
+  { id: "ZZLL_Sune_9", group: "Sune", groupName: "Sune", name: "S3", alg: "R U' L' U R' U' L" },
+  { id: "ZZLL_Sune_10", group: "Sune", groupName: "Sune", name: "S3", alg: "D' R U R' U R U' R' U' D R2 U' R U' R' U R' U R2" },
+  { id: "ZZLL_Sune_11", group: "Sune", groupName: "Sune", name: "S3", alg: "R U R' U R U R' U' R U R D R' U' R D' R' U2 R'" },
+  { id: "ZZLL_Sune_12", group: "Sune", groupName: "Sune", name: "S3", alg: "U' R' U2 R U R' U' R' D' R U' R' D R U R U' R' U' R" },
+  { id: "ZZLL_Sune_13", group: "Sune", groupName: "Sune", name: "S4", alg: "U' R2 U R' U R D R' U2 R D' R' U R U' R2" },
+  { id: "ZZLL_Sune_14", group: "Sune", groupName: "Sune", name: "S4", alg: "R' D R2 D' R2 U R2 D R2 D' R2 U' R'" },
+  { id: "ZZLL_Sune_15", group: "Sune", groupName: "Sune", name: "S4", alg: "U R U2 R' L' U2 R U R' U2 L R U2 R'" },
+  { id: "ZZLL_Sune_16", group: "Sune", groupName: "Sune", name: "S4", alg: "R' D' R U R' D R2 U' R' U R U R' U' R U2 R' U R U2 R'" },
+  { id: "ZZLL_Sune_17", group: "Sune", groupName: "Sune", name: "S4", alg: "R U' R' U' R U R D R' U2 R D' R2 U R U2 R'" },
+  { id: "ZZLL_Sune_18", group: "Sune", groupName: "Sune", name: "S5", alg: "R' D R' U R D' U R U' R' U' R2 U R U' R'" },
+  { id: "ZZLL_Sune_19", group: "Sune", groupName: "Sune", name: "S5", alg: "U2 R2 D' r U2 r' D R2 U R' U R" },
+  { id: "ZZLL_Sune_20", group: "Sune", groupName: "Sune", name: "S5", alg: "U' R' U' F U' R2 U R2 U F' R U' R U' R'" },
+  { id: "ZZLL_Sune_21", group: "Sune", groupName: "Sune", name: "S5", alg: "U' R2 D' R U2 R D2 R' U' R D2 R' U R' D R U2 R" },
+  { id: "ZZLL_Sune_22", group: "Sune", groupName: "Sune", name: "S5", alg: "U' R' U' R' D' R U' R' D R' U R2 U R U' R U' R'" },
+  { id: "ZZLL_Sune_23", group: "Sune", groupName: "Sune", name: "S6", alg: "U2 R U R' U R2 D r' U2 r D' R2" },
+  { id: "ZZLL_Sune_24", group: "Sune", groupName: "Sune", name: "S6", alg: "U' R' U' R U R2 U' R' U' R U D' R U R' D R'" },
+  { id: "ZZLL_Sune_25", group: "Sune", groupName: "Sune", name: "S6", alg: "F' R U R' U R U2 R' F U R U' R' U2 R U' R'" },
+  { id: "ZZLL_Sune_26", group: "Sune", groupName: "Sune", name: "S6", alg: "U R' F R U R' U' R' F' D' R U R' D R2" },
+  { id: "ZZLL_Antisune_1", group: "Antisune", groupName: "Antisune", name: "AS1", alg: "U' R2 D' R U2 R' D R U R' F R U R U' R' F' R" },
+  { id: "ZZLL_Antisune_2", group: "Antisune", groupName: "Antisune", name: "AS1", alg: "U2 R U R' U R' U' R2 U' R2 U2 R" },
+  { id: "ZZLL_Antisune_3", group: "Antisune", groupName: "Antisune", name: "AS1", alg: "U R' U' R U R U2 R' U' R' U R U' R U' R'" },
+  { id: "ZZLL_Antisune_4", group: "Antisune", groupName: "Antisune", name: "AS1", alg: "U R U R' U' R' U' R U R U' R' U' R' U R" },
+  { id: "ZZLL_Antisune_5", group: "Antisune", groupName: "Antisune", name: "AS2", alg: "U' R U2 R' U' R U R' L' U R U' L U2 R'" },
+  { id: "ZZLL_Antisune_6", group: "Antisune", groupName: "Antisune", name: "AS2", alg: "U' F U' R' U R U F' R' U R U' R' U2 R" },
+  { id: "ZZLL_Antisune_7", group: "Antisune", groupName: "Antisune", name: "AS2", alg: "z D' R' D R U R' D' R U' R U R' D R U' z'" },
+  { id: "ZZLL_Antisune_8", group: "Antisune", groupName: "Antisune", name: "AS2", alg: "R U2 R' U' R U r' F r U2 R' U' r' F2 r" },
+  { id: "ZZLL_Antisune_9", group: "Antisune", groupName: "Antisune", name: "AS3", alg: "R' U L U' R U L'" },
+  { id: "ZZLL_Antisune_10", group: "Antisune", groupName: "Antisune", name: "AS3", alg: "D R' U' R U' R' U R U D' R2 U R' U R U' R U' R2" },
+  { id: "ZZLL_Antisune_11", group: "Antisune", groupName: "Antisune", name: "AS3", alg: "R' U' R U' R' U' R U R' U' R' D' R U R' D R U2 R" },
+  { id: "ZZLL_Antisune_12", group: "Antisune", groupName: "Antisune", name: "AS3", alg: "U R U2 R' U' R U R D R' U R D' R' U' R' U R U R'" },
+  { id: "ZZLL_Antisune_13", group: "Antisune", groupName: "Antisune", name: "AS4", alg: "R D' R2 D R2 U' R2 D' R2 D R2 U R" },
+  { id: "ZZLL_Antisune_14", group: "Antisune", groupName: "Antisune", name: "AS4", alg: "U R U2 R' L' U2 R U' R' U2 L R U2 R'" },
+  { id: "ZZLL_Antisune_15", group: "Antisune", groupName: "Antisune", name: "AS4", alg: "U' R U R' U' R' U' R U R U' R' U' R2 D' R U' R' D R U2 R" },
+  { id: "ZZLL_Antisune_16", group: "Antisune", groupName: "Antisune", name: "AS4", alg: "U' R U2 R' U' R2 D R' U2 R D' R' U' R' U R U R'" },
+  { id: "ZZLL_Antisune_17", group: "Antisune", groupName: "Antisune", name: "AS5", alg: "R D' R U' R' D U' R' U R U R2 U' R' U R" },
+  { id: "ZZLL_Antisune_18", group: "Antisune", groupName: "Antisune", name: "AS5", alg: "U2 R2 D r' U2 r D' R2 U' R U' R'" },
+  { id: "ZZLL_Antisune_19", group: "Antisune", groupName: "Antisune", name: "AS5", alg: "U R U R' U2 R U R' U' F' R U2 R' U' R U' R' F" },
+  { id: "ZZLL_Antisune_20", group: "Antisune", groupName: "Antisune", name: "AS5", alg: "R2 D' R U' R' D F R U R U' R' F' R" },
+  { id: "ZZLL_Antisune_21", group: "Antisune", groupName: "Antisune", name: "AS6", alg: "U2 R' U' R U' R2 D' r U2 r' D R2" },
+  { id: "ZZLL_Antisune_22", group: "Antisune", groupName: "Antisune", name: "AS6", alg: "U R U R' U' R2 U R U R' U' D R' U' R D' R" },
+  { id: "ZZLL_Antisune_23", group: "Antisune", groupName: "Antisune", name: "AS6", alg: "U R U R' U R' F U' R2 U' R2 U F' U R" },
+  { id: "ZZLL_Antisune_24", group: "Antisune", groupName: "Antisune", name: "AS6", alg: "U' R U R' U R' U' R2 U' R D' R U R' D R U R" },
+];
+
 
 
 // ===================== Algs Trainer: cube-state diagram engine =====================
@@ -12302,9 +12608,6 @@ const ALGS_I18N = {
 function algsT() {
     return (window.settingsManager?.settings?.language === 'ru') ? ALGS_I18N.ru : ALGS_I18N.en;
 }
-function isMobileDevice() {
-    return ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-}
 
 const AlgsDiagram = (function() {
     const SOLVED = 'UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB';
@@ -12348,8 +12651,8 @@ const AlgsDiagram = (function() {
     function svgRect(x, y, w, h, color) {
         return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${color}"/>`;
     }
-    function svgArrow(x1, y1, x2, y2, id) {
-        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111111" stroke-width="2.5" marker-end="url(#${id})" opacity="0.85"/>`;
+    function svgArrow(x1, y1, x2, y2, id, color) {
+        return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2.75" marker-end="url(#${id})" opacity="0.92"/>`;
     }
 
     // ===== Isometric F2L cube diagram (top + front + right faces) =====
@@ -12366,8 +12669,16 @@ const AlgsDiagram = (function() {
     // canonical Front-Right corner (where the visible F and R faces meet).
     const SLOT_REFRAME_Y = { FR: 0, BR: 1, BL: 2, FL: 3 };
 
+    // Complete facelet tables for all 8 corners / 12 edges (derived from cube-engine.js's
+    // cornerFacelet/edgeFacelet). Needed because during an algorithm the tracked pair can
+    // temporarily sit anywhere on the cube, not just the U layer.
+    const CORNER_ALL = [[8,9,20],[6,18,38],[0,36,47],[2,45,11],[29,26,15],[27,44,24],[33,53,42],[35,17,51]];
+    const EDGE_ALL = [[5,10],[7,19],[3,37],[1,46],[32,16],[28,25],[30,43],[34,52],[23,12],[21,41],[50,39],[48,14]];
+    // Original (persistent) cubie IDs for each slot's target corner+edge — DFR=4/FR=8 etc.
+    const SLOT_CUBIE = { FR: {c: 4, e: 8}, BR: {c: 7, e: 11}, FL: {c: 5, e: 9}, BL: {c: 6, e: 10} };
+
     function renderIsoF2L(entry) {
-        let c, str;
+        let c, str, json;
         try {
             c = Cube.fromString(SOLVED);
             c.move(invertAlg(entry.alg));
@@ -12376,21 +12687,46 @@ const AlgsDiagram = (function() {
             else if (k === 2) c.move('y2');
             else if (k === 3) c.move("y'");
             str = c.asString();
+            json = c.toJSON();
         } catch (e) {
             return '<div class="algs-diagram-fallback">?</div>';
+        }
+        // Find where the tracked corner and edge (the physical pieces that belong in this slot)
+        // currently sit — anywhere on the cube — so we know which piece to keep in full color.
+        const target = SLOT_CUBIE[entry.slot] || SLOT_CUBIE.FR;
+        let cornerPos = -1, edgePos = -1;
+        for (let i = 0; i < 8; i++) { if (json.cp[i] === target.c) cornerPos = i; }
+        for (let i = 0; i < 12; i++) { if (json.ep[i] === target.e) edgePos = i; }
+
+        // Gray out every OTHER piece that originally belongs to the U layer (i.e. carries a
+        // yellow sticker) — corner identities 0-3 and edge identities 0-3 are U-layer pieces.
+        // D-layer pieces (identities 4-7) and E-slice edges (identities 8-11) have no yellow
+        // sticker at all, so they stay in real color regardless of the current tracked pair.
+        const grayed = new Set();
+        for (let i = 0; i < 8; i++) {
+            if (i === cornerPos) continue;
+            if (json.cp[i] < 4) CORNER_ALL[i].forEach(f => grayed.add(f));
+        }
+        for (let i = 0; i < 12; i++) {
+            if (i === edgePos) continue;
+            if (json.ep[i] < 4) EDGE_ALL[i].forEach(f => grayed.add(f));
+        }
+        function pieceColor(idx) {
+            if (grayed.has(idx)) return '#8a8a8a';
+            return COLOR[str[idx]] || '#999';
         }
         let svg = `<svg viewBox="55 15 150 155" class="algs-diagram-svg" xmlns="http://www.w3.org/2000/svg">`;
         // TOP face (U): row = yi, col = xi
         for (let xi = 0; xi < 3; xi++) for (let yi = 0; yi < 3; yi++) {
             const idx = 0 + yi * 3 + xi;
             const poly = [isoPt(xi,yi,0), isoPt(xi+1,yi,0), isoPt(xi+1,yi+1,0), isoPt(xi,yi+1,0)];
-            svg += `<polygon points="${isoPoly(poly)}" fill="${COLOR[str[idx]]||'#999'}" stroke="#111" stroke-width="1"/>`;
+            svg += `<polygon points="${isoPoly(poly)}" fill="${pieceColor(idx)}" stroke="#111" stroke-width="1"/>`;
         }
         // FRONT face (F): row = zi, col = xi, at y=3. Bottom-right (xi=2,zi=2) = target slot.
         for (let xi = 0; xi < 3; xi++) for (let zi = 0; zi < 3; zi++) {
             const isTarget = (xi === 2 && zi === 2);
             const idx = 18 + zi * 3 + xi;
-            const color = isTarget ? '#ffffff' : (COLOR[str[idx]] || '#999');
+            const color = isTarget ? '#8a8a8a' : pieceColor(idx);
             const poly = [isoPt(xi,3,zi), isoPt(xi+1,3,zi), isoPt(xi+1,3,zi+1), isoPt(xi,3,zi+1)];
             svg += `<polygon points="${isoPoly(poly)}" fill="${color}" stroke="#111" stroke-width="1"/>`;
         }
@@ -12398,7 +12734,7 @@ const AlgsDiagram = (function() {
         for (let yi = 0; yi < 3; yi++) for (let zi = 0; zi < 3; zi++) {
             const isTarget = (yi === 2 && zi === 2);
             const idx = 9 + zi * 3 + (2 - yi);
-            const color = isTarget ? '#ffffff' : (COLOR[str[idx]] || '#999');
+            const color = isTarget ? '#8a8a8a' : pieceColor(idx);
             const poly = [isoPt(3,yi,zi), isoPt(3,yi+1,zi), isoPt(3,yi+1,zi+1), isoPt(3,yi,zi+1)];
             svg += `<polygon points="${isoPoly(poly)}" fill="${color}" stroke="#111" stroke-width="1"/>`;
         }
@@ -12424,8 +12760,11 @@ const AlgsDiagram = (function() {
 
         let svg = `<svg viewBox="0 0 140 140" class="algs-diagram-svg" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <marker id="arr-${entry.id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                    <path d="M0,0 L6,3 L0,6 Z" fill="#111111"/>
+                <marker id="arrC-${entry.id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="#7a1020"/>
+                </marker>
+                <marker id="arrE-${entry.id}" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" fill="#0d3b8c"/>
                 </marker>
             </defs>`;
 
@@ -12440,19 +12779,20 @@ const AlgsDiagram = (function() {
             svg += svgRect(x, y, w, h, COLOR[str[idx]] || '#999');
         }
 
-        // arrows for any corner/edge permutation (PLL)
+        // arrows for any corner/edge permutation (PLL) — corners in dark red, edges in dark blue
+        // so double-cycle cases (e.g. G-perms) read as two distinct cycles instead of a tangled mess.
         for (let i = 0; i < 4; i++) {
             if (json.cp[i] !== i) {
                 const [x1,y1] = cellCenter(CORNER_U_IDX[i]);
                 const [x2,y2] = cellCenter(CORNER_U_IDX[json.cp[i]]);
-                svg += svgArrow(x1, y1, x2, y2, 'arr-' + entry.id);
+                svg += svgArrow(x1, y1, x2, y2, 'arrC-' + entry.id, '#7a1020');
             }
         }
         for (let i = 0; i < 4; i++) {
             if (json.ep[i] !== i) {
                 const [x1,y1] = cellCenter(EDGE_U_IDX[i]);
                 const [x2,y2] = cellCenter(EDGE_U_IDX[json.ep[i]]);
-                svg += svgArrow(x1, y1, x2, y2, 'arr-' + entry.id);
+                svg += svgArrow(x1, y1, x2, y2, 'arrE-' + entry.id, '#0d3b8c');
             }
         }
 
@@ -12489,6 +12829,8 @@ const AlgsDiagram = (function() {
         1: document.getElementById('algsStep1'),
         2: document.getElementById('algsStep2'),
         '2b': document.getElementById('algsStep2b'),
+        '2c': document.getElementById('algsStep2c'),
+        '2d': document.getElementById('algsStep2d'),
         3: document.getElementById('algsStep3'),
         '3b': document.getElementById('algsStep3b'),
         4: document.getElementById('algsStep4'),
@@ -12511,7 +12853,7 @@ const AlgsDiagram = (function() {
         modal.classList.toggle('algs-fullscreen', key !== '1');
         const T = algsT();
         const setLabel = currentSet === 'F2L' && currentSlot ? `F2L · ${currentSlot}` : (currentSet || T.algorithms);
-        const titles = {1: T.modalTitle, 2: T.chooseMethod, '2b': T.chooseMethod, 3: T.chooseSet, '3b': T.chooseSet, 4: setLabel, 5: T.practicePrefix + setLabel};
+        const titles = {1: T.modalTitle, 2: T.chooseMethod, '2b': T.chooseMethod, '2c': T.chooseMethod, 3: T.chooseSet, '3b': T.chooseSet, 4: setLabel, 5: T.practicePrefix + setLabel};
         titleEl.textContent = titles[key];
         practiceActive = (key === '5');
         if (key !== '5') Practice.stop();
@@ -12567,12 +12909,39 @@ const AlgsDiagram = (function() {
     });
     steps['2b']?.querySelectorAll('.algs-card[data-method]').forEach(card => {
         card.addEventListener('click', () => {
-            if (card.dataset.method === 'zz-full') {
-                currentSet = 'ZZ';
-                currentSlot = null;
-                renderAlgList('ZZ');
-                showStep('4');
+            if (card.dataset.method === 'zz-a') {
+                showStep('2c');
+            } else if (card.dataset.method === 'zz-b') {
+                showStep('2d');
             }
+        });
+    });
+    steps['2c']?.querySelectorAll('.algs-card[data-method]').forEach(card => {
+        card.addEventListener('click', () => {
+            currentSlot = null;
+            if (card.dataset.method === 'zz-2828') {
+                currentSet = 'ZZ28';
+            } else if (card.dataset.method === 'zz-coll') {
+                currentSet = 'ZZCOLL';
+            } else if (card.dataset.method === 'zz-full') {
+                currentSet = 'ZZ';
+            } else if (card.dataset.method === 'zz-ocell') {
+                currentSet = 'ZZOCELL';
+            }
+            renderAlgList(currentSet);
+            showStep('4');
+        });
+    });
+    steps['2d']?.querySelectorAll('.algs-card[data-method]').forEach(card => {
+        card.addEventListener('click', () => {
+            currentSlot = null;
+            if (card.dataset.method === 'zz-zzll') {
+                currentSet = 'ZZLL';
+            } else if (card.dataset.method === 'zz-r') {
+                currentSet = 'ZZR';
+            }
+            renderAlgList(currentSet);
+            showStep('4');
         });
     });
     steps[3]?.querySelectorAll('.algs-card[data-set]').forEach(card => {
@@ -12603,6 +12972,24 @@ const AlgsDiagram = (function() {
             if (name === 'OLL') return OLL;
             if (name === 'PLL') return PLL;
             if (name === 'ZZ') return ZZ;
+            if (name === 'ZZ28') {
+                return OLL.filter(e => e.group === 'All Edges Oriented Correctly').concat(PLL);
+            }
+            if (name === 'ZZCOLL') {
+                return COLL.concat(PLL.filter(e => e.group === 'Permutations of Edges Only'));
+            }
+            if (name === 'ZZOCELL') {
+                return OCELL.concat(CPLL);
+            }
+            if (name === 'ZZLL') {
+                return ZZLL;
+            }
+            if (name === 'ZZR') {
+                const olc = OLL.filter(e => e.group === 'All Edges Oriented Correctly');
+                const pllNames = ['Aa','Ab','E','F','Na','Nb','T','Z','H'];
+                const pllSubset = PLL.filter(e => pllNames.includes(e.name));
+                return olc.concat(pllSubset);
+            }
             return F2L.filter(e => e.slot === currentSlot);
         }
         let data = pickData(setName);
@@ -12709,11 +13096,10 @@ const AlgsDiagram = (function() {
 
         function translate(key) {
             const T = algsT();
-            const mobile = isMobileDevice();
             const map = {
-                practiceHintStart: mobile ? T.tapStart : T.pressSpaceStart,
-                practiceHintStop: mobile ? T.tapStop : T.pressSpaceStop,
-                practiceHintNext: mobile ? T.tapNext : T.pressSpaceNext,
+                practiceHintStart: T.pressSpaceStart,
+                practiceHintStop: T.pressSpaceStop,
+                practiceHintNext: T.pressSpaceNext,
             };
             return map[key];
         }
@@ -12877,8 +13263,8 @@ const AlgsDiagram = (function() {
         // Capture phase so this fires BEFORE the main app timer's spacebar handler.
         document.addEventListener('keydown', onKeyDown, true);
 
-        // Mobile/touch: no physical spacebar, so tapping anywhere in the drill area
-        // (except the Finish button) starts/stops the timer, same as Space on desktop.
+        // Tapping/clicking anywhere in the drill area (except the Finish button)
+        // starts/stops the timer, same as Space.
         phase2El?.addEventListener('click', (e) => {
             if (!practiceActive || phase2El.classList.contains('algs-step-hidden')) return;
             if (e.target.closest('#algsFinishPractice')) return;
@@ -12904,7 +13290,13 @@ const AlgsDiagram = (function() {
         // Scenario B: mixed pool of checked/selected algorithms — straight to drill, no metronome, no scramble.
         function start(setName, unlearnedOnly) {
             mode = 'pool';
-            const data = setName === 'OLL' ? OLL : setName === 'PLL' ? PLL : setName === 'ZZ' ? ZZ : F2L.filter(e => e.slot === currentSlot);
+            const data = setName === 'OLL' ? OLL : setName === 'PLL' ? PLL : setName === 'ZZ' ? ZZ
+                : setName === 'ZZ28' ? OLL.filter(e => e.group === 'All Edges Oriented Correctly').concat(PLL)
+                : setName === 'ZZCOLL' ? COLL.concat(PLL.filter(e => e.group === 'Permutations of Edges Only'))
+                : setName === 'ZZOCELL' ? OCELL.concat(CPLL)
+                : setName === 'ZZLL' ? ZZLL
+                : setName === 'ZZR' ? OLL.filter(e => e.group === 'All Edges Oriented Correctly').concat(PLL.filter(e => ['Aa','Ab','E','F','Na','Nb','T','Z','H'].includes(e.name)))
+                : F2L.filter(e => e.slot === currentSlot);
             const learned = getLearned();
             pool = unlearnedOnly ? data.filter(e => !learned[e.id]) : data.slice();
             if (pool.length === 0) pool = data.slice();
@@ -12988,12 +13380,8 @@ const AlgsDiagram = (function() {
             dropdown.classList.remove('visible');
         }
     });
-    document.getElementById('fireMenuTargetTime')?.addEventListener('click', () => {
-        dropdown.classList.remove('visible');
-        document.getElementById('targetTimeBtn')?.click();
-    });
-    document.getElementById('fireMenuHonestMode')?.addEventListener('click', () => {
-        dropdown.classList.remove('visible');
-        document.getElementById('honestModeBtn')?.click();
+    // Close the dropdown whenever any item inside it is clicked
+    dropdown.querySelectorAll('.fire-menu-item').forEach(item => {
+        item.addEventListener('click', () => dropdown.classList.remove('visible'));
     });
 })();
