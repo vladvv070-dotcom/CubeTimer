@@ -1,5 +1,5 @@
 /* ============================================================
-   Next Cube Pro 1.3.0 — script.js
+   CubeTimer 1.3.0 — script.js
    All application logic
    ============================================================ */
 
@@ -11,7 +11,7 @@
                 this.currentMood = 'friend'; // default mood
                 
                 // Load saved mood from localStorage
-                const savedMood = localStorage.getItem('timerMood');
+                const savedMood = AppStorage.getRaw('timerMood');
                 if (savedMood) {
                     this.currentMood = savedMood;
                 }
@@ -24,7 +24,7 @@
             setMood(mood) {
                 if (this.moods[mood]) {
                     this.currentMood = mood;
-                    localStorage.setItem('timerMood', mood);
+                    AppStorage.setRaw('timerMood', mood);
                 }
             }
 
@@ -223,6 +223,38 @@
                 if (ieExportTitle) ieExportTitle.textContent = t.ieExportTitle;
                 if (ieImportTitle) ieImportTitle.textContent = t.ieImportTitle;
 
+                // Auth (login / register)
+                const authBtn = document.querySelector('#authBtn');
+                const authRegisterTitle = document.querySelector('#authRegisterTitle');
+                const authNicknameLabel = document.querySelector('#authNicknameLabel');
+                const authRegEmailLabel = document.querySelector('#authRegEmailLabel');
+                const authRegPasswordLabel = document.querySelector('#authRegPasswordLabel');
+                const authRegPasswordRepeatLabel = document.querySelector('#authRegPasswordRepeatLabel');
+                const authRegisterBtn = document.querySelector('#authRegisterBtn');
+                const authDividerText = document.querySelector('#authDividerText');
+                const authLoginIdLabel = document.querySelector('#authLoginIdLabel');
+                const authLoginPasswordLabel = document.querySelector('#authLoginPasswordLabel');
+                const authCloseBtn = document.querySelector('#authCloseBtn');
+                const authLoginBtn = document.querySelector('#authLoginBtn');
+                const authWarningTitle = document.querySelector('#authWarningTitle');
+                const authWarningText = document.querySelector('#authWarningText');
+                const authWarningCloseBtn = document.querySelector('#authWarningCloseBtn');
+                if (authBtn) authBtn.textContent = `👤 ${t.authBtn}`;
+                if (authRegisterTitle) authRegisterTitle.textContent = t.authRegisterTitle;
+                if (authNicknameLabel) authNicknameLabel.textContent = t.authNicknameLabel;
+                if (authRegEmailLabel) authRegEmailLabel.textContent = t.authRegEmailLabel;
+                if (authRegPasswordLabel) authRegPasswordLabel.textContent = t.authRegPasswordLabel;
+                if (authRegPasswordRepeatLabel) authRegPasswordRepeatLabel.textContent = t.authRegPasswordRepeatLabel;
+                if (authRegisterBtn) authRegisterBtn.textContent = t.authRegisterBtn;
+                if (authDividerText) authDividerText.textContent = t.authDividerText;
+                if (authLoginIdLabel) authLoginIdLabel.textContent = t.authLoginIdLabel;
+                if (authLoginPasswordLabel) authLoginPasswordLabel.textContent = t.authLoginPasswordLabel;
+                if (authCloseBtn) authCloseBtn.textContent = t.authCloseBtn;
+                if (authLoginBtn) authLoginBtn.textContent = t.authLoginBtn;
+                if (authWarningTitle) authWarningTitle.textContent = t.authWarningTitle;
+                if (authWarningText) authWarningText.textContent = t.authWarningText;
+                if (authWarningCloseBtn) authWarningCloseBtn.textContent = t.authWarningCloseBtn;
+
                 // Target Time
                 const ttModalTitle = document.querySelector('#ttModalTitle');
                 const ttEnableLabel = document.querySelector('#ttEnableLabel');
@@ -242,7 +274,7 @@
                 if (hmActiveDesc) hmActiveDesc.textContent = t.hmActiveDesc;
                 if (hmMinutesLabel) hmMinutesLabel.textContent = t.hmMinutesLabel;
 
-                const honestModeCloseActive = document.getElementById('honestModeCloseActive');
+                const honestModeCloseActive = DOM('honestModeCloseActive');
                 if (honestModeCloseActive) honestModeCloseActive.textContent = t.hmCloseLabel;
                 if (window.timer && window.timer._updateHonestModeBtn) window.timer._updateHonestModeBtn();
                 
@@ -409,11 +441,11 @@
                 _st('subsessionCreateBtn',  t.subsessionCreate);
                 _st('shContextAddSubsession', t.subsessionContextBtn);
 
-                const nameInput = document.getElementById('subsessionNameInput');
+                const nameInput = DOM('subsessionNameInput');
                 if (nameInput) nameInput.placeholder = t.subsessionNamePlaceholder || 'e.g. Morning practice';
 
                 // Export Image
-                const exportBtn = document.getElementById('exportImageBtn');
+                const exportBtn = DOM('exportImageBtn');
                 if (exportBtn) exportBtn.textContent = t.exportImageBtn;
                 _st('exportImgTitleEl',        t.exportImageTitle);
                 _st('exportFormatLabelEl',     t.exportFormatLabel);
@@ -425,7 +457,7 @@
                 _st('exportOptTrendEl',        t.exportOptTrend);
                 _st('exportOptCountEl',        t.exportOptCount);
                 _st('exportOptDisciplineEl',   t.exportOptDiscipline);
-                const dlBtn = document.getElementById('exportImgDownloadBtn');
+                const dlBtn = DOM('exportImgDownloadBtn');
                 if (dlBtn) dlBtn.textContent = t.exportDownloadBtn;
 
                 // Timer behaviour
@@ -496,14 +528,14 @@
             }
 
             loadSettings() {
-                const saved = localStorage.getItem('cubeTimerSettings');
+                const saved = AppStorage.getJSON('cubeTimerSettings');
                 if (saved) {
-                    this.settings = { ...this.settings, ...JSON.parse(saved) };
+                    this.settings = { ...this.settings, ...saved };
                 }
             }
 
             saveSettings() {
-                localStorage.setItem('cubeTimerSettings', JSON.stringify(this.settings));
+                AppStorage.setJSON('cubeTimerSettings', this.settings);
             }
 
             applySettings() {
@@ -521,10 +553,10 @@
                 this.updateDisplayOptions();
 
                 // Update UI elements
-                const holdDelaySlider = document.getElementById('holdDelaySlider');
+                const holdDelaySlider = DOM('holdDelaySlider');
                 if (holdDelaySlider) {
                     holdDelaySlider.value = this.settings.holdDelay;
-                    document.getElementById('holdDelayValue').textContent = `Hold delay: ${this.settings.holdDelay} ms`;
+                    DOM('holdDelayValue').textContent = `Hold delay: ${this.settings.holdDelay} ms`;
                 }
                 
                 // Update theme buttons
@@ -537,7 +569,7 @@
                     }
                 });
 
-                const soundsToggle = document.getElementById('soundsToggle');
+                const soundsToggle = DOM('soundsToggle');
                 if (this.settings.sounds) {
                     soundsToggle.classList.add('active');
                 } else {
@@ -554,9 +586,9 @@
                 });
 
                 // Update checkboxes
-                const showAo5Checkbox = document.getElementById('showAo5Checkbox');
-                const showAo12Checkbox = document.getElementById('showAo12Checkbox');
-                const showAo100Checkbox = document.getElementById('showAo100Checkbox');
+                const showAo5Checkbox = DOM('showAo5Checkbox');
+                const showAo12Checkbox = DOM('showAo12Checkbox');
+                const showAo100Checkbox = DOM('showAo100Checkbox');
                 
                 if (showAo5Checkbox) showAo5Checkbox.checked = this.settings.showAo5;
                 if (showAo12Checkbox) showAo12Checkbox.checked = this.settings.showAo12;
@@ -578,7 +610,7 @@
                 });
 
                 // Update inspection toggle
-                const inspectionToggle = document.getElementById('inspectionToggle');
+                const inspectionToggle = DOM('inspectionToggle');
                 if (inspectionToggle) {
                     if (this.settings.inspection) {
                         inspectionToggle.classList.add('active');
@@ -588,13 +620,13 @@
                 }
 
                 // Show/hide inspection mode group based on inspection toggle state
-                const inspectionModeGroup = document.getElementById('inspectionModeGroup');
+                const inspectionModeGroup = DOM('inspectionModeGroup');
                 if (inspectionModeGroup) {
                     inspectionModeGroup.style.display = this.settings.inspection ? 'block' : 'none';
                 }
 
                 // Update voice inspection warnings toggle
-                const voiceInspectionToggle = document.getElementById('voiceInspectionToggle');
+                const voiceInspectionToggle = DOM('voiceInspectionToggle');
                 if (voiceInspectionToggle) {
                     voiceInspectionToggle.classList.toggle('active', !!this.settings.voiceInspectionEnabled);
                 }
@@ -1189,7 +1221,7 @@
             }
 
             buildBgOptions() {
-                const container = document.getElementById('bgOptions');
+                const container = DOM('bgOptions');
                 if (!container) return;
                 container.innerHTML = '';
 
@@ -1300,7 +1332,7 @@
                     b.classList.toggle('active', b.dataset.font === (this.settings.customFont || 'default'));
                 });
                 // Bg buttons — only inside #bgOptions (dynamic container)
-                const bgContainer = document.getElementById('bgOptions');
+                const bgContainer = DOM('bgOptions');
                 if (bgContainer) {
                     bgContainer.querySelectorAll('.bg-btn').forEach(b => {
                         b.classList.toggle('active', b.dataset.bg === (this.settings.customBg || 'none'));
@@ -1323,11 +1355,11 @@
                 });
 
                 // Sync hideUi toggle switch
-                const hideUiToggle = document.getElementById('hideUiToggle');
+                const hideUiToggle = DOM('hideUiToggle');
                 if (hideUiToggle) hideUiToggle.classList.toggle('active', !!this.settings.hideUiDuringSolve);
 
                 // Sync mouseStart toggle switch
-                const mouseStartToggle = document.getElementById('mouseStartToggle');
+                const mouseStartToggle = DOM('mouseStartToggle');
                 if (mouseStartToggle) mouseStartToggle.classList.toggle('active', !!this.settings.mouseStart);
             }
 
@@ -1383,14 +1415,14 @@
             initEventListeners() {
                 // Open/Close Settings
                 document.getElementById('settingsBtn').addEventListener('click', () => {
-                    document.getElementById('settingsOverlay').classList.add('visible');
+                    DOM('settingsOverlay').classList.add('visible');
                     // Build palette and bg options, sync all toggle states
                     setTimeout(() => {
                         this.buildAccentPalette();
                         this.buildBgOptions();
                         this._syncTimeFormatUI();
                         // Re-sync inspection mode group visibility
-                        const inspectionModeGroup = document.getElementById('inspectionModeGroup');
+                        const inspectionModeGroup = DOM('inspectionModeGroup');
                         if (inspectionModeGroup) {
                             inspectionModeGroup.style.display = this.settings.inspection ? 'block' : 'none';
                         }
@@ -1398,43 +1430,43 @@
                 });
 
                 document.getElementById('closeSettings').addEventListener('click', () => {
-                    document.getElementById('settingsOverlay').classList.remove('visible');
+                    DOM('settingsOverlay').classList.remove('visible');
                 });
 
-                document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+                DOM('settingsOverlay').addEventListener('click', (e) => {
                     if (e.target.id === 'settingsOverlay') {
-                        document.getElementById('settingsOverlay').classList.remove('visible');
+                        DOM('settingsOverlay').classList.remove('visible');
                     }
                 });
 
                 // Close Statistics (open is handled after timer init)
                 document.getElementById('closeStatistics').addEventListener('click', () => {
-                    document.getElementById('statisticsOverlay').classList.remove('visible');
+                    DOM('statisticsOverlay').classList.remove('visible');
                 });
 
-                document.getElementById('statisticsOverlay').addEventListener('click', (e) => {
+                DOM('statisticsOverlay').addEventListener('click', (e) => {
                     if (e.target.id === 'statisticsOverlay') {
-                        document.getElementById('statisticsOverlay').classList.remove('visible');
+                        DOM('statisticsOverlay').classList.remove('visible');
                     }
                 });
 
                 // Close Sessions (open is handled after timer init)
                 document.getElementById('closeSessions').addEventListener('click', () => {
-                    document.getElementById('sessionsOverlay').classList.remove('visible');
+                    DOM('sessionsOverlay').classList.remove('visible');
                 });
 
-                document.getElementById('sessionsOverlay').addEventListener('click', (e) => {
+                DOM('sessionsOverlay').addEventListener('click', (e) => {
                     if (e.target.id === 'sessionsOverlay') {
-                        document.getElementById('sessionsOverlay').classList.remove('visible');
+                        DOM('sessionsOverlay').classList.remove('visible');
                     }
                 });
 
                 // ESC key to close
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
-                        document.getElementById('settingsOverlay').classList.remove('visible');
-                        document.getElementById('statisticsOverlay').classList.remove('visible');
-                        document.getElementById('sessionsOverlay').classList.remove('visible');
+                        DOM('settingsOverlay').classList.remove('visible');
+                        DOM('statisticsOverlay').classList.remove('visible');
+                        DOM('sessionsOverlay').classList.remove('visible');
                     }
                 });
 
@@ -1455,12 +1487,12 @@
                 });
 
                 // Hold Delay Slider
-                const holdDelaySlider = document.getElementById('holdDelaySlider');
+                const holdDelaySlider = DOM('holdDelaySlider');
                 if (holdDelaySlider) {
                     holdDelaySlider.addEventListener('input', (e) => {
                         const value = parseInt(e.target.value);
                         this.settings.holdDelay = value;
-                        document.getElementById('holdDelayValue').textContent = `Hold delay: ${value} ms`;
+                        DOM('holdDelayValue').textContent = `Hold delay: ${value} ms`;
                         this.saveSettings();
                     });
                 }
@@ -1495,7 +1527,7 @@
                             setTimeout(() => { this.buildAccentPalette(); this.buildBgOptions(); }, 30);
                         }
                         // Always sync inspection mode group on any section switch
-                        const inspectionModeGroup = document.getElementById('inspectionModeGroup');
+                        const inspectionModeGroup = DOM('inspectionModeGroup');
                         if (inspectionModeGroup) {
                             inspectionModeGroup.style.display = this.settings.inspection ? 'block' : 'none';
                         }
@@ -1547,7 +1579,7 @@
                 });
 
                 // Sounds Toggle
-                const soundsToggle = document.getElementById('soundsToggle');
+                const soundsToggle = DOM('soundsToggle');
                 if (soundsToggle) {
                     soundsToggle.addEventListener('click', () => {
                         this.settings.sounds = !this.settings.sounds;
@@ -1557,7 +1589,7 @@
                 }
 
                 // Inspection Toggle
-                const inspectionToggle = document.getElementById('inspectionToggle');
+                const inspectionToggle = DOM('inspectionToggle');
                 if (inspectionToggle) {
                     inspectionToggle.addEventListener('click', () => {
                         this.settings.inspection = !this.settings.inspection;
@@ -1567,7 +1599,7 @@
                 }
 
                 // Voice Inspection Warnings Toggle
-                const voiceInspectionToggle = document.getElementById('voiceInspectionToggle');
+                const voiceInspectionToggle = DOM('voiceInspectionToggle');
                 if (voiceInspectionToggle) {
                     voiceInspectionToggle.classList.toggle('active', !!this.settings.voiceInspectionEnabled);
                     voiceInspectionToggle.addEventListener('click', () => {
@@ -1613,9 +1645,9 @@
                 });
 
                 // NEW: Display Options Checkboxes
-                const showAo5Checkbox = document.getElementById('showAo5Checkbox');
-                const showAo12Checkbox = document.getElementById('showAo12Checkbox');
-                const showAo100Checkbox = document.getElementById('showAo100Checkbox');
+                const showAo5Checkbox = DOM('showAo5Checkbox');
+                const showAo12Checkbox = DOM('showAo12Checkbox');
+                const showAo100Checkbox = DOM('showAo100Checkbox');
                 
                 if (showAo5Checkbox) {
                     showAo5Checkbox.addEventListener('change', (e) => {
@@ -1789,7 +1821,7 @@
                 setInterval(updateOffsetPreview, 30000); // update every 30s
 
                 // ── Hide UI During Solve ──
-                const hideUiToggle = document.getElementById('hideUiToggle');
+                const hideUiToggle = DOM('hideUiToggle');
                 if (hideUiToggle) {
                     hideUiToggle.addEventListener('click', () => {
                         this.settings.hideUiDuringSolve = !this.settings.hideUiDuringSolve;
@@ -1801,7 +1833,7 @@
                 }
 
                 // ── Mouse Start ──
-                const mouseStartToggle = document.getElementById('mouseStartToggle');
+                const mouseStartToggle = DOM('mouseStartToggle');
                 if (mouseStartToggle) {
                     mouseStartToggle.addEventListener('click', () => {
                         this.settings.mouseStart = !this.settings.mouseStart;
@@ -1992,13 +2024,13 @@
                 if (!('speechSynthesis' in window)) return;
 
                 const lang = this.settings.language || 'en';
-                const isRu = lang === 'ru';
-                const text = isRu ? `${secondsElapsed} секунд` : `${secondsElapsed} seconds`;
+                const isRuLang = lang === 'ru';
+                const text = isRuLang ? `${secondsElapsed} секунд` : `${secondsElapsed} seconds`;
 
                 const speakNow = () => {
                     try {
                         const utterance = new SpeechSynthesisUtterance(text);
-                        utterance.lang = isRu ? 'ru-RU' : 'en-US';
+                        utterance.lang = isRuLang ? 'ru-RU' : 'en-US';
                         utterance.rate = 1.05;
                         utterance.volume = 1;
                         window.speechSynthesis.speak(utterance);
@@ -2053,7 +2085,7 @@
         }
 
         // Timer Logic
-        class NextCubeProTimer {
+        class CubeTimer {
             constructor() {
                 this.time = 0;
                 this.isRunning = false;
@@ -2101,9 +2133,9 @@
             }
 
             loadSessions() {
-                const saved = localStorage.getItem('cubeTimerSessions');
+                const saved = AppStorage.getJSON('cubeTimerSessions');
                 if (saved) {
-                    const sessions = JSON.parse(saved);
+                    const sessions = saved;
                     // ── Migration: add discipline to old sessions ──
                     let needsSave = false;
                     Object.values(sessions).forEach(s => {
@@ -2151,7 +2183,7 @@
                         }
                     });
                     if (needsSave) {
-                        localStorage.setItem('cubeTimerSessions', JSON.stringify(sessions));
+                        AppStorage.setJSON('cubeTimerSessions', sessions);
                     }
                     return sessions;
                 }
@@ -2170,13 +2202,13 @@
             }
 
             loadCurrentSessionId() {
-                const saved = localStorage.getItem('cubeTimerCurrentSession');
+                const saved = AppStorage.getRaw('cubeTimerCurrentSession');
                 return saved || 'no-session';
             }
 
             saveSessions() {
-                localStorage.setItem('cubeTimerSessions', JSON.stringify(this.sessions));
-                localStorage.setItem('cubeTimerCurrentSession', this.currentSessionId);
+                AppStorage.setJSON('cubeTimerSessions', this.sessions);
+                AppStorage.setRaw('cubeTimerCurrentSession', this.currentSessionId);
             }
 
             get solves() {
@@ -2285,18 +2317,121 @@
                 const importResultCloseBtn = document.getElementById('importResultCloseBtn');
                 if (importResultCloseBtn) {
                     importResultCloseBtn.addEventListener('click', () => {
-                        document.getElementById('importResultOverlay').classList.remove('visible');
+                        DOM('importResultOverlay').classList.remove('visible');
                     });
                 }
 
                 const ieCloseBtn = document.getElementById('ieCloseBtn');
                 if (ieCloseBtn) {
                     ieCloseBtn.addEventListener('click', () => {
-                        document.getElementById('importExportOverlay').classList.remove('visible');
+                        DOM('importExportOverlay').classList.remove('visible');
                     });
                 }
 
-                const ieOverlay = document.getElementById('importExportOverlay');
+                // ── Auth (UI only for now, backend not wired up) ──
+                const authBtn = document.getElementById('authBtn');
+                if (authBtn) {
+                    authBtn.addEventListener('click', () => {
+                        DOM('authOverlay').classList.add('visible');
+                    });
+                }
+                const authCloseBtn = document.getElementById('authCloseBtn');
+                if (authCloseBtn) {
+                    authCloseBtn.addEventListener('click', () => {
+                        DOM('authOverlay').classList.remove('visible');
+                    });
+                }
+                const authRegisterBtn = document.getElementById('authRegisterBtn');
+                if (authRegisterBtn) {
+                    authRegisterBtn.addEventListener('click', () => {
+                        const lang = getLang();
+                        const t = translations[lang];
+                        const errEl = DOM('authRegError');
+                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
+                        errEl.classList.remove('visible');
+
+                        const nickname = DOM('authRegNickname').value.trim();
+                        const email = DOM('authRegEmail').value.trim();
+                        const password = DOM('authRegPassword').value;
+                        const passwordRepeat = DOM('authRegPasswordRepeat').value;
+
+                        if (!nickname || !email || !password || !passwordRepeat) {
+                            showErr(t.authErrRequired);
+                            return;
+                        }
+                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                            showErr(t.authErrEmailFormat);
+                            return;
+                        }
+                        if (password.length < 6) {
+                            showErr(t.authErrPasswordShort);
+                            return;
+                        }
+                        if (password !== passwordRepeat) {
+                            showErr(t.authErrPasswordMismatch);
+                            return;
+                        }
+
+                        // Validation passed.
+                        // TODO: wire up real registration (nickname/email/password) here.
+                        // Once the account is created and the user is signed in, call:
+                        //   AppStorage.setJSON('authUser', { uid, nickname, email });
+                        //   AppSync.runSync();
+                        //   DOM('authOverlay').classList.remove('visible');
+                        //   DOM('authWarningOverlay').classList.remove('visible');
+                        // If the backend rejects it (e.g. email already in use),
+                        // call showErr(...) with a message instead -- see
+                        // window.authFirebaseErrorMessage(code) in sync.js for a
+                        // ready-made map of Firebase's error codes to messages.
+                    });
+                }
+                const authLoginBtn = document.getElementById('authLoginBtn');
+                if (authLoginBtn) {
+                    authLoginBtn.addEventListener('click', () => {
+                        const lang = getLang();
+                        const t = translations[lang];
+                        const errEl = DOM('authLoginError');
+                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
+                        errEl.classList.remove('visible');
+
+                        const loginId = DOM('authLoginId').value.trim();
+                        const password = DOM('authLoginPassword').value;
+
+                        if (!loginId || !password) {
+                            showErr(t.authErrRequired);
+                            return;
+                        }
+
+                        // Validation passed on our end. Whether the password is
+                        // actually correct can only be checked once real auth is
+                        // wired up -- that check happens on the backend, not here.
+                        // TODO: wire up real login (email or nickname + password) here.
+                        // On success, same 4 calls as in authRegisterBtn above.
+                        // On failure (wrong password / no such account), call:
+                        //   showErr(window.authFirebaseErrorMessage(error.code, lang));
+                    });
+                }
+                const authGoogleBtn = document.getElementById('authGoogleBtn');
+                if (authGoogleBtn) {
+                    authGoogleBtn.addEventListener('click', () => {
+                        // TODO: wire up Google sign-in here.
+                        // On success, same 4 calls as in authRegisterBtn above.
+                    });
+                }
+                const authWarningCloseBtn = document.getElementById('authWarningCloseBtn');
+                if (authWarningCloseBtn) {
+                    authWarningCloseBtn.addEventListener('click', () => {
+                        DOM('authWarningOverlay').classList.remove('visible');
+                    });
+                }
+                // Not-logged-in nudge: shows once per page load until a real
+                // logged-in user is stored under 'authUser' (set that up when
+                // wiring in real auth, and this stops firing automatically).
+                if (!AppStorage.getJSON('authUser')) {
+                    DOM('authWarningOverlay').classList.add('visible');
+                }
+
+                const ieOverlay = DOM('importExportOverlay');
                 if (ieOverlay) {
                     ieOverlay.addEventListener('click', (e) => {
                         const exportBtn = e.target.closest('[data-export]');
@@ -2307,7 +2442,7 @@
                 }
 
                 // ── Target Time ──
-                const targetTimeBtn = document.getElementById('targetTimeBtn');
+                const targetTimeBtn = DOM('targetTimeBtn');
                 const targetTimeOverlay = document.getElementById('targetTimeOverlay');
                 const targetTimeToggle = document.getElementById('targetTimeToggle');
                 const targetTimeInput = document.getElementById('targetTimeInput');
@@ -2364,12 +2499,12 @@
                 }
 
                 // ── Honest Mode ──
-                const honestModeBtn = document.getElementById('honestModeBtn');
-                const honestModeOverlay = document.getElementById('honestModeOverlay');
+                const honestModeBtn = DOM('honestModeBtn');
+                const honestModeOverlay = DOM('honestModeOverlay');
                 const hmIdleState = document.getElementById('hmIdleState');
                 const hmActiveState = document.getElementById('hmActiveState');
                 const honestModeMinutesInput = document.getElementById('honestModeMinutesInput');
-                const hmCountdownDisplay = document.getElementById('hmCountdownDisplay');
+                const hmCountdownDisplay = DOM('hmCountdownDisplay');
 
                 const openHonestModeModal = () => {
                     const session = this.sessions[this.currentSessionId];
@@ -2411,7 +2546,7 @@
 
                 // Just closes the modal — Honest Mode itself can't be stopped early,
                 // that would defeat the point. It only ends when the timer runs out.
-                const honestModeCloseActive = document.getElementById('honestModeCloseActive');
+                const honestModeCloseActive = DOM('honestModeCloseActive');
                 if (honestModeCloseActive) {
                     honestModeCloseActive.addEventListener('click', closeHonestModeModal);
                 }
@@ -2420,7 +2555,7 @@
             // Keeps the countdown text inside the (currently open) Honest Mode modal
             // in sync — separate from _updateHonestModeBtn, which only updates the pills.
             _refreshHonestModeCountdownDisplay() {
-                const display = document.getElementById('hmCountdownDisplay');
+                const display = DOM('hmCountdownDisplay');
                 if (!display) return;
                 const session = this.sessions[this.currentSessionId];
                 if (!session || !session.honestMode) return;
@@ -2434,12 +2569,12 @@
             // Refreshes the Target Time pill and the goal label near the timer,
             // to reflect current settings.
             _updateTargetTimeBtn() {
-                const btn = document.getElementById('targetTimeBtn');
+                const btn = DOM('targetTimeBtn');
                 const label = document.getElementById('targetTimeBtnLabel');
                 const goalLabel = document.getElementById('targetTimeGoalLabel');
 
                 const s = window.settingsManager?.settings;
-                const lang = window.settingsManager?.settings?.language || 'en';
+                const lang = getLang();
                 const t = translations[lang] || translations.en;
                 const isSet = s && s.targetTimeEnabled && s.targetTime > 0;
 
@@ -2771,7 +2906,7 @@
             }
 
             _honestModeLockedAlert() {
-                const lang = window.settingsManager?.settings?.language || 'en';
+                const lang = getLang();
                 const t = translations[lang] || translations.en;
                 alert(t.honestModeLocked || "This solve is locked by Honest Mode and can't be edited or deleted until it ends.");
             }
@@ -2848,11 +2983,11 @@
             // Refreshes the Honest Mode pill to reflect the CURRENTLY SELECTED
             // session's state — call this on session switch too.
             _updateHonestModeBtn() {
-                const btn = document.getElementById('honestModeBtn');
+                const btn = DOM('honestModeBtn');
                 const label = document.getElementById('honestModeBtnLabel');
 
                 const session = this.sessions[this.currentSessionId];
-                const lang = window.settingsManager?.settings?.language || 'en';
+                const lang = getLang();
                 const t = translations[lang] || translations.en;
                 const active = session && session.honestMode;
 
@@ -2871,7 +3006,7 @@
                     btn.classList.toggle('active', !!active);
                 }
 
-                const overlay = document.getElementById('honestModeOverlay');
+                const overlay = DOM('honestModeOverlay');
                 if (overlay && overlay.classList.contains('visible')) {
                     this._refreshHonestModeCountdownDisplay();
                 }
@@ -2900,7 +3035,7 @@
                     id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                     time: time,
                     timestamp: Date.now(),
-                    scramble: document.getElementById('scrambleText').textContent,
+                    scramble: DOM('scrambleText').textContent,
                     penalty: null,
                     dnf: false,
                     targetMet
@@ -2914,7 +3049,7 @@
                     this._maybeAutoExport();
                     
                     // Update solve history if it's open
-                    if (window.sessionsManager && document.getElementById('solveHistorySection').style.display === 'flex') {
+                    if (window.sessionsManager && DOM('solveHistorySection').style.display === 'flex') {
                         window.sessionsManager.populateSolveHistory();
                     }
                 }
@@ -2934,7 +3069,7 @@
                     id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                     time: 0,
                     timestamp: Date.now(),
-                    scramble: document.getElementById('scrambleText').textContent,
+                    scramble: DOM('scrambleText').textContent,
                     penalty: null,
                     dnf: true
                 };
@@ -2946,7 +3081,7 @@
                     this.saveSessions();
                     this._maybeAutoExport();
 
-                    if (window.sessionsManager && document.getElementById('solveHistorySection').style.display === 'flex') {
+                    if (window.sessionsManager && DOM('solveHistorySection').style.display === 'flex') {
                         window.sessionsManager.populateSolveHistory();
                     }
                 }
@@ -3018,7 +3153,7 @@
             showNewBestIndicator(key) {
                 if (!this.titleStrip || !this.recordTitle) return;
 
-                const lang = window.settingsManager?.settings?.language || 'en';
+                const lang = getLang();
                 const t = translations[lang] || translations.en;
                 const textMap = {
                     single: t.newBestSingle,
@@ -3150,9 +3285,9 @@
                     const mean = times.reduce((a, b) => a + b, 0) / times.length;
                     const variance = times.reduce((sum, time) => sum + Math.pow(time - mean, 2), 0) / times.length;
                     const stdDev = Math.sqrt(variance);
-                    document.getElementById('detailStdDev').textContent = this.formatTime(stdDev);
+                    DOM('detailStdDev').textContent = this.formatTime(stdDev);
                 } else {
-                    document.getElementById('detailStdDev').textContent = '--';
+                    DOM('detailStdDev').textContent = '--';
                 }
 
                 // Render charts
@@ -3168,7 +3303,7 @@
                 this.renderSubsessionPie();
 
                 // Show modal
-                document.getElementById('statisticsOverlay').classList.add('visible');
+                DOM('statisticsOverlay').classList.add('visible');
             }
 
             renderProgressChart() {
@@ -3356,7 +3491,7 @@
             }
 
             _updateChartResetBtn(totalPoints) {
-                const btn = document.getElementById('chartResetZoom');
+                const btn = DOM('chartResetZoom');
                 if (!btn) return;
                 const isZoomed = window.chartZoomState &&
                     (window.chartZoomState.xMin > 0 || window.chartZoomState.xMax < totalPoints - 1);
@@ -3478,7 +3613,7 @@
                 updateCursor();
 
                 // Reset zoom button
-                const resetBtn = document.getElementById('chartResetZoom');
+                const resetBtn = DOM('chartResetZoom');
                 const onReset = () => {
                     window.chartZoomState = { xMin: 0, xMax: totalPoints - 1 };
                     this._applyChartZoom(0, totalPoints - 1, totalPoints);
@@ -3726,7 +3861,7 @@
 
             // Chart 1: how many solves were clean vs +2 vs DNF, current session.
             renderPenaltyPie() {
-                const t = (window.settingsManager?.settings?.language === 'ru')
+                const t = (isRu())
                     ? window.translations?.ru : window.translations?.en;
 
                 let clean = 0, plusTwo = 0, dnf = 0;
@@ -3788,7 +3923,7 @@
                 }
                 block.style.display = '';
 
-                const t = (window.settingsManager?.settings?.language === 'ru')
+                const t = (isRu())
                     ? window.translations?.ru : window.translations?.en;
 
                 const taggedIds = new Set(subsessions.flatMap(ss => ss.solveIds));
@@ -3818,7 +3953,7 @@
                 const firstLblEl = document.querySelector('.trend-compare-item:first-child .trend-compare-label');
                 const lastLblEl  = document.querySelector('.trend-compare-item:last-child .trend-compare-label');
 
-                const t = (window.settingsManager?.settings?.language === 'ru')
+                const t = (isRu())
                     ? window.translations?.ru : window.translations?.en;
 
                 if (!arrowEl) return;
@@ -3986,7 +4121,7 @@
                 // Update hint
                 const hint = document.getElementById('heatmapHint');
                 if (hint) {
-                    const t = (window.settingsManager?.settings?.language === 'ru')
+                    const t = (isRu())
                         ? window.translations?.ru : window.translations?.en;
                     const best = avgs.reduce((bestH, v, h) => v !== null && (bestH === -1 || v < avgs[bestH]) ? h : bestH, -1);
                     if (best !== -1) {
@@ -4001,17 +4136,17 @@
             openSessions() {
                 this.renderSessionsList();
                 this.updateSessionDetails();
-                document.getElementById('sessionsOverlay').classList.add('visible');
+                DOM('sessionsOverlay').classList.add('visible');
 
                 // Setup session action buttons
                 document.getElementById('newSessionBtn').onclick = () => this.createNewSession();
-                document.getElementById('renameSessionBtn').onclick = () => this.renameSession();
+                DOM('renameSessionBtn').onclick = () => this.renameSession();
                 document.getElementById('resetSessionBtn').onclick = () => this.resetCurrentSession();
-                document.getElementById('deleteSessionBtn').onclick = () => this.deleteCurrentSession();
+                DOM('deleteSessionBtn').onclick = () => this.deleteCurrentSession();
                 document.getElementById('exportSessionBtn').onclick = () => this.exportSessionCSV();
                 
                 // Setup solve history click handler
-                const solvesElement = document.getElementById('sessionSolves');
+                const solvesElement = DOM('sessionSolves');
                 if (solvesElement) {
                     solvesElement.classList.add('clickable');
                     solvesElement.onclick = () => this.openSolveHistory();
@@ -4046,11 +4181,11 @@
                 if (!session) return;
                 
                 this.populateSolveHistory();
-                document.getElementById('solveHistorySection').style.display = 'flex';
+                DOM('solveHistorySection').style.display = 'flex';
             }
 
             closeSolveHistory() {
-                document.getElementById('solveHistorySection').style.display = 'none';
+                DOM('solveHistorySection').style.display = 'none';
             }
 
             populateSolveHistory() {
@@ -4175,7 +4310,7 @@
                 tbody.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     if (this._selectedSolveIndices.size < 2) return;
-                    const menu = document.getElementById('shContextMenu');
+                    const menu = DOM('shContextMenu');
                     menu.style.display = 'block';
                     menu.style.left = e.pageX + 'px';
                     menu.style.top  = e.pageY + 'px';
@@ -4283,13 +4418,13 @@
             initSubsessionUI() {
                 // Close context menu on outside click
                 document.addEventListener('click', (e) => {
-                    const menu = document.getElementById('shContextMenu');
+                    const menu = DOM('shContextMenu');
                     if (menu && !menu.contains(e.target)) menu.style.display = 'none';
                 });
 
                 // Context menu → open modal
                 document.getElementById('shContextAddSubsession')?.addEventListener('click', () => {
-                    document.getElementById('shContextMenu').style.display = 'none';
+                    DOM('shContextMenu').style.display = 'none';
                     this._openSubsessionModal();
                 });
 
@@ -4303,12 +4438,12 @@
 
                 // Close / Cancel
                 const closeModal = () => {
-                    document.getElementById('subsessionOverlay').style.display = 'none';
+                    DOM('subsessionOverlay').style.display = 'none';
                 };
                 document.getElementById('subsessionModalClose')?.addEventListener('click', closeModal);
                 document.getElementById('subsessionCancelBtn')?.addEventListener('click', closeModal);
-                document.getElementById('subsessionOverlay')?.addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('subsessionOverlay')) closeModal();
+                DOM('subsessionOverlay')?.addEventListener('click', (e) => {
+                    if (e.target === DOM('subsessionOverlay')) closeModal();
                 });
 
                 // Create
@@ -4317,7 +4452,7 @@
                 });
 
                 // Enter key in name input
-                document.getElementById('subsessionNameInput')?.addEventListener('keydown', (e) => {
+                DOM('subsessionNameInput')?.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') this._createSubsession();
                 });
             }
@@ -4327,26 +4462,26 @@
                 if (count < 2) return;
 
                 // Reset modal state
-                document.getElementById('subsessionNameInput').value = '';
-                document.getElementById('subsessionExcludeToggle').checked = false;
+                DOM('subsessionNameInput').value = '';
+                DOM('subsessionExcludeToggle').checked = false;
                 document.querySelectorAll('.subsession-color-btn').forEach((b, i) => {
                     b.classList.toggle('active', i === 0);
                 });
                 document.getElementById('subsessionSelectedInfo').textContent =
                     `${count} solve${count !== 1 ? 's' : ''} selected`;
 
-                document.getElementById('subsessionOverlay').style.display = 'flex';
-                setTimeout(() => document.getElementById('subsessionNameInput').focus(), 50);
+                DOM('subsessionOverlay').style.display = 'flex';
+                setTimeout(() => DOM('subsessionNameInput').focus(), 50);
             }
 
             _createSubsession() {
                 const session = this.sessions[this.currentSessionId];
                 if (!session) return;
 
-                const name = document.getElementById('subsessionNameInput').value.trim()
+                const name = DOM('subsessionNameInput').value.trim()
                     || `Subsession ${(session.subsessions?.length || 0) + 1}`;
                 const color = document.querySelector('.subsession-color-btn.active')?.dataset.color || '#4a9eff';
-                const excludeFromAvg = document.getElementById('subsessionExcludeToggle').checked;
+                const excludeFromAvg = DOM('subsessionExcludeToggle').checked;
 
                 // Ensure solves have stable IDs (same formula as migration in loadSessions)
                 session.solves.forEach((s, i) => {
@@ -4365,7 +4500,7 @@
                 });
 
                 this.saveSessions();
-                document.getElementById('subsessionOverlay').style.display = 'none';
+                DOM('subsessionOverlay').style.display = 'none';
                 this._selectedSolveIndices = new Set();
                 this.populateSolveHistory();
                 this.renderSubsessionStats();
@@ -4382,17 +4517,17 @@
                 this._exportFormat   = 'story';
                 this._exportSessionId = null; // null = current session
 
-                document.getElementById('exportImageBtn')?.addEventListener('click', () => {
+                DOM('exportImageBtn')?.addEventListener('click', () => {
                     this._openExportImageModal();
                 });
 
                 const closeModal = () => {
-                    document.getElementById('exportImgOverlay').style.display = 'none';
+                    DOM('exportImgOverlay').style.display = 'none';
                 };
                 document.getElementById('exportImgClose')?.addEventListener('click', closeModal);
                 document.getElementById('exportImgCancelBtn')?.addEventListener('click', closeModal);
-                document.getElementById('exportImgOverlay')?.addEventListener('click', (e) => {
-                    if (e.target === document.getElementById('exportImgOverlay')) closeModal();
+                DOM('exportImgOverlay')?.addEventListener('click', (e) => {
+                    if (e.target === DOM('exportImgOverlay')) closeModal();
                 });
 
                 document.querySelectorAll('.export-format-btn').forEach(btn => {
@@ -4408,19 +4543,19 @@
                     document.getElementById(id)?.addEventListener('change', () => this._drawExportCard());
                 });
 
-                document.getElementById('exportSessionSelect')?.addEventListener('change', (e) => {
+                DOM('exportSessionSelect')?.addEventListener('change', (e) => {
                     this._exportSessionId = e.target.value;
                     this._drawExportCard();
                 });
 
-                document.getElementById('exportImgDownloadBtn')?.addEventListener('click', () => {
+                DOM('exportImgDownloadBtn')?.addEventListener('click', () => {
                     this._downloadExportCard();
                 });
             }
 
             _openExportImageModal() {
                 // Populate session dropdown
-                const sel = document.getElementById('exportSessionSelect');
+                const sel = DOM('exportSessionSelect');
                 if (sel) {
                     sel.innerHTML = '';
                     Object.values(this.sessions).forEach(s => {
@@ -4432,7 +4567,7 @@
                     });
                     this._exportSessionId = this.currentSessionId;
                 }
-                document.getElementById('exportImgOverlay').style.display = 'flex';
+                DOM('exportImgOverlay').style.display = 'flex';
                 this._drawExportCard();
             }
 
@@ -4456,7 +4591,7 @@
             }
 
             _drawExportCard() {
-                const canvas = document.getElementById('exportImgCanvas');
+                const canvas = DOM('exportImgCanvas');
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
@@ -4501,7 +4636,7 @@
                     return { pct:pct.toFixed(1), direction:pct<0.5?'flat':(diff>0?'up':'down') };
                 })();
 
-                const lang    = window.settingsManager?.settings?.language==='ru'?'ru-RU':'en-US';
+                const lang = isRu() ? 'ru-RU' : 'en-US';
                 const dateStr = new Date().toLocaleDateString(lang,{year:'numeric',month:'long',day:'numeric'});
                 const sparkData = [...solves].reverse().filter(s=>!s.dnf).map(s=>s.time+(s.penalty||0));
 
@@ -4640,7 +4775,7 @@
                 ctx.textBaseline='alphabetic';
                 ctx.font=`700 ${Math.round(55*s)}px Georgia,serif`;
                 ctx.fillStyle='#2b2519';
-                ctx.fillText('NEXT CUBE PRO',x,y+Math.round(50*s));
+                ctx.fillText('CUBE TIMER',x,y+Math.round(50*s));
                 ctx.font=`400 ${Math.round(24*s)}px 'Inter',sans-serif`;
                 ctx.fillStyle='#9a8060';
                 ctx.fillText(dateStr,x,y+Math.round(50*s)+Math.round(34*s));
@@ -4706,7 +4841,7 @@
                 this._exportStamp(ctx,w-pad-sR,h-pad-sR,sR);
                 ctx.font=`400 ${Math.round(w*0.019)}px 'Inter',sans-serif`;
                 ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
-                ctx.fillText('Made with Next Cube Pro',pad,h-Math.round(pad*.38));
+                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.38));
             }
 
             _exportWide(ctx,w,h,{disciplineLabel,dateStr,includeDiscipline,includeTrend,finalCards,sparkData}) {
@@ -4738,7 +4873,7 @@
                 this._exportStamp(ctx,w-pad*.6-sR,h-pad*.6-sR,sR);
                 ctx.font=`400 ${Math.round(h*0.022)}px 'Inter',sans-serif`;
                 ctx.fillStyle='rgba(220,190,150,0.55)'; ctx.textBaseline='alphabetic';
-                ctx.fillText('Made with Next Cube Pro',pad,h-Math.round(pad*.28));
+                ctx.fillText('Made with Cube Timer',pad,h-Math.round(pad*.28));
             }
 
             _roundRect(ctx,x,y,w,h,r) {
@@ -4749,7 +4884,7 @@
             }
 
             _downloadExportCard() {
-                const canvas=document.getElementById('exportImgCanvas');
+                const canvas=DOM('exportImgCanvas');
                 if (!canvas) return;
                 canvas.toBlob((blob)=>{
                     const url=URL.createObjectURL(blob);
@@ -4777,7 +4912,7 @@
                     return;
                 }
 
-                const t = (window.settingsManager?.settings?.language === 'ru')
+                const t = (isRu())
                     ? window.translations?.ru : window.translations?.en;
 
                 block.style.display = '';
@@ -4822,7 +4957,7 @@
                         this.saveSessions();
                         this.renderSubsessionStats();
                         this.renderSubsessionPie();
-                        const historySection = document.getElementById('solveHistorySection');
+                        const historySection = DOM('solveHistorySection');
                         if (historySection && historySection.style.display !== 'none') {
                             this.populateSolveHistory();
                         }
@@ -4843,6 +4978,7 @@
                 if (!confirm('Delete this solve?')) return;
 
                 session.solves.splice(index, 1);
+                if (window.SyncTombstones) window.SyncTombstones.addDeletedSolve(solve.id);
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
@@ -4862,6 +4998,7 @@
                 }
                 
                 solve.penalty = solve.penalty ? null : 2;
+                solve.updatedAt = Date.now();
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
@@ -4879,6 +5016,7 @@
                 if (solve.dnf) {
                     solve.penalty = null;
                 }
+                solve.updatedAt = Date.now();
                 
                 this.saveSessions();
                 this.populateSolveHistory();
@@ -4938,12 +5076,12 @@
                 this.generateScramble();
 
                 // Update solve history if it's open
-                if (document.getElementById('solveHistorySection').style.display === 'flex') {
+                if (DOM('solveHistorySection').style.display === 'flex') {
                     this.populateSolveHistory();
                 }
                 
                 // Update session select in header
-                const sessionSelect = document.getElementById('sessionSelect');
+                const sessionSelect = DOM('sessionSelect');
                 if (sessionSelect) {
                     this.updateSessionDropdown();
                 }
@@ -4976,7 +5114,7 @@
                 const avg = validSolves.length > 0 ? 
                     validSolves.reduce((sum, s) => sum + s.time + (s.penalty || 0), 0) / validSolves.length : null;
 
-                document.getElementById('sessionSolves').textContent = solves.length;
+                DOM('sessionSolves').textContent = solves.length;
                 document.getElementById('sessionBest').textContent = best !== null ? this.formatTime(best) : '--';
                 document.getElementById('sessionAo5').textContent = ao5 !== null ? this.formatTime(ao5) : '--';
                 document.getElementById('sessionAo12').textContent = ao12 !== null ? this.formatTime(ao12) : '--';
@@ -4985,8 +5123,8 @@
 
                 // Enable/disable buttons
                 const isDefault = session.isDefault;
-                document.getElementById('renameSessionBtn').disabled = isDefault;
-                document.getElementById('deleteSessionBtn').disabled = isDefault;
+                DOM('renameSessionBtn').disabled = isDefault;
+                DOM('deleteSessionBtn').disabled = isDefault;
             }
 
             calculateAverageForSession(solves, count) {
@@ -5082,12 +5220,13 @@
                 if (!confirm(`Delete "${session.name}"? This will permanently delete all ${session.solves.length} solves.`)) return;
 
                 delete this.sessions[this.currentSessionId];
+                if (window.SyncTombstones) window.SyncTombstones.addDeletedSession(this.currentSessionId);
                 this.currentSessionId = 'no-session';
                 this.saveSessions();
                 this.renderSessionsList();
                 this.updateSessionDetails();
                 this.updateUI();
-                document.getElementById('sessionsOverlay').classList.remove('visible');
+                DOM('sessionsOverlay').classList.remove('visible');
             }
 
             exportSessionCSV() {
@@ -5136,7 +5275,7 @@
             }
 
             updateSessionDropdown() {
-                const select = document.getElementById('sessionSelect');
+                const select = DOM('sessionSelect');
                 if (!select) return;
 
                 select.innerHTML = '';
@@ -5318,6 +5457,7 @@
                 if (currentSession.solves[0].dnf) {
                     currentSession.solves[0].penalty = null;
                 }
+                currentSession.solves[0].updatedAt = Date.now();
                 this.hideNewBestIndicator();
                 this.saveSessions();
                 this.updateUI();
@@ -5338,6 +5478,7 @@
                 } else {
                     currentSession.solves[0].penalty = 2;
                 }
+                currentSession.solves[0].updatedAt = Date.now();
                 this.hideNewBestIndicator();
                 this.saveSessions();
                 this.updateUI();
@@ -5358,7 +5499,8 @@
                 }
 
                 if (confirm('Delete last solve?')) {
-                    currentSession.solves.shift();
+                    const removed = currentSession.solves.shift();
+                    if (removed && window.SyncTombstones) window.SyncTombstones.addDeletedSolve(removed.id);
                     this.hideNewBestIndicator();
                     this.saveSessions();
                     this.updateUI();
@@ -5506,6 +5648,7 @@
                         currentSession.solves[0].dnf = false;
                         currentSession.solves[0].penalty = null;
                     }
+                    currentSession.solves[0].updatedAt = Date.now();
                     this.hideNewBestIndicator();
                     this.saveSessions();
                     this.updateUI();
@@ -5516,7 +5659,7 @@
                 const session = this.sessions[this.currentSessionId];
                 const discipline = session?.discipline || '3x3';
                 const scramble = ScrambleGenerator.getScramble(discipline);
-                document.getElementById('scrambleText').textContent = scramble;
+                DOM('scrambleText').textContent = scramble;
             }
 
             drawChart() {
@@ -5620,7 +5763,7 @@
                     this.hideNewBestIndicator();
                     this.saveSessions();
                     this.updateUI();
-                    document.getElementById('settingsOverlay').classList.remove('visible');
+                    DOM('settingsOverlay').classList.remove('visible');
                 }
             }
 
@@ -5637,7 +5780,7 @@
             //     defensive CSV parser since the exact column layout isn't publicly documented.
 
             openImportExportModal() {
-                document.getElementById('importExportOverlay').classList.add('visible');
+                DOM('importExportOverlay').classList.add('visible');
             }
 
             _escapeHtml(str) {
@@ -5647,7 +5790,7 @@
             }
 
             _ieT() {
-                const lang = window.settingsManager?.settings?.language || 'en';
+                const lang = getLang();
                 return translations[lang] || translations.en;
             }
 
@@ -5836,7 +5979,7 @@
             // Shows the generic import summary modal: progress bar, per-session
             // breakdown, and "Session X (Puzzle) is marked as 3x3" style warnings.
             _showImportResult({ timerLabel, imported, skipped, sessions, warnings }) {
-                const overlay = document.getElementById('importResultOverlay');
+                const overlay = DOM('importResultOverlay');
                 if (!overlay) return;
 
                 const total = imported + skipped;
@@ -5874,7 +6017,7 @@
                 overlay.classList.add('visible');
             }
 
-            // ─── Next Cube Pro (JSON) — our own native format ──────────────
+            // ─── FireCube Timer (JSON) — our own native format ──────────────
             _parseFireCubeJson(text) {
                 const data = JSON.parse(text);
                 const parsedSessions = [];
@@ -6487,7 +6630,7 @@
                 const t = this._ieT();
 
                 const parsersAndLabels = {
-                    firecube: { label: 'Next Cube Pro', parse: (txt, name) => this._parseFireCubeJson(txt) },
+                    firecube: { label: 'FireCube Timer', parse: (txt, name) => this._parseFireCubeJson(txt) },
                     cstimer: { label: 'csTimer', parse: (txt, name) => this._parseCstimerTxt(txt) },
                     lastcubex: { label: 'Last Cube X', parse: (txt, name) => this._parseLastCubeXCsv(txt) },
                     cubedesk: { label: 'CubeDesk', parse: (txt, name) => this._parseCubeDeskTxt(txt) },
@@ -6497,7 +6640,7 @@
                 const entry = parsersAndLabels[source];
                 if (!entry) return;
 
-                document.getElementById('importExportOverlay').classList.remove('visible');
+                DOM('importExportOverlay').classList.remove('visible');
 
                 this._pickFile((text, fileName) => {
                     try {
@@ -6510,7 +6653,7 @@
             }
 
             _handleExportChoice(source) {
-                document.getElementById('importExportOverlay').classList.remove('visible');
+                DOM('importExportOverlay').classList.remove('visible');
                 switch (source) {
                     case 'firecube': this.exportData(); break;
                     case 'cstimer': this._exportToCstimerFormat('firecube_cstimer'); break;
@@ -7007,7 +7150,7 @@
                     if (key.toLowerCase() === 'n' && !e.ctrlKey && !e.metaKey) {
                         e.preventDefault();
                         this._toggleOverlay('settingsOverlay', () => {
-                            const overlay = document.getElementById('settingsOverlay');
+                            const overlay = DOM('settingsOverlay');
                             overlay?.classList.add('visible');
                             // Reset sidebar state, but do NOT focus — kb-nav activates only via arrows
                             this.settingsFocus = 'sidebar';
@@ -7048,7 +7191,7 @@
         }
 
         // ══════════════════════════════════════════════════════════════
-        // WCA-Compatible Scramble Engine  (Next Cube Pro 0.9.1)
+        // WCA-Compatible Scramble Engine  (CubeTimer 0.9.1)
         // Inspired by TNoodle architecture — strategy pattern per discipline
         // ══════════════════════════════════════════════════════════════
 
@@ -7348,7 +7491,7 @@
                 };
             }
 
-            // Public API — used by NextCubeProTimer.generateScramble()
+            // Public API — used by CubeTimer.generateScramble()
             static getScramble(discipline) {
                 const strategy = this.STRATEGIES[discipline] || WCA_3x3;
                 const raw = strategy.generate();
@@ -7384,7 +7527,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const commentary = new CommentarySystem();
             const settingsManager = new SettingsManager();
-            const timer = new NextCubeProTimer();
+            const timer = new CubeTimer();
             const hotkeyManager = new HotkeyManager();
             
             // Make globally accessible
@@ -7614,16 +7757,16 @@ const AlgsDiagram = (function() {
     const LS_KEY = 'algsTrainerLearned';
     const STATS_KEY = 'algsTrainerStats';
     function getLearned() {
-        try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch(e) { return {}; }
+        return AppStorage.getJSON(LS_KEY, {});
     }
     function setLearned(obj) {
-        localStorage.setItem(LS_KEY, JSON.stringify(obj));
+        AppStorage.setJSON(LS_KEY, obj);
     }
     function getStats() {
-        try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch(e) { return {}; }
+        return AppStorage.getJSON(STATS_KEY, {});
     }
     function setStats(obj) {
-        localStorage.setItem(STATS_KEY, JSON.stringify(obj));
+        AppStorage.setJSON(STATS_KEY, obj);
     }
 
     const overlay = document.getElementById('algsOverlay');
@@ -7693,7 +7836,7 @@ const AlgsDiagram = (function() {
     }
 
     document.getElementById('fireMenuAlgsTrainer')?.addEventListener('click', () => {
-        document.getElementById('fireMenuDropdown')?.classList.remove('visible');
+        DOM('fireMenuDropdown')?.classList.remove('visible');
         openAlgs();
     });
     closeBtn?.addEventListener('click', closeAlgs);
@@ -7802,7 +7945,7 @@ const AlgsDiagram = (function() {
 
         const learned = getLearned();
         const totalCount = data.length;
-        const onlyUnlearned = document.getElementById('algsPracticeUnlearnedOnly')?.checked;
+        const onlyUnlearned = DOM('algsPracticeUnlearnedOnly')?.checked;
         if (onlyUnlearned) data = data.filter(e => !learned[e.id]);
 
         grid.innerHTML = '';
@@ -8147,11 +8290,11 @@ const AlgsDiagram = (function() {
 
     document.getElementById('algsStartPractice')?.addEventListener('click', () => {
         if (!currentSet) return;
-        const unlearnedOnly = document.getElementById('algsPracticeUnlearnedOnly')?.checked;
+        const unlearnedOnly = DOM('algsPracticeUnlearnedOnly')?.checked;
         Practice.start(currentSet, unlearnedOnly);
         showStep(5);
     });
-    document.getElementById('algsPracticeUnlearnedOnly')?.addEventListener('change', () => {
+    DOM('algsPracticeUnlearnedOnly')?.addEventListener('change', () => {
         if (currentSet) renderAlgList(currentSet);
     });
 })();
@@ -8159,7 +8302,7 @@ const AlgsDiagram = (function() {
 // ===================== Fire Menu dropdown toggle =====================
 (function() {
     const btn = document.getElementById('fireMenuBtn');
-    const dropdown = document.getElementById('fireMenuDropdown');
+    const dropdown = DOM('fireMenuDropdown');
     if (!btn || !dropdown) return;
     function translateDropdown() {
         const T = algsT();

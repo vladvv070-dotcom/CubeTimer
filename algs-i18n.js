@@ -39,5 +39,5 @@ const ALGS_I18N = {
     },
 };
 function algsT() {
-    return (window.settingsManager?.settings?.language === 'ru') ? ALGS_I18N.ru : ALGS_I18N.en;
+    return isRu() ? ALGS_I18N.ru : ALGS_I18N.en;
 }
