@@ -2372,17 +2372,25 @@
                             return;
                         }
 
-                        // Validation passed.
-                        // TODO: wire up real registration (nickname/email/password) here.
-                        // Once the account is created and the user is signed in, call:
-                        //   AppStorage.setJSON('authUser', { uid, nickname, email });
-                        //   AppSync.runSync();
-                        //   DOM('authOverlay').classList.remove('visible');
-                        //   DOM('authWarningOverlay').classList.remove('visible');
-                        // If the backend rejects it (e.g. email already in use),
-                        // call showErr(...) with a message instead -- see
-                        // window.authFirebaseErrorMessage(code) in sync.js for a
-                        // ready-made map of Firebase's error codes to messages.
+                        // Validation passed -- create the account.
+                        authRegisterBtn.disabled = true;
+                        (async () => {
+                            try {
+                                const user = await window.CubeAuth.registerWithNickname(nickname, email, password);
+                                AppStorage.setJSON('authUser', { uid: user.uid, nickname, email });
+                                await window.AppSync.runSync();
+                                DOM('authOverlay').classList.remove('visible');
+                                DOM('authWarningOverlay').classList.remove('visible');
+                            } catch (error) {
+                                if (error.code === 'nickname-in-use') {
+                                    showErr(lang === 'ru' ? 'Этот ник уже занят' : 'This nickname is already taken');
+                                } else {
+                                    showErr(window.authFirebaseErrorMessage(error.code, lang));
+                                }
+                            } finally {
+                                authRegisterBtn.disabled = false;
+                            }
+                        })();
                     });
                 }
                 const authLoginBtn = document.getElementById('authLoginBtn');
@@ -2402,20 +2410,59 @@
                             return;
                         }
 
-                        // Validation passed on our end. Whether the password is
-                        // actually correct can only be checked once real auth is
-                        // wired up -- that check happens on the backend, not here.
-                        // TODO: wire up real login (email or nickname + password) here.
-                        // On success, same 4 calls as in authRegisterBtn above.
-                        // On failure (wrong password / no such account), call:
-                        //   showErr(window.authFirebaseErrorMessage(error.code, lang));
+                        // Validation passed on our end -- resolve nickname/email and sign in.
+                        authLoginBtn.disabled = true;
+                        (async () => {
+                            try {
+                                const email = await window.CubeAuth.resolveEmailForLogin(loginId);
+                                if (!email) {
+                                    showErr(window.authFirebaseErrorMessage('auth/user-not-found', lang));
+                                    return;
+                                }
+                                const cred = await window.CubeAuth.loginWithEmail(email, password);
+                                AppStorage.setJSON('authUser', {
+                                    uid: cred.user.uid,
+                                    nickname: cred.user.displayName || loginId,
+                                    email: cred.user.email
+                                });
+                                await window.AppSync.runSync();
+                                DOM('authOverlay').classList.remove('visible');
+                                DOM('authWarningOverlay').classList.remove('visible');
+                            } catch (error) {
+                                showErr(window.authFirebaseErrorMessage(error.code, lang));
+                            } finally {
+                                authLoginBtn.disabled = false;
+                            }
+                        })();
                     });
                 }
                 const authGoogleBtn = document.getElementById('authGoogleBtn');
                 if (authGoogleBtn) {
                     authGoogleBtn.addEventListener('click', () => {
-                        // TODO: wire up Google sign-in here.
-                        // On success, same 4 calls as in authRegisterBtn above.
+                        const lang = getLang();
+                        const errEl = DOM('authRegError');
+                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
+                        errEl.classList.remove('visible');
+
+                        authGoogleBtn.disabled = true;
+                        (async () => {
+                            try {
+                                const cred = await window.CubeAuth.loginWithGoogle();
+                                const nickname = await window.CubeAuth.ensureUserProfile(cred.user);
+                                AppStorage.setJSON('authUser', {
+                                    uid: cred.user.uid,
+                                    nickname,
+                                    email: cred.user.email
+                                });
+                                await window.AppSync.runSync();
+                                DOM('authOverlay').classList.remove('visible');
+                                DOM('authWarningOverlay').classList.remove('visible');
+                            } catch (error) {
+                                showErr(window.authFirebaseErrorMessage(error.code, lang));
+                            } finally {
+                                authGoogleBtn.disabled = false;
+                            }
+                        })();
                     });
                 }
                 const authWarningCloseBtn = document.getElementById('authWarningCloseBtn');

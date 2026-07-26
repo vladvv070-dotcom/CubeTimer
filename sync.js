@@ -99,14 +99,22 @@ const SyncMerge = {
 // ---- Cloud read/write -- TODO: wire up to Firebase --------------------
 const CloudSync = {
     async pull() {
-        // TODO: read the signed-in user's { sessions, currentSessionId }
-        // from Firestore and return it. Return null if there's nothing
-        // there yet (new account) or nobody is signed in.
-        return null;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return null;
+        try {
+            const data = await window.CubeSync.loadUserData();
+            return (data && data.syncData) ? data.syncData : null;
+        } catch (e) {
+            console.error('CloudSync.pull failed:', e);
+            return null;
+        }
     },
     async push(data) {
-        // TODO: write { sessions, currentSessionId } to Firestore under
-        // the signed-in user's document.
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        try {
+            await window.CubeSync.saveUserData({ syncData: data });
+        } catch (e) {
+            console.error('CloudSync.push failed:', e);
+        }
     }
 };
 
