@@ -2227,7 +2227,9 @@
                 if (window.queueAutoPush) {
                     window.queueAutoPush(() => ({
                         sessions: this.sessions,
-                        currentSessionId: this.currentSessionId
+                        currentSessionId: this.currentSessionId,
+                        deletedSolveIds: window.SyncTombstones ? window.SyncTombstones.getDeletedSolveEntries() : [],
+                        deletedSessionIds: window.SyncTombstones ? window.SyncTombstones.getDeletedSessionEntries() : []
                     }));
                 }
             }

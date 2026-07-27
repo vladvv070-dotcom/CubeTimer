@@ -42,6 +42,40 @@ const SyncTombstones = {
     },
     getDeletedSessionIds() {
         return new Set(AppStorage.getJSON('deletedSessionIds', []).map(x => x.id));
+    },
+
+    // Raw entries (with deletedAt) -- this is what gets pushed to Firestore,
+    // so other devices learn about deletions that happened on this one.
+    getDeletedSolveEntries() {
+        return AppStorage.getJSON('deletedSolveIds', []);
+    },
+    getDeletedSessionEntries() {
+        return AppStorage.getJSON('deletedSessionIds', []);
+    },
+
+    // Fold tombstones that came from Firestore into this device's local
+    // list (union by id). Without this, a deletion made on device A would
+    // never be recognized by device B's merge, and would get resurrected
+    // the moment B's local (still-has-it) copy gets merged back in.
+    mergeRemoteSolveTombstones(remoteEntries) {
+        const local = AppStorage.getJSON('deletedSolveIds', []);
+        const byId = new Map(local.map(e => [e.id, e]));
+        for (const e of (remoteEntries || [])) {
+            if (!byId.has(e.id)) byId.set(e.id, e);
+        }
+        const merged = Array.from(byId.values());
+        AppStorage.setJSON('deletedSolveIds', merged);
+        return merged;
+    },
+    mergeRemoteSessionTombstones(remoteEntries) {
+        const local = AppStorage.getJSON('deletedSessionIds', []);
+        const byId = new Map(local.map(e => [e.id, e]));
+        for (const e of (remoteEntries || [])) {
+            if (!byId.has(e.id)) byId.set(e.id, e);
+        }
+        const merged = Array.from(byId.values());
+        AppStorage.setJSON('deletedSessionIds', merged);
+        return merged;
     }
 };
 
@@ -127,6 +161,15 @@ const AppSync = {
         const timer = window.timer;
         if (!timer) return;
 
+        // Fold in tombstones from Firestore FIRST -- otherwise a solve/session
+        // deleted on another device looks, from this device's point of view,
+        // just like a solve/session it never heard was deleted, and the
+        // union-merge below would resurrect it.
+        if (remote) {
+            SyncTombstones.mergeRemoteSolveTombstones(remote.deletedSolveIds);
+            SyncTombstones.mergeRemoteSessionTombstones(remote.deletedSessionIds);
+        }
+
         const deletedSessionIds = SyncTombstones.getDeletedSessionIds();
         const deletedSolveIds = SyncTombstones.getDeletedSolveIds();
 
@@ -145,7 +188,9 @@ const AppSync = {
 
         await CloudSync.push({
             sessions: mergedSessions,
-            currentSessionId: timer.currentSessionId
+            currentSessionId: timer.currentSessionId,
+            deletedSolveIds: SyncTombstones.getDeletedSolveEntries(),
+            deletedSessionIds: SyncTombstones.getDeletedSessionEntries()
         });
     }
 };
