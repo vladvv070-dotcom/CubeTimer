@@ -2415,12 +2415,21 @@
                 if (authLogoutConfirmBtn) {
                     authLogoutConfirmBtn.addEventListener('click', () => {
                         authLogoutConfirmBtn.disabled = true;
-                        window.CubeAuth.logout().catch(e => console.error('Logout failed:', e)).finally(() => {
+                        const finishLogout = () => {
                             AppStorage.setJSON('authUser', null);
                             updateAuthBtnUI();
                             authLogoutConfirmBtn.disabled = false;
                             DOM('authAccountOverlay').classList.remove('visible');
-                        });
+                        };
+                        if (window.CubeAuth && window.CubeAuth.logout) {
+                            window.CubeAuth.logout().catch(e => console.error('Logout failed:', e)).finally(finishLogout);
+                        } else {
+                            // Firebase module hasn't loaded in this page load (network
+                            // hiccup, blocked request, etc). Still let the person log
+                            // out locally rather than leaving the button stuck.
+                            console.error('window.CubeAuth is not available -- firebase-init.js may not have loaded. Logging out locally only.');
+                            finishLogout();
+                        }
                     });
                 }
                 const authCloseBtn = document.getElementById('authCloseBtn');
