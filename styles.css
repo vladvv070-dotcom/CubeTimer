@@ -6903,6 +6903,15 @@
             color: #e8edf4;
         }
 
+        .new-session-btn.danger {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .new-session-btn.danger:hover {
+            filter: brightness(1.1);
+        }
+
 
         
 
@@ -7276,6 +7285,11 @@ html {
     font-size: 0.95rem;
     line-height: 1.5;
     margin-bottom: 1.5rem;
+}
+
+.auth-account-email {
+    color: inherit;
+    opacity: 0.7;
 }
 
 .auth-error {

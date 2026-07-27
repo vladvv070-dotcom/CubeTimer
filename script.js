@@ -239,7 +239,14 @@
                 const authWarningTitle = document.querySelector('#authWarningTitle');
                 const authWarningText = document.querySelector('#authWarningText');
                 const authWarningCloseBtn = document.querySelector('#authWarningCloseBtn');
-                if (authBtn) authBtn.textContent = `👤 ${t.authBtn}`;
+                const authAccountCloseBtn = document.querySelector('#authAccountCloseBtn');
+                const authLogoutBtn = document.querySelector('#authLogoutBtn');
+                if (authBtn) {
+                    const authUser = AppStorage.getJSON('authUser');
+                    authBtn.textContent = authUser
+                        ? `👤 ${authUser.nickname || authUser.email}`
+                        : `👤 ${t.authBtn}`;
+                }
                 if (authRegisterTitle) authRegisterTitle.textContent = t.authRegisterTitle;
                 if (authNicknameLabel) authNicknameLabel.textContent = t.authNicknameLabel;
                 if (authRegEmailLabel) authRegEmailLabel.textContent = t.authRegEmailLabel;
@@ -254,6 +261,8 @@
                 if (authWarningTitle) authWarningTitle.textContent = t.authWarningTitle;
                 if (authWarningText) authWarningText.textContent = t.authWarningText;
                 if (authWarningCloseBtn) authWarningCloseBtn.textContent = t.authWarningCloseBtn;
+                if (authAccountCloseBtn) authAccountCloseBtn.textContent = t.authAccountCloseBtn;
+                if (authLogoutBtn) authLogoutBtn.textContent = t.authLogoutBtn;
 
                 // Target Time
                 const ttModalTitle = document.querySelector('#ttModalTitle');
@@ -2209,6 +2218,12 @@
             saveSessions() {
                 AppStorage.setJSON('cubeTimerSessions', this.sessions);
                 AppStorage.setRaw('cubeTimerCurrentSession', this.currentSessionId);
+                if (window.queueAutoPush) {
+                    window.queueAutoPush(() => ({
+                        sessions: this.sessions,
+                        currentSessionId: this.currentSessionId
+                    }));
+                }
             }
 
             get solves() {
@@ -2328,11 +2343,55 @@
                     });
                 }
 
-                // ── Auth (UI only for now, backend not wired up) ──
+                // ── Auth: login/register + account status/logout ──
+                const updateAuthBtnUI = () => {
+                    const lang = getLang();
+                    const t = translations[lang];
+                    const authUser = AppStorage.getJSON('authUser');
+                    const btn = document.getElementById('authBtn');
+                    if (btn) {
+                        btn.textContent = authUser
+                            ? `👤 ${authUser.nickname || authUser.email}`
+                            : `👤 ${t.authBtn}`;
+                    }
+                };
+                this._updateAuthBtnUI = updateAuthBtnUI;
+                updateAuthBtnUI();
+
                 const authBtn = document.getElementById('authBtn');
                 if (authBtn) {
                     authBtn.addEventListener('click', () => {
-                        DOM('authOverlay').classList.add('visible');
+                        const authUser = AppStorage.getJSON('authUser');
+                        if (authUser) {
+                            const lang = getLang();
+                            const t = translations[lang];
+                            DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${authUser.nickname || ''}`.trim();
+                            DOM('authAccountEmail').textContent = authUser.email || '';
+                            DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
+                            DOM('authLogoutBtn').textContent = t.authLogoutBtn;
+                            DOM('authAccountOverlay').classList.add('visible');
+                        } else {
+                            DOM('authOverlay').classList.add('visible');
+                        }
+                    });
+                }
+                const authAccountCloseBtn = document.getElementById('authAccountCloseBtn');
+                if (authAccountCloseBtn) {
+                    authAccountCloseBtn.addEventListener('click', () => {
+                        DOM('authAccountOverlay').classList.remove('visible');
+                    });
+                }
+                const authLogoutBtn = document.getElementById('authLogoutBtn');
+                if (authLogoutBtn) {
+                    authLogoutBtn.addEventListener('click', () => {
+                        const lang = getLang();
+                        const t = translations[lang];
+                        if (!confirm(t.authLogoutConfirm)) return;
+                        window.CubeAuth.logout().finally(() => {
+                            AppStorage.setJSON('authUser', null);
+                            updateAuthBtnUI();
+                            DOM('authAccountOverlay').classList.remove('visible');
+                        });
                     });
                 }
                 const authCloseBtn = document.getElementById('authCloseBtn');
@@ -2378,6 +2437,7 @@
                             try {
                                 const user = await window.CubeAuth.registerWithNickname(nickname, email, password);
                                 AppStorage.setJSON('authUser', { uid: user.uid, nickname, email });
+                                updateAuthBtnUI();
                                 await window.AppSync.runSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');
@@ -2413,8 +2473,9 @@
                         // Validation passed on our end -- resolve nickname/email and sign in.
                         authLoginBtn.disabled = true;
                         (async () => {
+                            let email;
                             try {
-                                const email = await window.CubeAuth.resolveEmailForLogin(loginId);
+                                email = await window.CubeAuth.resolveEmailForLogin(loginId);
                                 if (!email) {
                                     showErr(window.authFirebaseErrorMessage('auth/user-not-found', lang));
                                     return;
@@ -2425,10 +2486,18 @@
                                     nickname: cred.user.displayName || loginId,
                                     email: cred.user.email
                                 });
+                                updateAuthBtnUI();
                                 await window.AppSync.runSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');
                             } catch (error) {
+                                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                                    const methods = await window.CubeAuth.getSignInMethods(email || loginId);
+                                    if (methods.includes('google.com') && !methods.includes('password')) {
+                                        showErr(t.authErrUseGoogle);
+                                        return;
+                                    }
+                                }
                                 showErr(window.authFirebaseErrorMessage(error.code, lang));
                             } finally {
                                 authLoginBtn.disabled = false;
@@ -2454,6 +2523,7 @@
                                     nickname,
                                     email: cred.user.email
                                 });
+                                updateAuthBtnUI();
                                 await window.AppSync.runSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');

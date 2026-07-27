@@ -96,7 +96,7 @@ const SyncMerge = {
     }
 };
 
-// ---- Cloud read/write -- TODO: wire up to Firebase --------------------
+// ---- Cloud read/write -- talks to Firestore via firebase-init.js's CubeSync
 const CloudSync = {
     async pull() {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return null;
@@ -149,6 +149,24 @@ const AppSync = {
         });
     }
 };
+
+// ---- Live autosync: push after every local change ------------------------
+// Called from Timer.saveSessions() -- i.e. after every solve, DNF, +2,
+// delete, edit, or session change. Debounced so several rapid saves
+// (e.g. delete + re-render) collapse into a single network write.
+// Deliberately does NOT pull/merge -- this device already has the
+// freshest state after its own edit; a full AppSync.runSync() (with
+// pull) still happens on every sign-in, which is when merging
+// against another device's changes actually matters.
+let _autoPushTimer = null;
+function queueAutoPush(getData) {
+    if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+    clearTimeout(_autoPushTimer);
+    _autoPushTimer = setTimeout(() => {
+        CloudSync.push(getData()).catch(e => console.error('Auto-sync push failed:', e));
+    }, 800);
+}
+window.queueAutoPush = queueAutoPush;
 
 window.SyncTombstones = SyncTombstones;
 window.SyncMerge = SyncMerge;

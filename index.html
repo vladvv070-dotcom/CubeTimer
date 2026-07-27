@@ -1093,6 +1093,18 @@
         </div>
     </div>
 
+    <!-- Auth: account status + logout, shown when authBtn is clicked while logged in -->
+    <div class="new-session-overlay" id="authAccountOverlay">
+        <div class="new-session-modal auth-warning-modal">
+            <div class="new-session-title" id="authAccountTitle">Вы вошли</div>
+            <p class="auth-warning-text auth-account-email" id="authAccountEmail"></p>
+            <div class="new-session-actions">
+                <button class="new-session-btn cancel" id="authAccountCloseBtn">Закрыть</button>
+                <button class="new-session-btn danger" id="authLogoutBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Auth: "you're not logged in" warning, shown on load until real auth is wired up -->
     <div class="new-session-overlay" id="authWarningOverlay">
         <div class="new-session-modal auth-warning-modal">
@@ -1165,7 +1177,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.22.6</div>
+    <div class="version-display">1.22.7</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1283,7 +1295,6 @@
         </div>
     </div>
 
-    <script type="module" src="firebase-init.js"></script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
     <script defer src="sync.js"></script>

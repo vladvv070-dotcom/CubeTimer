@@ -12,7 +12,8 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  fetchSignInMethodsForEmail
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   getFirestore,
@@ -88,6 +89,17 @@ window.CubeAuth = {
 
   loginWithEmail: (email, password) =>
     signInWithEmailAndPassword(auth, email, password),
+
+  // Список способов входа, привязанных к email (['password'], ['google.com'], ...).
+  // Используется, чтобы объяснить пользователю, почему "неверный пароль",
+  // если на самом деле аккаунт создан через Google и пароля не имеет.
+  getSignInMethods: async (email) => {
+    try {
+      return await fetchSignInMethodsForEmail(auth, email);
+    } catch (e) {
+      return [];
+    }
+  },
 
   loginWithGoogle: () => signInWithPopup(auth, googleProvider),
 
