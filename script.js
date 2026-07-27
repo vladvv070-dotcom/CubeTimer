@@ -241,6 +241,9 @@
                 const authWarningCloseBtn = document.querySelector('#authWarningCloseBtn');
                 const authAccountCloseBtn = document.querySelector('#authAccountCloseBtn');
                 const authLogoutBtn = document.querySelector('#authLogoutBtn');
+                const authLogoutConfirmTitle = document.querySelector('#authLogoutConfirmTitle');
+                const authLogoutCancelBtn = document.querySelector('#authLogoutCancelBtn');
+                const authLogoutConfirmBtn = document.querySelector('#authLogoutConfirmBtn');
                 if (authBtn) {
                     const authUser = AppStorage.getJSON('authUser');
                     authBtn.textContent = authUser
@@ -263,6 +266,9 @@
                 if (authWarningCloseBtn) authWarningCloseBtn.textContent = t.authWarningCloseBtn;
                 if (authAccountCloseBtn) authAccountCloseBtn.textContent = t.authAccountCloseBtn;
                 if (authLogoutBtn) authLogoutBtn.textContent = t.authLogoutBtn;
+                if (authLogoutConfirmTitle) authLogoutConfirmTitle.textContent = t.authLogoutConfirm;
+                if (authLogoutCancelBtn) authLogoutCancelBtn.textContent = t.authLogoutCancelBtn;
+                if (authLogoutConfirmBtn) authLogoutConfirmBtn.textContent = t.authLogoutBtn;
 
                 // Target Time
                 const ttModalTitle = document.querySelector('#ttModalTitle');
@@ -2369,6 +2375,12 @@
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
                             DOM('authLogoutBtn').textContent = t.authLogoutBtn;
+                            DOM('authLogoutConfirmTitle').textContent = t.authLogoutConfirm;
+                            DOM('authLogoutCancelBtn').textContent = t.authLogoutCancelBtn;
+                            DOM('authLogoutConfirmBtn').textContent = t.authLogoutBtn;
+                            // Always reopen on the account view, not mid-confirmation.
+                            DOM('authAccountView').style.display = '';
+                            DOM('authLogoutConfirmView').style.display = 'none';
                             DOM('authAccountOverlay').classList.add('visible');
                         } else {
                             DOM('authOverlay').classList.add('visible');
@@ -2381,15 +2393,32 @@
                         DOM('authAccountOverlay').classList.remove('visible');
                     });
                 }
+                // "Log out" (in the account view) doesn't sign out immediately --
+                // it swaps to an in-modal confirmation step. We avoid the native
+                // confirm() dialog here since some recording/automation setups
+                // suppress it silently, which made the button look broken.
                 const authLogoutBtn = document.getElementById('authLogoutBtn');
                 if (authLogoutBtn) {
                     authLogoutBtn.addEventListener('click', () => {
-                        const lang = getLang();
-                        const t = translations[lang];
-                        if (!confirm(t.authLogoutConfirm)) return;
-                        window.CubeAuth.logout().finally(() => {
+                        DOM('authAccountView').style.display = 'none';
+                        DOM('authLogoutConfirmView').style.display = '';
+                    });
+                }
+                const authLogoutCancelBtn = document.getElementById('authLogoutCancelBtn');
+                if (authLogoutCancelBtn) {
+                    authLogoutCancelBtn.addEventListener('click', () => {
+                        DOM('authLogoutConfirmView').style.display = 'none';
+                        DOM('authAccountView').style.display = '';
+                    });
+                }
+                const authLogoutConfirmBtn = document.getElementById('authLogoutConfirmBtn');
+                if (authLogoutConfirmBtn) {
+                    authLogoutConfirmBtn.addEventListener('click', () => {
+                        authLogoutConfirmBtn.disabled = true;
+                        window.CubeAuth.logout().catch(e => console.error('Logout failed:', e)).finally(() => {
                             AppStorage.setJSON('authUser', null);
                             updateAuthBtnUI();
+                            authLogoutConfirmBtn.disabled = false;
                             DOM('authAccountOverlay').classList.remove('visible');
                         });
                     });
