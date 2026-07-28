@@ -3,24 +3,32 @@
    Merge-by-id with tombstones, so signing in on a second device
    never overwrites/loses solves -- it combines both.
 
-   HOW IT WORKS
-   - Every solve/session already has a stable unique `id` (set at
-     creation) plus a timestamp. Merge = union of both sides by id.
-   - Deleting a solve/session doesn't just remove it locally -- its
-     id also gets recorded in a tombstone list (see SyncTombstones
-     below), so a merge never resurrects something you deleted on
-     purpose, even if an older copy of it still exists elsewhere.
+   HOW IT WORKS (per-solve model, not one big blob)
+   - Firestore layout: users/{uid} holds only small, rarely-changing
+     metadata (nickname, email, session names/disciplines, current
+     session id). The actual solve history lives one-document-per-solve
+     in users/{uid}/solves/{solveId}, plus users/{uid}/tombstones/{id}
+     for deletions.
+   - The FULL solve history is only ever read from Firestore once,
+     right after sign-in (AppSync.runSync). After that, every local
+     change (new solve, DNF/+2/edit, delete) pushes exactly ONE
+     Firestore write/update/delete for that single solve -- never a
+     re-read, never a re-upload of the whole history. This is what
+     keeps a heavy user (thousands of solves) from burning through
+     the daily read/write quota in a session or two.
+   - Stats (Ao5/Ao12/Ao100, best, charts) are always computed from
+     the in-memory `timer.sessions[...].solves` array -- never by
+     querying Firestore. That was already true before this file was
+     rewritten and remains true here; this file only changes how
+     solves get in and out of Firestore, not how they're read for
+     display.
+   - Deleting a solve doesn't just remove it locally -- its id also
+     gets recorded in a tombstone (see SyncTombstones below), so a
+     merge never resurrects something you deleted on purpose, even
+     if an older copy of it still exists elsewhere.
    - Editing a solve (DNF/+2/manual edit) stamps `updatedAt`. If the
      same solve id was edited differently on two devices, the merge
-     keeps whichever edit has the newer `updatedAt`.
-
-   WHAT'S LEFT TO WIRE UP (marked with TODO below)
-   - CloudSync.pull() / CloudSync.push() are stubs that do nothing
-     yet. Once Firebase (or whatever backend) is connected, fill
-     these in to read/write the signed-in user's data in Firestore.
-     Everything else (the merge logic, the local save, the tombstone
-     bookkeeping) is already wired and will "just work" as soon as
-     those two functions talk to a real backend.
+     (at next sign-in) keeps whichever edit has the newer `updatedAt`.
    ============================================================ */
 
 // ---- Tombstones: remember what was intentionally deleted -------------
@@ -44,8 +52,7 @@ const SyncTombstones = {
         return new Set(AppStorage.getJSON('deletedSessionIds', []).map(x => x.id));
     },
 
-    // Raw entries (with deletedAt) -- this is what gets pushed to Firestore,
-    // so other devices learn about deletions that happened on this one.
+    // Raw entries (with deletedAt) -- used locally for filtering merges.
     getDeletedSolveEntries() {
         return AppStorage.getJSON('deletedSolveIds', []);
     },
@@ -102,8 +109,12 @@ const SyncMerge = {
         return Array.from(byId.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     },
 
-    // Merge two session dictionaries (keyed by session id).
-    mergeSessions(localSessions, remoteSessions, deletedSessionIds, deletedSolveIds) {
+    // Merge two session metadata dictionaries (keyed by session id).
+    // Solves are NOT part of this anymore -- they're merged separately
+    // via mergeSolves, keyed by their own sessionId field, since they
+    // now live in a flat Firestore subcollection rather than nested
+    // inside each session's blob.
+    mergeSessionsMeta(localSessions, remoteSessions, deletedSessionIds) {
         const merged = {};
         const allIds = new Set([
             ...Object.keys(localSessions || {}),
@@ -117,11 +128,9 @@ const SyncMerge = {
             const remote = (remoteSessions || {})[id];
 
             if (local && remote) {
-                merged[id] = {
-                    ...remote,
-                    ...local, // local metadata (name, discipline edits) wins on conflict
-                    solves: SyncMerge.mergeSolves(local.solves, remote.solves, deletedSolveIds)
-                };
+                // local metadata (name, discipline edits) wins on conflict;
+                // solves get overwritten below once mergeSolves runs.
+                merged[id] = { ...remote, ...local, solves: local.solves || remote.solves || [] };
             } else {
                 merged[id] = local || remote;
             }
@@ -132,83 +141,196 @@ const SyncMerge = {
 
 // ---- Cloud read/write -- talks to Firestore via firebase-init.js's CubeSync
 const CloudSync = {
-    async pull() {
+    // Metadata only (nickname, session names/disciplines, current session
+    // id) -- small, rarely-changing document. NOT the solve history.
+    async pullMeta() {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return null;
         try {
-            const data = await window.CubeSync.loadUserData();
-            return (data && data.syncData) ? data.syncData : null;
+            return await window.CubeSync.loadUserData();
         } catch (e) {
-            console.error('CloudSync.pull failed:', e);
+            console.error('CloudSync.pullMeta failed:', e);
             return null;
         }
     },
-    async push(data) {
+    async pushMeta(meta) {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
         try {
-            await window.CubeSync.saveUserData({ syncData: data });
+            await window.CubeSync.saveSessionsMeta(meta);
         } catch (e) {
-            console.error('CloudSync.push failed:', e);
+            console.error('CloudSync.pushMeta failed:', e);
+        }
+    },
+
+    // The ENTIRE solve history, read exactly once (called only from
+    // AppSync.runSync, i.e. once per sign-in / page load with a
+    // restored session -- never on a per-solve basis).
+    async pullAllSolvesOnce() {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return { solves: [], tombstones: [] };
+        try {
+            return await window.CubeSync.loadAllSolvesOnce();
+        } catch (e) {
+            console.error('CloudSync.pullAllSolvesOnce failed:', e);
+            return { solves: [], tombstones: [] };
+        }
+    },
+
+    // Point writes -- exactly one Firestore operation each, no re-read
+    // of the rest of the history.
+    async pushNewSolve(sessionId, solve) {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        try {
+            await window.CubeSync.saveSolve(sessionId, solve);
+        } catch (e) {
+            console.error('CloudSync.pushNewSolve failed:', e);
+        }
+    },
+    async pushSolveUpdate(solveId, patch) {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        try {
+            await window.CubeSync.updateSolve(solveId, patch);
+        } catch (e) {
+            console.error('CloudSync.pushSolveUpdate failed:', e);
+        }
+    },
+    async pushSolveDelete(solveId) {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        try {
+            await window.CubeSync.deleteSolveRemote(solveId);
+        } catch (e) {
+            console.error('CloudSync.pushSolveDelete failed:', e);
         }
     }
 };
 
 // ---- Orchestration ------------------------------------------------------
 const AppSync = {
-    // Call this right after a successful login (and optionally after
-    // every solve, if you want near-live sync across open devices).
+    // Call this right after a successful login, and once on page load if
+    // a session was restored. This is the ONLY place the full solve
+    // history gets read from Firestore -- every subsequent solve add/
+    // edit/delete uses the point-write functions below instead.
     async runSync() {
-        const remote = await CloudSync.pull();
         const timer = window.timer;
         if (!timer) return;
+
+        const [remoteMeta, remoteHistory] = await Promise.all([
+            CloudSync.pullMeta(),
+            CloudSync.pullAllSolvesOnce()
+        ]);
 
         // Fold in tombstones from Firestore FIRST -- otherwise a solve/session
         // deleted on another device looks, from this device's point of view,
         // just like a solve/session it never heard was deleted, and the
         // union-merge below would resurrect it.
-        if (remote) {
-            SyncTombstones.mergeRemoteSolveTombstones(remote.deletedSolveIds);
-            SyncTombstones.mergeRemoteSessionTombstones(remote.deletedSessionIds);
+        if (remoteMeta) {
+            SyncTombstones.mergeRemoteSessionTombstones(remoteMeta.deletedSessionIds);
         }
+        SyncTombstones.mergeRemoteSolveTombstones(remoteHistory.tombstones);
 
         const deletedSessionIds = SyncTombstones.getDeletedSessionIds();
         const deletedSolveIds = SyncTombstones.getDeletedSolveIds();
 
-        const mergedSessions = remote
-            ? SyncMerge.mergeSessions(timer.sessions, remote.sessions, deletedSessionIds, deletedSolveIds)
-            : timer.sessions;
+        // Merge session metadata (names/disciplines), solves temporarily empty.
+        const mergedSessions = remoteMeta
+            ? SyncMerge.mergeSessionsMeta(timer.sessions, remoteMeta.sessions, deletedSessionIds)
+            : { ...timer.sessions };
+
+        // Group the flat remote solve list by sessionId, then merge each
+        // session's local solves against its remote solves.
+        const remoteSolvesBySession = {};
+        for (const solve of remoteHistory.solves) {
+            const sid = solve.sessionId || 'no-session';
+            (remoteSolvesBySession[sid] = remoteSolvesBySession[sid] || []).push(solve);
+        }
+
+        const localSolvesNotYetRemote = []; // solves that exist locally but never made it to Firestore
+        for (const sessionId of Object.keys(mergedSessions)) {
+            if (deletedSessionIds.has(sessionId)) continue;
+            const localSolves = timer.sessions[sessionId]?.solves || [];
+            const remoteSolves = remoteSolvesBySession[sessionId] || [];
+            mergedSessions[sessionId].solves = SyncMerge.mergeSolves(localSolves, remoteSolves, deletedSolveIds);
+
+            const remoteIds = new Set(remoteSolves.map(s => s.id));
+            for (const solve of localSolves) {
+                if (!remoteIds.has(solve.id) && !deletedSolveIds.has(solve.id)) {
+                    localSolvesNotYetRemote.push({ sessionId, solve });
+                }
+            }
+        }
 
         timer.sessions = mergedSessions;
-        if (!mergedSessions[timer.currentSessionId] && remote?.currentSessionId) {
-            timer.currentSessionId = remote.currentSessionId;
+        if (!mergedSessions[timer.currentSessionId] && remoteMeta?.currentSessionId) {
+            timer.currentSessionId = remoteMeta.currentSessionId;
         }
         timer.saveSessions();
         timer.renderSessionsList?.();
         timer.updateSessionDetails?.();
         timer.updateUI();
 
-        await CloudSync.push({
-            sessions: mergedSessions,
+        // Keep the header's "logged in as ..." nickname fresh after a
+        // restored session (login/register/Google-login already set this
+        // themselves right after auth, so this mainly covers page reloads).
+        const user = window.CubeAuth?.getCurrentUser?.();
+        if (user && remoteMeta?.nickname) {
+            AppStorage.setJSON('authUser', { uid: user.uid, nickname: remoteMeta.nickname, email: user.email });
+        }
+
+        // Push metadata once if it changed, and backfill any solves that
+        // were created locally but never reached Firestore (e.g. made
+        // while offline, or before the very first sign-in on this device).
+        // This is a one-time catch-up, not a recurring re-upload of
+        // everything -- each solve is still exactly one write.
+        AppSync.pushSessionsMetaNow();
+        for (const { sessionId, solve } of localSolvesNotYetRemote) {
+            await CloudSync.pushNewSolve(sessionId, solve);
+        }
+    },
+
+    // ---- Point-write helpers, called directly from Timer on each action ----
+    pushNewSolve(sessionId, solve) {
+        CloudSync.pushNewSolve(sessionId, solve);
+    },
+    pushSolveUpdate(solveId, patch) {
+        CloudSync.pushSolveUpdate(solveId, patch);
+    },
+    pushSolveDelete(solveId) {
+        CloudSync.pushSolveDelete(solveId);
+    },
+
+    // Metadata (session names/disciplines/current session) is small and
+    // changes rarely, so it's fine to push it as a whole -- debounced the
+    // same way the old blob push was, just without the solve history
+    // riding along with it.
+    pushSessionsMetaNow() {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        const timer = window.timer;
+        if (!timer) return;
+        const sessionsMeta = {};
+        for (const [id, session] of Object.entries(timer.sessions)) {
+            const { solves, ...meta } = session; // eslint-disable-line no-unused-vars
+            sessionsMeta[id] = meta;
+        }
+        CloudSync.pushMeta({
+            sessions: sessionsMeta,
             currentSessionId: timer.currentSessionId,
-            deletedSolveIds: SyncTombstones.getDeletedSolveEntries(),
             deletedSessionIds: SyncTombstones.getDeletedSessionEntries()
         });
     }
 };
 
-// ---- Live autosync: push after every local change ------------------------
-// Called from Timer.saveSessions() -- i.e. after every solve, DNF, +2,
-// delete, edit, or session change. Debounced so several rapid saves
-// (e.g. delete + re-render) collapse into a single network write.
-// Deliberately does NOT pull/merge -- this device already has the
-// freshest state after its own edit; a full AppSync.runSync() (with
-// pull) still happens on every sign-in, which is when merging
-// against another device's changes actually matters.
-let _autoPushTimer = null;
-function queueAutoPush(getData) {
+// ---- Live autosync of METADATA ONLY: push after session-level changes --
+// Called from Timer.saveSessions() -- session create/rename/delete,
+// discipline change, session switch, etc. Debounced so several rapid
+// changes collapse into a single small write. Deliberately excludes the
+// solves array now (that's not what changed here in the common case,
+// and per-solve actions push themselves individually via the functions
+// above) -- this is the whole point of the rewrite: no more re-uploading
+// the entire solve history on every save.
+let _metaPushTimer = null;
+function queueAutoPush() {
     if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
-    clearTimeout(_autoPushTimer);
-    _autoPushTimer = setTimeout(() => {
-        CloudSync.push(getData()).catch(e => console.error('Auto-sync push failed:', e));
+    clearTimeout(_metaPushTimer);
+    _metaPushTimer = setTimeout(() => {
+        AppSync.pushSessionsMetaNow();
     }, 800);
 }
 window.queueAutoPush = queueAutoPush;

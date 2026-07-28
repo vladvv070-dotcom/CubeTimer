@@ -7185,31 +7185,6 @@ html {
     }
 }
 
-/* Mobile-only toggle for the Last 5 Solves card. Hidden by default;
-   the mobile breakpoint below turns it on. */
-.mobile-solves-toggle {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
-    background: var(--bg-card);
-    border: 1px solid rgba(74, 158, 255, 0.15);
-    color: var(--text-secondary);
-    padding: 0.65rem 1rem;
-    border-radius: var(--border-radius-sm);
-    font-family: 'Anybody', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.mobile-solves-toggle:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-}
-
 /* ============================================================
    Mobile declutter (phones): timer + scramble stay the hero.
    Last 5 Solves / Best Times / Progress chart are hidden by
@@ -7225,22 +7200,13 @@ html {
         gap: 0.75rem;
     }
 
-    /* Last 5 Solves: hidden by default, revealed via the toggle button */
-    .left-column {
-        gap: 0.6rem;
-    }
-
+    /* Last 5 Solves: not useful on mobile (check the Sessions modal on desktop instead) */
     .left-column .card {
         display: none;
     }
 
-    .left-column .card.mobile-open {
-        display: block;
-        padding: 1.25rem !important;
-    }
-
-    .mobile-solves-toggle {
-        display: flex;
+    .left-column {
+        gap: 0.6rem;
     }
 
     .control-btn {

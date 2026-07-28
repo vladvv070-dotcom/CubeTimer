@@ -18,8 +18,13 @@ import {
 import {
   getFirestore,
   doc,
+  collection,
   setDoc,
   getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
@@ -155,20 +160,77 @@ window.CubeSync = {
     return onSnapshot(doc(db, "users", user.uid), (snap) => {
       callback(snap.exists() ? snap.data() : null);
     });
+  },
+
+  // ---------------------------------------------------------------
+  // Точечная работа со сборками: каждый solve — отдельный документ
+  // в users/{uid}/solves/{solveId}, а не поле в одном большом блобе.
+  // Это даёт ровно 1 read/write за операцию вместо перезаписи всей
+  // истории целиком, и позволяет читать всю историю только один
+  // раз (при логине), а не при каждом пересчёте статистики.
+  // ---------------------------------------------------------------
+
+  // Один раз (обычно сразу после логина) забрать ВСЮ историю сборок
+  // и список "надгробий" удалений — и больше не читать их снова до
+  // следующего логина/явного ресинка.
+  loadAllSolvesOnce: async () => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Пользователь не авторизован");
+    const [solvesSnap, tombstonesSnap] = await Promise.all([
+      getDocs(collection(db, "users", user.uid, "solves")),
+      getDocs(collection(db, "users", user.uid, "tombstones"))
+    ]);
+    const solves = solvesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const tombstones = tombstonesSnap.docs.map(d => ({ id: d.id, deletedAt: d.data().deletedAt }));
+    return { solves, tombstones };
+  },
+
+  // Ровно 1 write: новый solve целиком (создание).
+  saveSolve: async (sessionId, solve) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    await setDoc(doc(db, "users", user.uid, "solves", solve.id), { ...solve, sessionId });
+  },
+
+  // Ровно 1 write: точечное изменение полей существующего solve
+  // (DNF/+2/ручное редактирование времени). Не трогает остальные
+  // документы и не перезаписывает solve целиком.
+  updateSolve: async (solveId, patch) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    await updateDoc(doc(db, "users", user.uid, "solves", solveId), patch);
+  },
+
+  // Ровно 1 delete + 1 write (надгробие), атомарно через batch —
+  // чтобы другие устройства при следующем логине узнали об удалении
+  // и не "воскресили" solve при слиянии.
+  deleteSolveRemote: async (solveId) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    const batch = writeBatch(db);
+    batch.delete(doc(db, "users", user.uid, "solves", solveId));
+    batch.set(doc(db, "users", user.uid, "tombstones", solveId), { deletedAt: Date.now() });
+    await batch.commit();
+  },
+
+  // Метаданные сессий (имя, дисциплина и т.п.) БЕЗ массивов solves —
+  // маленький документ, который почти не растёт и меняется редко
+  // (создание/переименование/удаление сессии), в отличие от истории
+  // сборок.
+  saveSessionsMeta: async (meta) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    await setDoc(doc(db, "users", user.uid), meta, { merge: true });
   }
 };
 
 // При старте страницы, если Firebase сам восстановил сессию
-// (стандартное поведение — сессия хранится в браузере), подтягиваем
-// актуальный ник и досинхронизируем данные без повторного логина.
+// (стандартное поведение — сессия хранится в браузере), запускаем
+// полный ресинк один раз. AppSync.runSync() сам читает и метаданные,
+// и историю сборок — второй getDoc здесь был бы лишним чтением.
 onAuthStateChanged(auth, async (user) => {
   if (!user || !window.AppStorage) return;
   try {
-    const snap = await getDoc(doc(db, "users", user.uid));
-    const nickname = snap.exists() && snap.data().nickname
-      ? snap.data().nickname
-      : (user.displayName || (user.email ? user.email.split("@")[0] : "user"));
-    window.AppStorage.setJSON("authUser", { uid: user.uid, nickname, email: user.email });
     if (window.AppSync && window.AppSync.runSync) {
       await window.AppSync.runSync();
     }

@@ -1428,20 +1428,6 @@
             }
 
             initEventListeners() {
-                // Mobile: toggle the Last 5 Solves card (hidden by default on small screens)
-                const mobileSolvesToggle = document.getElementById('mobileSolvesToggle');
-                if (mobileSolvesToggle) {
-                    mobileSolvesToggle.addEventListener('click', () => {
-                        const solvesCard = document.querySelector('.left-column .card');
-                        if (!solvesCard) return;
-                        const isOpen = solvesCard.classList.toggle('mobile-open');
-                        mobileSolvesToggle.classList.toggle('active', isOpen);
-                        const arrow = isOpen ? '▲' : '📋';
-                        const iconSpan = mobileSolvesToggle.querySelector('span:first-child');
-                        if (iconSpan) iconSpan.textContent = arrow;
-                    });
-                }
-
                 // Open/Close Settings
                 document.getElementById('settingsBtn').addEventListener('click', () => {
                     DOM('settingsOverlay').classList.add('visible');
@@ -2238,13 +2224,12 @@
             saveSessions() {
                 AppStorage.setJSON('cubeTimerSessions', this.sessions);
                 AppStorage.setRaw('cubeTimerCurrentSession', this.currentSessionId);
+                // Pushes only session metadata (names/disciplines/current session) —
+                // the solve history itself is synced separately, one solve at a time,
+                // via window.AppSync.pushNewSolve/pushSolveUpdate/pushSolveDelete
+                // called right where each solve action happens.
                 if (window.queueAutoPush) {
-                    window.queueAutoPush(() => ({
-                        sessions: this.sessions,
-                        currentSessionId: this.currentSessionId,
-                        deletedSolveIds: window.SyncTombstones ? window.SyncTombstones.getDeletedSolveEntries() : [],
-                        deletedSessionIds: window.SyncTombstones ? window.SyncTombstones.getDeletedSessionEntries() : []
-                    }));
+                    window.queueAutoPush();
                 }
             }
 
@@ -3214,6 +3199,7 @@
                     this._registerSolveInHonestMode(currentSession, solve);
                     this.saveSessions();
                     this._maybeAutoExport();
+                    if (window.AppSync) window.AppSync.pushNewSolve(this.currentSessionId, solve);
                     
                     // Update solve history if it's open
                     if (window.sessionsManager && DOM('solveHistorySection').style.display === 'flex') {
@@ -3247,6 +3233,7 @@
                     this._registerSolveInHonestMode(currentSession, solve);
                     this.saveSessions();
                     this._maybeAutoExport();
+                    if (window.AppSync) window.AppSync.pushNewSolve(this.currentSessionId, solve);
 
                     if (window.sessionsManager && DOM('solveHistorySection').style.display === 'flex') {
                         window.sessionsManager.populateSolveHistory();
@@ -5151,6 +5138,7 @@
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
+                if (window.AppSync) window.AppSync.pushSolveDelete(solve.id);
                 
                 // Update main timer display if needed
                 if (window.timer) {
@@ -5171,6 +5159,13 @@
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
+                if (window.AppSync) {
+                    window.AppSync.pushSolveUpdate(solve.id, {
+                        dnf: solve.dnf,
+                        penalty: solve.penalty,
+                        updatedAt: solve.updatedAt
+                    });
+                }
                 
                 if (window.timer) {
                     window.timer.updateUI();
@@ -5190,6 +5185,13 @@
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
+                if (window.AppSync) {
+                    window.AppSync.pushSolveUpdate(solve.id, {
+                        dnf: solve.dnf,
+                        penalty: solve.penalty,
+                        updatedAt: solve.updatedAt
+                    });
+                }
                 
                 if (window.timer) {
                     window.timer.updateUI();
@@ -5630,6 +5632,13 @@
                 this.hideNewBestIndicator();
                 this.saveSessions();
                 this.updateUI();
+                if (window.AppSync) {
+                    window.AppSync.pushSolveUpdate(currentSession.solves[0].id, {
+                        dnf: currentSession.solves[0].dnf,
+                        penalty: currentSession.solves[0].penalty,
+                        updatedAt: currentSession.solves[0].updatedAt
+                    });
+                }
                 
                 // Trigger commentary for DNF
                 if (window.commentary && currentSession.solves[0].dnf) {
@@ -5651,6 +5660,12 @@
                 this.hideNewBestIndicator();
                 this.saveSessions();
                 this.updateUI();
+                if (window.AppSync) {
+                    window.AppSync.pushSolveUpdate(currentSession.solves[0].id, {
+                        penalty: currentSession.solves[0].penalty,
+                        updatedAt: currentSession.solves[0].updatedAt
+                    });
+                }
                 
                 // Trigger commentary for +2
                 if (window.commentary && currentSession.solves[0].penalty === 2) {
@@ -5673,6 +5688,7 @@
                     this.hideNewBestIndicator();
                     this.saveSessions();
                     this.updateUI();
+                    if (removed && window.AppSync) window.AppSync.pushSolveDelete(removed.id);
                     
                     // Trigger commentary for delete
                     if (window.commentary) {
@@ -5821,6 +5837,14 @@
                     this.hideNewBestIndicator();
                     this.saveSessions();
                     this.updateUI();
+                    if (window.AppSync) {
+                        window.AppSync.pushSolveUpdate(currentSession.solves[0].id, {
+                            time: currentSession.solves[0].time,
+                            dnf: currentSession.solves[0].dnf,
+                            penalty: currentSession.solves[0].penalty,
+                            updatedAt: currentSession.solves[0].updatedAt
+                        });
+                    }
                 }
             }
 
