@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <meta name="description" content="Next Cube Pro — бесплатный онлайн-таймер для кубика Рубика 3x3, 2x2, 4x4, 5x5 и других головоломок: скрамблы WCA, тренажёр OLL/PLL, статистика Ao5/Ao12/Ao100, боты-комментаторы.">
-    <meta name="keywords" content="таймер для кубика рубика онлайн, таймер спидкубинга с ботом-комментатором, cube timer бесплатно, таймер кубика рубика с честным режимом, тренажёр oll pll алгоритмов онлайн, генератор скрамблов wca 3x3 2x2 4x4 5x5, таймер для пираминкс скьюб мегаминкс, статистика ao5 ao12 ao100 онлайн, экспорт solve из cstimer cubedesk twisty timer, таймер кубика рубика на русском языке">
+    <meta name="description" content="Next Cube Pro — бесплатный онлайн-таймер для кубика Рубика.">
+    <meta name="keywords" content="таймер для кубика рубика онлайн, таймер спидкубинга с ботом-комментатором, cube timer бесплатно, таймер кубика рубика с честным режимом, тренажёром алгоритмов онлайн, генератор скрамблов wca 3x3 2x2 4x4 5x5, таймер для пираминкс скьюб мегаминкс, статистика ao5 ao12 ao100 онлайн, экспорт solve из cstimer cubedesk twisty timer, таймер кубика рубика на русском языке">
     <meta name="google-site-verification" content="_Y6OSl5EY9Ym_5p1YvXY4qH5Q0gwGWQWGid2E5WpXlM" />
 
     <meta property="og:type" content="website">
@@ -13,16 +13,22 @@
     <meta property="og:title" content="Next Cube Pro — онлайн-таймер для спидкубинга с ботом-комментатором">
     <meta property="og:description" content="Бесплатный таймер для кубика Рубика 3x3, 2x2, 4x4, 5x5 и других головоломок: скрамблы WCA, тренажёр OLL/PLL, статистика Ao5/Ao12/Ao100, боты-комментаторы.">
     <meta property="og:url" content="https://vladvv070-dotcom.github.io/NextCubePro/">
-    <meta property="og:image" content="https://vladvv070-dotcom.github.io/NextCubePro/avatar.png">
+    <meta property="og:image" content="https://vladvv070-dotcom.github.io/NextCubePro/images/avatar.png">
     <meta property="og:locale" content="ru_RU">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Next Cube Pro — онлайн-таймер для спидкубинга">
     <meta name="twitter:description" content="Бесплатный таймер для кубика Рубика: скрамблы WCA, тренажёр OLL/PLL, статистика Ao5/Ao12/Ao100, боты-комментаторы.">
-    <meta name="twitter:image" content="https://vladvv070-dotcom.github.io/NextCubePro/avatar.png">
+    <meta name="twitter:image" content="https://vladvv070-dotcom.github.io/NextCubePro/images/avatar.png">
     
     <title>Next Cube Pro — Онлайн таймер для спидкубинга с ботом-комментатором</title>
     
-    <link rel="icon" type="image/png" href="./avatar.png" sizes="any">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./images/android-chrome-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
+    <link rel="manifest" href="./site.webmanifest">
+    <meta name="theme-color" content="#0d0f14">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,12 +47,12 @@
       "description": "Бесплатный онлайн-таймер для спидкубинга: кубик Рубика 3x3, 2x2, 4x4, 5x5, пираминкс, скьюб и другие головоломки WCA. Генератор официальных скрамблов, тренажёр алгоритмов OLL/PLL, статистика Ao5/Ao12/Ao100 и уникальная система комментирования сборок ботами.",
       "featureList": [
         "Генератор официальных скрамблов WCA (3x3, 2x2, 4x4, 5x5, 6x6, 7x7, пираминкс, скьюб, мегаминкс)",
-        "Тренажёр алгоритмов OLL и PLL",
-        "Честный режим (Honest Mode) и целевое время сборки",
-        "Аналитика и статистика сборок: Ao5, Ao12, Ao100",
+        "Тренажёр алгоритмов разных методик",
+        "Честный режим (Honest Mode) и целевое время сборки (Target Time)",
+        "Аналитика и детальная статистика сборок: Ao5, Ao12, Ao100",
         "Боты-комментаторы (Враг, Друг, Подкалыватель, Соперник, Тренер)",
-        "Импорт и экспорт solve из csTimer, CubeDesk, Twisty Timer",
-        "Оптимизация под мобильные устройства и ПК"
+        "Импорт и экспорт solve из csTimer, CubeDeck, Twisty Timer, Last Cube X",
+        "Оптимизация под планшеты и ПК"
       ]
     }
     </script>
@@ -68,13 +74,13 @@
                 <div class="control-window">
                     <div class="header-icon-row">
                         <button class="icon-btn" id="settingsBtn" title="Settings">
-                            <img src="settings.png" alt="Settings" class="icon-img">
+                            <img src="images/settings.png" alt="Settings" class="icon-img">
                         </button>
                         <button class="icon-btn" id="sessionsBtn" title="Sessions">
-                            <img src="sessions.png" alt="Sessions" class="icon-img">
+                            <img src="images/sessions.png" alt="Sessions" class="icon-img">
                         </button>
                         <button class="icon-btn" id="statisticsBtn" title="Statistics">
-                            <img src="statistics.png" alt="Statistics" class="icon-img">
+                            <img src="images/statistics.png" alt="Statistics" class="icon-img">
                         </button>
                     </div>
                     <div class="fire-menu" id="fireMenu">
@@ -136,6 +142,11 @@
                     <button class="control-btn danger" id="deleteBtn">Delete</button>
                     <button class="control-btn" id="editBtn">Edit</button>
                 </div>
+
+                <!-- Mobile-only: reveals the Last 5 Solves card, which is hidden by default on small screens -->
+                <button class="mobile-solves-toggle" id="mobileSolvesToggle">
+                    <span>📋</span><span id="mobileSolvesToggleLabel">Last 5 Solves</span>
+                </button>
             </aside>
 
             <!-- Center Column - Timer -->
@@ -208,12 +219,14 @@
             </aside>
         </main>
 
-        <div class="export-buttons">
-            <button class="export-btn" id="importExportBtn">📤 Import / Export</button>
-        </div>
+        <div class="bottom-left-buttons">
+            <div class="export-buttons">
+                <button class="export-btn" id="importExportBtn">📤 Import / Export</button>
+            </div>
 
-        <div class="auth-buttons">
-            <button class="export-btn" id="authBtn">👤 Войти</button>
+            <div class="auth-buttons">
+                <button class="export-btn" id="authBtn">👤 Войти</button>
+            </div>
         </div>
 
         <!-- Hidden: kept in DOM only for script.js compatibility, no longer shown -->
@@ -1186,7 +1199,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.22.10</div>
+    <div class="version-display">1.22.15</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">

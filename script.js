@@ -1428,6 +1428,20 @@
             }
 
             initEventListeners() {
+                // Mobile: toggle the Last 5 Solves card (hidden by default on small screens)
+                const mobileSolvesToggle = document.getElementById('mobileSolvesToggle');
+                if (mobileSolvesToggle) {
+                    mobileSolvesToggle.addEventListener('click', () => {
+                        const solvesCard = document.querySelector('.left-column .card');
+                        if (!solvesCard) return;
+                        const isOpen = solvesCard.classList.toggle('mobile-open');
+                        mobileSolvesToggle.classList.toggle('active', isOpen);
+                        const arrow = isOpen ? '▲' : '📋';
+                        const iconSpan = mobileSolvesToggle.querySelector('span:first-child');
+                        if (iconSpan) iconSpan.textContent = arrow;
+                    });
+                }
+
                 // Open/Close Settings
                 document.getElementById('settingsBtn').addEventListener('click', () => {
                     DOM('settingsOverlay').classList.add('visible');
@@ -2581,12 +2595,8 @@
                         DOM('authWarningOverlay').classList.remove('visible');
                     });
                 }
-                // Not-logged-in nudge: shows once per page load until a real
-                // logged-in user is stored under 'authUser' (set that up when
-                // wiring in real auth, and this stops firing automatically).
-                if (!AppStorage.getJSON('authUser')) {
-                    DOM('authWarningOverlay').classList.add('visible');
-                }
+                // Not-logged-in nudge disabled: it was confusing for first-time
+                // visitors (shows a red warning before they understand the app).
 
                 const ieOverlay = DOM('importExportOverlay');
                 if (ieOverlay) {
@@ -3300,10 +3310,12 @@
             }
 
             showNewBestMessages(messages) {
+                const initialDelay = 2500; // wait 2.5s after the record before starting the slide-in animation
+                const holdDuration = 5000; // each record label stays visible for 5s
                 messages.forEach((message, index) => {
                     setTimeout(() => {
                         this.showNewBestIndicator(message);
-                    }, index * 2000); // show each record label for its own 2s window
+                    }, initialDelay + index * holdDuration);
                 });
             }
 
@@ -3327,7 +3339,7 @@
                 clearTimeout(this._newBestTimeout);
                 this._newBestTimeout = setTimeout(() => {
                     this.titleStrip.classList.remove('showing-record');
-                }, 2000);
+                }, 5000);
             }
 
             hideNewBestIndicator() {
