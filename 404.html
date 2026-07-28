@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>404 — Страница не найдена | Next Cube Pro</title>
+    <meta name="robots" content="noindex">
+
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+    <meta name="theme-color" content="#0d0f14">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-card: rgba(26, 33, 55, 0.6);
+            --text-primary: #e8edf4;
+            --text-secondary: #a8b4c8;
+            --text-muted: #6b7896;
+            --accent-primary: #4a9eff;
+            --accent-secondary: #7b6fff;
+            --border-radius: 20px;
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #141928 50%, #1a2137 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(74, 158, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(123, 111, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(74, 158, 255, 0.15);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 3rem 2.5rem;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cube-icon {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 20px rgba(74, 158, 255, 0.4));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(8deg); }
+        }
+
+        .error-code {
+            font-family: 'Anybody', sans-serif;
+            font-weight: 700;
+            font-size: 5.5rem;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+        }
+
+        .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            font-family: 'Anybody', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(74, 158, 255, 0.45);
+        }
+
+        .brand {
+            margin-top: 2rem;
+            font-family: 'Anybody', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .brand span {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="cube-icon">🧊</div>
+        <div class="error-code">404</div>
+        <div class="title">Скрамбл в никуда</div>
+        <div class="subtitle">Такой страницы не существует — возможно, ссылка устарела или в адресе опечатка.</div>
+        <a class="btn-primary" href="https://vladvv070-dotcom.github.io/NextCubePro/">
+            ⏱ Открыть таймер
+        </a>
+        <div class="brand">Next<span>Cube</span>Pro</div>
+    </div>
+</body>
+</html>
