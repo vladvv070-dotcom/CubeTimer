@@ -1108,8 +1108,11 @@
                 <div class="new-session-title" id="authAccountTitle">Вы вошли</div>
                 <p class="auth-warning-text auth-account-email" id="authAccountEmail"></p>
                 <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="authChangeNicknameBtn">Изменить ник</button>
                     <button class="new-session-btn cancel" id="authAccountCloseBtn">Закрыть</button>
-                    <button class="new-session-btn danger" id="authLogoutBtn">Выйти</button>
+                </div>
+                <div class="new-session-actions">
+                    <button class="new-session-btn danger" id="authLogoutBtn" style="width:100%;">Выйти</button>
                 </div>
             </div>
             <div id="authLogoutConfirmView" style="display:none;">
@@ -1117,6 +1120,17 @@
                 <div class="new-session-actions">
                     <button class="new-session-btn cancel" id="authLogoutCancelBtn">Отмена</button>
                     <button class="new-session-btn danger" id="authLogoutConfirmBtn">Выйти</button>
+                </div>
+            </div>
+            <div id="authChangeNicknameView" style="display:none;">
+                <div class="new-session-title" id="authChangeNicknameTitle">Изменить ник</div>
+                <div class="new-session-field">
+                    <input class="new-session-input" type="text" id="authNewNicknameInput" autocomplete="off" maxlength="24">
+                </div>
+                <p class="auth-error" id="authChangeNicknameError"></p>
+                <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="authChangeNicknameCancelBtn">Отмена</button>
+                    <button class="new-session-btn primary" id="authChangeNicknameSaveBtn">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -1194,7 +1208,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">1.22.21</div>
+    <div class="version-display">1.22.23</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">

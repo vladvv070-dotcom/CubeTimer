@@ -242,15 +242,23 @@ const AppSync = {
             (remoteSolvesBySession[sid] = remoteSolvesBySession[sid] || []).push(solve);
         }
 
-        const localSolvesNotYetRemote = []; // solves that exist locally but never made it to Firestore
+        const localSolvesNotYetRemote = []; // solves that exist locally (or only in the legacy embedded field) but never made it to the new subcollection
         for (const sessionId of Object.keys(mergedSessions)) {
             if (deletedSessionIds.has(sessionId)) continue;
             const localSolves = timer.sessions[sessionId]?.solves || [];
             const remoteSolves = remoteSolvesBySession[sessionId] || [];
-            mergedSessions[sessionId].solves = SyncMerge.mergeSolves(localSolves, remoteSolves, deletedSolveIds);
+            // Backward-compat: sessions created before the subcollection rewrite
+            // may still have their solves sitting in the OLD embedded field
+            // (remote.sessions[id].solves from the metadata doc). Treat that as
+            // a third merge source instead of silently discarding it -- this is
+            // exactly what went missing on the phone.
+            const legacySolves = (remoteMeta?.sessions?.[sessionId]?.solves) || [];
+
+            const solvesWithLegacy = SyncMerge.mergeSolves(localSolves, legacySolves, deletedSolveIds);
+            mergedSessions[sessionId].solves = SyncMerge.mergeSolves(solvesWithLegacy, remoteSolves, deletedSolveIds);
 
             const remoteIds = new Set(remoteSolves.map(s => s.id));
-            for (const solve of localSolves) {
+            for (const solve of mergedSessions[sessionId].solves) {
                 if (!remoteIds.has(solve.id) && !deletedSolveIds.has(solve.id)) {
                     localSolvesNotYetRemote.push({ sessionId, solve });
                 }

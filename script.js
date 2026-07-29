@@ -2382,6 +2382,7 @@
                             // Always reopen on the account view, not mid-confirmation.
                             DOM('authAccountView').style.display = '';
                             DOM('authLogoutConfirmView').style.display = 'none';
+                            DOM('authChangeNicknameView').style.display = 'none';
                             DOM('authAccountOverlay').classList.add('visible');
                         } else {
                             DOM('authOverlay').classList.add('visible');
@@ -2433,6 +2434,75 @@
                         }
                     });
                 }
+
+                // "Change nickname" -- swaps to an inline edit form within the
+                // same account modal, same pattern as the logout confirmation.
+                const authChangeNicknameBtn = document.getElementById('authChangeNicknameBtn');
+                if (authChangeNicknameBtn) {
+                    authChangeNicknameBtn.addEventListener('click', () => {
+                        const authUser = AppStorage.getJSON('authUser');
+                        DOM('authNewNicknameInput').value = authUser?.nickname || '';
+                        DOM('authChangeNicknameError').classList.remove('visible');
+                        DOM('authChangeNicknameError').textContent = '';
+                        DOM('authAccountView').style.display = 'none';
+                        DOM('authChangeNicknameView').style.display = '';
+                    });
+                }
+                const authChangeNicknameCancelBtn = document.getElementById('authChangeNicknameCancelBtn');
+                if (authChangeNicknameCancelBtn) {
+                    authChangeNicknameCancelBtn.addEventListener('click', () => {
+                        DOM('authChangeNicknameView').style.display = 'none';
+                        DOM('authAccountView').style.display = '';
+                    });
+                }
+                const authChangeNicknameSaveBtn = document.getElementById('authChangeNicknameSaveBtn');
+                if (authChangeNicknameSaveBtn) {
+                    authChangeNicknameSaveBtn.addEventListener('click', () => {
+                        const lang = getLang();
+                        const errEl = DOM('authChangeNicknameError');
+                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
+                        errEl.classList.remove('visible');
+
+                        const newNickname = DOM('authNewNicknameInput').value.trim();
+                        if (!newNickname) {
+                            showErr(lang === 'ru' ? 'Введите ник' : 'Enter a nickname');
+                            return;
+                        }
+                        if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]{2,24}$/.test(newNickname)) {
+                            showErr(lang === 'ru'
+                                ? 'Ник: 2–24 символа, буквы/цифры/подчёркивание'
+                                : 'Nickname: 2-24 chars, letters/digits/underscore');
+                            return;
+                        }
+
+                        authChangeNicknameSaveBtn.disabled = true;
+                        (async () => {
+                            try {
+                                if (!window.CubeAuth || !window.CubeAuth.changeNickname) {
+                                    throw new Error('Firebase not loaded');
+                                }
+                                await window.CubeAuth.changeNickname(newNickname);
+                                const authUser = AppStorage.getJSON('authUser');
+                                AppStorage.setJSON('authUser', { ...authUser, nickname: newNickname });
+                                updateAuthBtnUI();
+
+                                const t = translations[getLang()];
+                                DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${newNickname}`.trim();
+                                DOM('authChangeNicknameView').style.display = 'none';
+                                DOM('authAccountView').style.display = '';
+                            } catch (error) {
+                                if (error.code === 'nickname-in-use') {
+                                    showErr(lang === 'ru' ? 'Этот ник уже занят' : 'This nickname is already taken');
+                                } else {
+                                    showErr(lang === 'ru' ? 'Не удалось изменить ник' : 'Failed to change nickname');
+                                }
+                            } finally {
+                                authChangeNicknameSaveBtn.disabled = false;
+                            }
+                        })();
+                    });
+                }
+
                 const authCloseBtn = document.getElementById('authCloseBtn');
                 if (authCloseBtn) {
                     authCloseBtn.addEventListener('click', () => {

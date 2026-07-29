@@ -133,7 +133,37 @@ window.CubeAuth = {
 
   getCurrentUser: () => auth.currentUser,
 
-  onAuthChange: (callback) => onAuthStateChanged(auth, callback)
+  onAuthChange: (callback) => onAuthStateChanged(auth, callback),
+
+  // Сменить ник у уже вошедшего пользователя. Резервирует новый ник,
+  // освобождает старый (чтобы его мог занять кто-то другой) и обновляет
+  // профиль. Бросает Error с .code === 'nickname-in-use', если новый ник
+  // уже занят кем-то другим.
+  changeNickname: async (newNickname) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Пользователь не авторизован");
+
+    const newKey = normalizeNickname(newNickname);
+    const existing = await getDoc(doc(db, "usernames", newKey));
+    if (existing.exists() && existing.data().uid !== user.uid) {
+      const err = new Error("Nickname already taken");
+      err.code = "nickname-in-use";
+      throw err;
+    }
+
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    const oldNickname = userSnap.exists() ? userSnap.data().nickname : null;
+
+    await reserveNickname(newNickname, user.uid, user.email);
+    await setDoc(doc(db, "users", user.uid), { nickname: newNickname }, { merge: true });
+    await updateProfile(user, { displayName: newNickname });
+
+    if (oldNickname && normalizeNickname(oldNickname) !== newKey) {
+      await deleteDoc(doc(db, "usernames", normalizeNickname(oldNickname)));
+    }
+
+    return newNickname;
+  }
 };
 
 window.CubeSync = {
