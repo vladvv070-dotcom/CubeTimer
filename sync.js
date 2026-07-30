@@ -212,6 +212,29 @@ const AppSync = {
         const timer = window.timer;
         if (!timer) return;
 
+        const user = window.CubeAuth?.getCurrentUser?.();
+        if (!user) return;
+
+        // Local tombstones and the local sessions cache live in this browser's
+        // localStorage, which is NOT scoped to a Firebase account -- it's just
+        // "whatever this device last had". If the signed-in uid is different
+        // from the one this device last synced (new account, switched
+        // account, account was deleted and recreated, etc.), that local cache
+        // -- deletion markers especially -- belongs to a DIFFERENT identity
+        // and must not be trusted. Left alone, a stale "session X was
+        // deleted" tombstone from a previous account would get unioned into
+        // the new account's cloud tombstone list and then propagate to every
+        // other device, which would honor it and hide their own real,
+        // never-deleted sessions. This is what caused sessions to vanish
+        // across every device after switching accounts.
+        const lastSyncedUid = AppStorage.getRaw('lastSyncedUid');
+        if (lastSyncedUid && lastSyncedUid !== user.uid) {
+            AppStorage.setJSON('deletedSolveIds', []);
+            AppStorage.setJSON('deletedSessionIds', []);
+            timer.sessions = {};
+        }
+        AppStorage.setRaw('lastSyncedUid', user.uid);
+
         const [remoteMeta, remoteHistory] = await Promise.all([
             CloudSync.pullMeta(),
             CloudSync.pullAllSolvesOnce()
@@ -277,8 +300,7 @@ const AppSync = {
         // Keep the header's "logged in as ..." nickname fresh after a
         // restored session (login/register/Google-login already set this
         // themselves right after auth, so this mainly covers page reloads).
-        const user = window.CubeAuth?.getCurrentUser?.();
-        if (user && remoteMeta?.nickname) {
+        if (remoteMeta?.nickname) {
             AppStorage.setJSON('authUser', { uid: user.uid, nickname: remoteMeta.nickname, email: user.email });
         }
 
