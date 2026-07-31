@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vladvv070-dotcom.github.io/NextCubePro/sitemap.xml
+Sitemap: https://nextcubepro.com/sitemap.xml
