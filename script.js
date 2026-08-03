@@ -2134,6 +2134,7 @@
                 this.titleStrip = document.getElementById('titleStrip');
                 this.recordTitle = document.getElementById('recordTitle');
                 
+                this._scrambleRequestId = 0;
                 this.initEventListeners();
                 this.generateScramble();
                 this.updateUI();
@@ -2382,7 +2383,6 @@
                             // Always reopen on the account view, not mid-confirmation.
                             DOM('authAccountView').style.display = '';
                             DOM('authLogoutConfirmView').style.display = 'none';
-                            DOM('authChangeNicknameView').style.display = 'none';
                             DOM('authAccountOverlay').classList.add('visible');
                         } else {
                             DOM('authOverlay').classList.add('visible');
@@ -2434,75 +2434,6 @@
                         }
                     });
                 }
-
-                // "Change nickname" -- swaps to an inline edit form within the
-                // same account modal, same pattern as the logout confirmation.
-                const authChangeNicknameBtn = document.getElementById('authChangeNicknameBtn');
-                if (authChangeNicknameBtn) {
-                    authChangeNicknameBtn.addEventListener('click', () => {
-                        const authUser = AppStorage.getJSON('authUser');
-                        DOM('authNewNicknameInput').value = authUser?.nickname || '';
-                        DOM('authChangeNicknameError').classList.remove('visible');
-                        DOM('authChangeNicknameError').textContent = '';
-                        DOM('authAccountView').style.display = 'none';
-                        DOM('authChangeNicknameView').style.display = '';
-                    });
-                }
-                const authChangeNicknameCancelBtn = document.getElementById('authChangeNicknameCancelBtn');
-                if (authChangeNicknameCancelBtn) {
-                    authChangeNicknameCancelBtn.addEventListener('click', () => {
-                        DOM('authChangeNicknameView').style.display = 'none';
-                        DOM('authAccountView').style.display = '';
-                    });
-                }
-                const authChangeNicknameSaveBtn = document.getElementById('authChangeNicknameSaveBtn');
-                if (authChangeNicknameSaveBtn) {
-                    authChangeNicknameSaveBtn.addEventListener('click', () => {
-                        const lang = getLang();
-                        const errEl = DOM('authChangeNicknameError');
-                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
-                        errEl.classList.remove('visible');
-
-                        const newNickname = DOM('authNewNicknameInput').value.trim();
-                        if (!newNickname) {
-                            showErr(lang === 'ru' ? 'Введите ник' : 'Enter a nickname');
-                            return;
-                        }
-                        if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]{2,24}$/.test(newNickname)) {
-                            showErr(lang === 'ru'
-                                ? 'Ник: 2–24 символа, буквы/цифры/подчёркивание'
-                                : 'Nickname: 2-24 chars, letters/digits/underscore');
-                            return;
-                        }
-
-                        authChangeNicknameSaveBtn.disabled = true;
-                        (async () => {
-                            try {
-                                if (!window.CubeAuth || !window.CubeAuth.changeNickname) {
-                                    throw new Error('Firebase not loaded');
-                                }
-                                await window.CubeAuth.changeNickname(newNickname);
-                                const authUser = AppStorage.getJSON('authUser');
-                                AppStorage.setJSON('authUser', { ...authUser, nickname: newNickname });
-                                updateAuthBtnUI();
-
-                                const t = translations[getLang()];
-                                DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${newNickname}`.trim();
-                                DOM('authChangeNicknameView').style.display = 'none';
-                                DOM('authAccountView').style.display = '';
-                            } catch (error) {
-                                if (error.code === 'nickname-in-use') {
-                                    showErr(lang === 'ru' ? 'Этот ник уже занят' : 'This nickname is already taken');
-                                } else {
-                                    showErr(lang === 'ru' ? 'Не удалось изменить ник' : 'Failed to change nickname');
-                                }
-                            } finally {
-                                authChangeNicknameSaveBtn.disabled = false;
-                            }
-                        })();
-                    });
-                }
-
                 const authCloseBtn = document.getElementById('authCloseBtn');
                 if (authCloseBtn) {
                     authCloseBtn.addEventListener('click', () => {
@@ -5918,11 +5849,18 @@
                 }
             }
 
-            generateScramble() {
+            async generateScramble() {
                 const session = this.sessions[this.currentSessionId];
                 const discipline = session?.discipline || '3x3';
-                const scramble = ScrambleGenerator.getScramble(discipline);
-                DOM('scrambleText').textContent = scramble;
+                // Real WCA-engine scrambles load async (cubing.js), so show a
+                // placeholder immediately and swap it in once it's ready.
+                const el = DOM('scrambleText');
+                const requestId = ++this._scrambleRequestId;
+                if (el) el.textContent = '...';
+                const scramble = await ScrambleGenerator.getScramble(discipline);
+                // Ignore stale results if the discipline changed while we were waiting.
+                if (requestId !== this._scrambleRequestId) return;
+                if (el) el.textContent = scramble;
             }
 
             drawChart() {
@@ -7739,7 +7677,29 @@
                 };
             }
 
-            // Strategy map — discipline key → generator class
+            // Maps our internal discipline keys to the WCA event IDs used by
+            // cubing.js (https://github.com/cubing/cubing.js), the scramble
+            // library maintained by a WCA Board member and used by the WCA's
+            // own tooling. For 2x2/3x3/4x4/pyraminx/skewb it generates true
+            // random-state scrambles (same method as the official TNoodle
+            // program); for 5x5+ and megaminx it uses WCA's specified
+            // random-move algorithms — i.e. exactly what a real competition uses.
+            static get WCA_EVENT_IDS() {
+                return {
+                    '3x3':      '333',
+                    '2x2':      '222',
+                    '4x4':      '444',
+                    '5x5':      '555',
+                    '6x6':      '666',
+                    '7x7':      '777',
+                    'pyraminx': 'pyram',
+                    'skewb':    'skewb',
+                    'megaminx': 'minx',
+                };
+            }
+
+            // Strategy map — discipline key → local fallback generator class
+            // (only used if the cubing.js engine fails to load, e.g. offline)
             static get STRATEGIES() {
                 return {
                     '3x3':      WCA_3x3,
@@ -7754,11 +7714,35 @@
                 };
             }
 
-            // Public API — used by CubeTimer.generateScramble()
-            static getScramble(discipline) {
+            // Lazily loads the cubing.js scramble module once and reuses it.
+            static _loadEngine() {
+                if (!this._enginePromise) {
+                    this._enginePromise = import('https://cdn.cubing.net/v0/js/cubing/scramble');
+                }
+                return this._enginePromise;
+            }
+
+            // Public API — used by CubeTimer.generateScramble().
+            // Async: returns Promise<string>. Tries the real WCA engine first,
+            // falls back to the local approximate generator if that's unavailable
+            // (e.g. no internet connection).
+            static async getScramble(discipline) {
+                const eventId = this.WCA_EVENT_IDS[discipline] || '333';
+                try {
+                    const { randomScrambleForEvent } = await this._loadEngine();
+                    const alg = await randomScrambleForEvent(eventId);
+                    return this._normalize(alg.toString());
+                } catch (err) {
+                    console.error('WCA scramble engine unavailable, using local fallback generator:', err);
+                    return this._fallbackScramble(discipline);
+                }
+            }
+
+            // Local approximate generator (random-move, not random-state) — only
+            // used as an offline fallback when the real engine can't be loaded.
+            static _fallbackScramble(discipline) {
                 const strategy = this.STRATEGIES[discipline] || WCA_3x3;
-                const raw = strategy.generate();
-                return this._normalize(raw);
+                return this._normalize(strategy.generate());
             }
 
             // Defensive normalizer — catches any remaining malformed wide-move tokens
