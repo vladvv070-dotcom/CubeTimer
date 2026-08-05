@@ -18,6 +18,7 @@
                 
                 // Database of commentaries by mood and category
                 this.moods = COMMENTARY_MOODS; // moved to commentary-data.js
+                this.moodsEn = window.moodsEn; // English phrase banks (commentary-data.js)
 
             } // end of constructor
 
@@ -342,7 +343,7 @@
                 const settingsButtons = document.querySelectorAll('#settingsOverlay .settings-button');
                 if (settingsButtons[0]) settingsButtons[0].textContent = t.exportJSON;
                 if (settingsButtons[1]) settingsButtons[1].textContent = t.exportCSV;
-                if (settingsButtons[2]) settingsButtons[2].textContent = t.importData;
+                if (settingsButtons[2]) settingsButtons[2].textContent = t.importExport;
                 if (settingsButtons[3]) settingsButtons[3].textContent = t.resetSession;
                 
                 // NEW SETTINGS MODAL - Sidebar navigation
@@ -431,7 +432,7 @@
                 const dataBtns = document.querySelectorAll('.data-btn');
                 if (dataBtns[0]) dataBtns[0].textContent = t.exportCSV;
                 if (dataBtns[1]) dataBtns[1].textContent = t.exportJSON;
-                if (dataBtns[2]) dataBtns[2].textContent = t.importData;
+                if (dataBtns[2]) dataBtns[2].textContent = t.importExport;
                 if (dataBtns[3]) dataBtns[3].textContent = t.resetSession;
                 
                 // Statistics modal

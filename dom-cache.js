@@ -14,7 +14,11 @@ const DOM = (() => {
     const cache = new Map();
     return function dom(id) {
         let el = cache.get(id);
-        if (el === undefined || !el.isConnected) {
+        // el === undefined -> never looked up yet, need a fresh query.
+        // el === null -> looked up before and genuinely doesn't exist in the
+        // DOM; that's a valid cached result, not a reason to re-query (and
+        // el.isConnected would throw on null if we tried).
+        if (el === undefined || (el !== null && !el.isConnected)) {
             el = document.getElementById(id);
             cache.set(id, el);
         }
