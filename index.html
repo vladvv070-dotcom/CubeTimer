@@ -1108,9 +1108,24 @@
                 <div class="new-session-title" id="authAccountTitle">Вы вошли</div>
                 <p class="auth-warning-text auth-account-email" id="authAccountEmail"></p>
                 <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="authChangeNicknameBtn">Изменить ник</button>
+                </div>
+                <div class="new-session-actions">
                     <button class="new-session-btn cancel" id="authAccountCloseBtn">Закрыть</button>
                     <button class="new-session-btn danger" id="authLogoutBtn">Выйти</button>
                 </div>
+            </div>
+            <div id="authChangeNicknameView" style="display:none;">
+                <div class="new-session-title" id="authChangeNicknameTitle">Изменить ник</div>
+                <div class="new-session-field">
+                    <label class="new-session-label" for="authNewNickname" id="authNewNicknameLabel">Новый ник</label>
+                    <input class="new-session-input" type="text" id="authNewNickname" autocomplete="off">
+                </div>
+                <div class="new-session-actions">
+                    <button class="new-session-btn cancel" id="authChangeNicknameCancelBtn">Отмена</button>
+                    <button class="new-session-btn primary" id="authChangeNicknameSaveBtn">Сохранить</button>
+                </div>
+                <p class="auth-error" id="authChangeNicknameError"></p>
             </div>
             <div id="authLogoutConfirmView" style="display:none;">
                 <div class="new-session-title" id="authLogoutConfirmTitle">Выйти из аккаунта?</div>
@@ -1194,7 +1209,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.1.4</div>
+    <div class="version-display">2.1.5</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">

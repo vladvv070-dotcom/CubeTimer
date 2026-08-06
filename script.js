@@ -2377,12 +2377,21 @@
                             DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${authUser.nickname || ''}`.trim();
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
+                            DOM('authChangeNicknameBtn').textContent = t.authChangeNicknameBtn;
                             DOM('authLogoutBtn').textContent = t.authLogoutBtn;
                             DOM('authLogoutConfirmTitle').textContent = t.authLogoutConfirm;
                             DOM('authLogoutCancelBtn').textContent = t.authLogoutCancelBtn;
                             DOM('authLogoutConfirmBtn').textContent = t.authLogoutBtn;
+                            DOM('authChangeNicknameTitle').textContent = t.authChangeNicknameTitle;
+                            DOM('authNewNicknameLabel').textContent = t.authNewNicknameLabel;
+                            DOM('authChangeNicknameSaveBtn').textContent = t.authChangeNicknameSaveBtn;
+                            DOM('authChangeNicknameCancelBtn').textContent = t.authChangeNicknameCancelBtn;
+                            DOM('authNewNickname').value = authUser.nickname || '';
+                            const authChangeNicknameErrorEl = DOM('authChangeNicknameError');
+                            if (authChangeNicknameErrorEl) authChangeNicknameErrorEl.classList.remove('visible');
                             // Always reopen on the account view, not mid-confirmation.
                             DOM('authAccountView').style.display = '';
+                            DOM('authChangeNicknameView').style.display = 'none';
                             DOM('authLogoutConfirmView').style.display = 'none';
                             DOM('authAccountOverlay').classList.add('visible');
                         } else {
@@ -2394,6 +2403,73 @@
                 if (authAccountCloseBtn) {
                     authAccountCloseBtn.addEventListener('click', () => {
                         DOM('authAccountOverlay').classList.remove('visible');
+                    });
+                }
+                const authChangeNicknameBtn = document.getElementById('authChangeNicknameBtn');
+                if (authChangeNicknameBtn) {
+                    authChangeNicknameBtn.addEventListener('click', () => {
+                        const authUser = AppStorage.getJSON('authUser');
+                        const errEl = DOM('authChangeNicknameError');
+                        if (errEl) errEl.classList.remove('visible');
+                        DOM('authNewNickname').value = (authUser && authUser.nickname) || '';
+                        DOM('authAccountView').style.display = 'none';
+                        DOM('authChangeNicknameView').style.display = '';
+                    });
+                }
+                const authChangeNicknameCancelBtn = document.getElementById('authChangeNicknameCancelBtn');
+                if (authChangeNicknameCancelBtn) {
+                    authChangeNicknameCancelBtn.addEventListener('click', () => {
+                        DOM('authChangeNicknameView').style.display = 'none';
+                        DOM('authAccountView').style.display = '';
+                    });
+                }
+                const authChangeNicknameSaveBtn = document.getElementById('authChangeNicknameSaveBtn');
+                if (authChangeNicknameSaveBtn) {
+                    authChangeNicknameSaveBtn.addEventListener('click', () => {
+                        const lang = getLang();
+                        const t = translations[lang];
+                        const errEl = DOM('authChangeNicknameError');
+                        const showErr = (msg) => { errEl.textContent = msg; errEl.classList.add('visible'); };
+                        errEl.classList.remove('visible');
+
+                        const newNickname = DOM('authNewNickname').value.trim();
+                        const authUser = AppStorage.getJSON('authUser');
+
+                        if (!newNickname) {
+                            showErr(t.authErrRequired);
+                            return;
+                        }
+                        if (authUser && newNickname === authUser.nickname) {
+                            // No actual change -- just go back without hitting Firebase.
+                            DOM('authChangeNicknameView').style.display = 'none';
+                            DOM('authAccountView').style.display = '';
+                            return;
+                        }
+                        if (!window.CubeAuth || !window.CubeAuth.changeNickname) {
+                            showErr(t.authErrGeneric);
+                            return;
+                        }
+
+                        authChangeNicknameSaveBtn.disabled = true;
+                        (async () => {
+                            try {
+                                const updatedNickname = await window.CubeAuth.changeNickname(newNickname);
+                                const updatedUser = { ...(authUser || {}), nickname: updatedNickname };
+                                AppStorage.setJSON('authUser', updatedUser);
+                                updateAuthBtnUI();
+                                DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${updatedNickname}`.trim();
+                                DOM('authChangeNicknameView').style.display = 'none';
+                                DOM('authAccountView').style.display = '';
+                            } catch (error) {
+                                if (error.code === 'nickname-in-use') {
+                                    showErr(t.authErrNicknameInUse);
+                                } else {
+                                    showErr(window.authFirebaseErrorMessage(error.code, lang));
+                                }
+                            } finally {
+                                authChangeNicknameSaveBtn.disabled = false;
+                            }
+                        })();
                     });
                 }
                 // "Log out" (in the account view) doesn't sign out immediately --
