@@ -7644,3 +7644,58 @@ html {
 .auth-error.visible {
     display: block;
 }
+
+/* ===== Telegram channel promo button (top-right corner) ===== */
+.tg-promo-btn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 150;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2AABEE, #229ED9);
+    color: #ffffff;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(34, 158, 217, 0.35);
+    transition: all 0.15s ease;
+}
+
+.tg-promo-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(34, 158, 217, 0.45);
+    filter: brightness(1.05);
+}
+
+.tg-promo-btn:active {
+    transform: translateY(0);
+}
+
+.tg-promo-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+@media (max-width: 700px) {
+    .tg-promo-btn {
+        top: 0.6rem;
+        right: 0.6rem;
+        padding: 0.5rem 0.65rem;
+    }
+
+    .tg-promo-btn #tgPromoBtnLabel,
+    .tg-promo-btn span[id="tgPromoBtnLabel"] {
+        display: none;
+    }
+
+    .tg-promo-icon {
+        font-size: 1.15rem;
+    }
+}

@@ -216,6 +216,10 @@
                 if (importExportBtn) importExportBtn.textContent = `📤 ${t.importExport || 'Import / Export'}`;
                 if (importExportDataBtn) importExportDataBtn.textContent = t.importExport || 'Import / Export';
 
+                // Telegram channel promo button (top-right corner)
+                const tgPromoBtnLabel = document.querySelector('#tgPromoBtnLabel');
+                if (tgPromoBtnLabel) tgPromoBtnLabel.textContent = t.tgPromoBtn;
+
                 // Import/Export modal
                 const ieModalTitle = document.querySelector('#ieModalTitle');
                 const ieExportTitle = document.querySelector('#ieExportTitle');
