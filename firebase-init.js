@@ -19,6 +19,8 @@ import {
   getFirestore,
   doc,
   collection,
+  query,
+  where,
   setDoc,
   getDoc,
   getDocs,
@@ -196,19 +198,39 @@ window.CubeSync = {
   // Точечная работа со сборками: каждый solve — отдельный документ
   // в users/{uid}/solves/{solveId}, а не поле в одном большом блобе.
   // Это даёт ровно 1 read/write за операцию вместо перезаписи всей
-  // истории целиком, и позволяет читать всю историю только один
-  // раз (при логине), а не при каждом пересчёте статистики.
+  // истории целиком. Полную историю (loadAllSolvesOnce) читаем всего
+  // один раз за всё время на устройство+аккаунт; после этого — только
+  // loadSolvesSince (дельта), см. комментарий над ней.
   // ---------------------------------------------------------------
 
-  // Один раз (обычно сразу после логина) забрать ВСЮ историю сборок
-  // и список "надгробий" удалений — и больше не читать их снова до
-  // следующего логина/явного ресинка.
+  // ВСЯ история сборок + список "надгробий" удалений. Вызывается ровно
+  // один раз за всё время для конкретного устройства+аккаунта — когда
+  // ещё нет локальной метки lastSyncedAt (sync.js, AppSync.runSync).
+  // После этого первого раза используется loadSolvesSince ниже.
   loadAllSolvesOnce: async () => {
     const user = auth.currentUser;
     if (!user) throw new Error("Пользователь не авторизован");
     const [solvesSnap, tombstonesSnap] = await Promise.all([
       getDocs(collection(db, "users", user.uid, "solves")),
       getDocs(collection(db, "users", user.uid, "tombstones"))
+    ]);
+    const solves = solvesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const tombstones = tombstonesSnap.docs.map(d => ({ id: d.id, deletedAt: d.data().deletedAt }));
+    return { solves, tombstones };
+  },
+
+  // Дельта-версия loadAllSolvesOnce: вместо ВСЕЙ истории читает только
+  // то, что изменилось после sinceTimestamp (по полю updatedAt у solve
+  // и deletedAt у tombstone — оба уже проставляются при каждой записи).
+  // Это то, что не даёт стоимости логина расти вместе с общим объёмом
+  // истории пользователя: цена визита = кол-во НОВОГО/ИЗМЕНЁННОГО,
+  // а не кол-во всего, что у него когда-либо было решено.
+  loadSolvesSince: async (sinceTimestamp) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Пользователь не авторизован");
+    const [solvesSnap, tombstonesSnap] = await Promise.all([
+      getDocs(query(collection(db, "users", user.uid, "solves"), where("updatedAt", ">", sinceTimestamp))),
+      getDocs(query(collection(db, "users", user.uid, "tombstones"), where("deletedAt", ">", sinceTimestamp)))
     ]);
     const solves = solvesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     const tombstones = tombstonesSnap.docs.map(d => ({ id: d.id, deletedAt: d.data().deletedAt }));

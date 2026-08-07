@@ -3265,10 +3265,15 @@
                     ? (time <= s.targetTime)
                     : null; // null = Target Time wasn't active for this solve
 
+                const now = Date.now();
                 const solve = {
-                    id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+                    id: `s_${now}_${Math.random().toString(36).slice(2,7)}`,
                     time: time,
-                    timestamp: Date.now(),
+                    timestamp: now,
+                    // Stamped at creation too (not just on later edits) so the
+                    // cloud delta-sync query (updatedAt > lastSyncedAt) picks
+                    // up brand-new solves, not just edited ones.
+                    updatedAt: now,
                     scramble: DOM('scrambleText').textContent,
                     penalty: null,
                     dnf: false,
@@ -3300,10 +3305,14 @@
 
             // WCA mode: inspection expired → save DNF automatically
             saveSolveDNF() {
+                const now = Date.now();
                 const solve = {
-                    id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+                    id: `s_${now}_${Math.random().toString(36).slice(2,7)}`,
                     time: 0,
-                    timestamp: Date.now(),
+                    timestamp: now,
+                    // See saveSolve() above -- stamped at creation so delta
+                    // sync (updatedAt > lastSyncedAt) sees it immediately.
+                    updatedAt: now,
                     scramble: DOM('scrambleText').textContent,
                     penalty: null,
                     dnf: true
