@@ -19,6 +19,9 @@
                 // Database of commentaries by mood and category
                 this.moods = COMMENTARY_MOODS; // moved to commentary-data.js
                 this.moodsEn = window.moodsEn; // English phrase banks (commentary-data.js)
+                this.customPhrases = this._normalizeCustomPhrases(
+                    AppStorage.getJSON('customPhrases', {})
+                );
 
             } // end of constructor
 
@@ -62,9 +65,11 @@
                 // written for the "friend" mood — fall back to friend's phrasing
                 // (still respecting language) so other moods don't crash on a
                 // category they haven't been written for yet.
-                const categoryComments = moodComments[category]
+                const defaultComments = moodComments[category]
                     || this.getMoodBank('friend')[category]
                     || this.moods.friend[category];
+                const customComments = this.customPhrases?.[this.currentMood]?.[category] || [];
+                const categoryComments = [...defaultComments, ...customComments];
                 let comment;
                 
                 do {
@@ -85,6 +90,79 @@
                 const lang = s?.commentaryLanguage || s?.language;
                 if (lang === 'en' && this.moodsEn && this.moodsEn[mood]) return this.moodsEn[mood];
                 return this.moods[mood];
+            }
+
+            _normalizeCustomPhrases(value) {
+                const result = {};
+                const allowedCategories = new Set([
+                    'neutral', 'fast_time', 'slow_time', 'pb_single', 'pb_average',
+                    'worse_average', 'dnf', 'plus_two', 'delete', 'target_success', 'target_fail'
+                ]);
+                if (!value || typeof value !== 'object' || Array.isArray(value)) return result;
+
+                for (const [mood, categories] of Object.entries(value)) {
+                    if (!this.moods?.[mood] || !categories || typeof categories !== 'object' || Array.isArray(categories)) continue;
+                    for (const [category, phrases] of Object.entries(categories)) {
+                        if (!allowedCategories.has(category) || !Array.isArray(phrases)) continue;
+                        const clean = [...new Set(phrases
+                            .filter(phrase => typeof phrase === 'string')
+                            .map(phrase => phrase.trim())
+                            .filter(Boolean)
+                            .map(phrase => phrase.slice(0, 300))
+                        )].slice(0, 50);
+                        if (!clean.length) continue;
+                        if (!result[mood]) result[mood] = {};
+                        result[mood][category] = clean;
+                    }
+                }
+                return result;
+            }
+
+            setCustomPhrases(value, updatedAt = Date.now()) {
+                this.customPhrases = this._normalizeCustomPhrases(value);
+                AppStorage.setJSON('customPhrases', this.customPhrases);
+                const numericUpdatedAt = Number(updatedAt);
+                const safeUpdatedAt = Number.isFinite(numericUpdatedAt) && numericUpdatedAt >= 0
+                    ? numericUpdatedAt
+                    : Date.now();
+                AppStorage.setRaw('customPhrasesUpdatedAt', String(safeUpdatedAt));
+                window.dispatchEvent(new CustomEvent('customphraseschange'));
+            }
+
+            addCustomPhrase(mood, category, phrase) {
+                const cleanPhrase = typeof phrase === 'string' ? phrase.trim().slice(0, 300) : '';
+                const allowedCategories = this._customPhraseCategoriesSet || (this._customPhraseCategoriesSet = new Set([
+                    'neutral', 'fast_time', 'slow_time', 'pb_single', 'pb_average',
+                    'worse_average', 'dnf', 'plus_two', 'delete', 'target_success', 'target_fail'
+                ]));
+                if (!cleanPhrase || !this.moods[mood] || !allowedCategories.has(category)) return { ok: false, reason: 'invalid' };
+
+                const existing = this.customPhrases?.[mood]?.[category] || [];
+                if (existing.includes(cleanPhrase)) return { ok: false, reason: 'duplicate' };
+                const totalPhrases = Object.values(this.customPhrases).reduce((moodTotal, categories) =>
+                    moodTotal + Object.values(categories).reduce((total, phrases) => total + phrases.length, 0), 0);
+                if (existing.length >= 50 || totalPhrases >= 500) return { ok: false, reason: 'limit' };
+
+                const next = structuredClone(this.customPhrases);
+                if (!next[mood]) next[mood] = {};
+                if (!next[mood][category]) next[mood][category] = [];
+                next[mood][category].push(cleanPhrase);
+                const updatedAt = Date.now();
+                this.setCustomPhrases(next, updatedAt);
+                return { ok: true, updatedAt };
+            }
+
+            removeCustomPhrase(mood, category, index) {
+                const existing = this.customPhrases?.[mood]?.[category];
+                if (!Array.isArray(existing) || index < 0 || index >= existing.length) return { ok: false };
+
+                const next = structuredClone(this.customPhrases);
+                next[mood][category].splice(index, 1);
+                if (!next[mood][category].length) delete next[mood][category];
+                if (!Object.keys(next[mood]).length) delete next[mood];
+                const updatedAt = Date.now();
+                this.setCustomPhrases(next, updatedAt);
+                return { ok: true, updatedAt };
             }
 
             show(context) {
@@ -186,6 +264,35 @@
                 if (statsBtn) statsBtn.textContent = t.statistics;
                 if (sessionsBtn) sessionsBtn.textContent = t.sessions;
                 if (settingsBtn) settingsBtn.textContent = t.settings;
+
+                const headerButtons = [
+                    ['settingsBtn', t.settings],
+                    ['sessionsBtn', t.sessions],
+                    ['statisticsBtn', t.statistics]
+                ];
+                headerButtons.forEach(([id, label]) => {
+                    const button = DOM(id);
+                    if (!button) return;
+                    button.title = label;
+                    button.setAttribute('aria-label', label);
+                    const image = button.querySelector('img');
+                    if (image) image.alt = label;
+                });
+
+                const setText = (selector, text) => {
+                    const el = document.querySelector(selector);
+                    if (el) el.textContent = text;
+                };
+                setText('#fireMenuBtn', t.more);
+                setText('#fireMenuAlgsTrainer span:last-child', t.algsTrainer);
+                setText('.fire-menu-item-disabled span:nth-child(2)', t.multiplayer);
+                setText('.fire-menu-item-disabled .fire-menu-soon', t.soon);
+                setText('#dailyChallengeMenuLabel', t.dailyChallengeMenu);
+                setText('#newScrambleBtn span:last-child', t.newScramble);
+                setText('#dailyChallengeTitle', t.dailyChallengeTitle);
+                setText('#dailyChallengeCloseBtn', t.dailyChallengeClose);
+                setText('#dailyChallengeSolveBtn', t.dailyChallengeSolve);
+                setText('#dailyChallengeActiveBadge', `\u{1F4C5} ${t.dailyChallengeActive}`);
                 
                 // Timer hint (reflects Mouse Start setting / touch devices)
                 const timerHint = document.querySelector('.timer-hint');
@@ -303,8 +410,20 @@
                 if (lastSolvesTitle) lastSolvesTitle.textContent = t.lastSolves;
                 
                 // Right column
-                const bestTimesTitle = document.querySelector('.right-column .card-title');
-                if (bestTimesTitle) bestTimesTitle.textContent = t.bestTimes;
+                const rightColumnTitles = document.querySelectorAll('.right-column .card-title');
+                if (rightColumnTitles[0]) rightColumnTitles[0].textContent = t.bestTimes;
+                if (rightColumnTitles[1]) rightColumnTitles[1].textContent = t.averages;
+                if (rightColumnTitles[2]) rightColumnTitles[2].textContent = t.progress;
+
+                const bestLabels = document.querySelectorAll('.best-label');
+                if (bestLabels[0]) bestLabels[0].textContent = t.best;
+                if (bestLabels[1]) bestLabels[1].textContent = t.ao5;
+                if (bestLabels[2]) bestLabels[2].textContent = t.ao12;
+                if (bestLabels[3]) bestLabels[3].textContent = t.ao100;
+                const averageLabels = document.querySelectorAll('.average-label');
+                if (averageLabels[0]) averageLabels[0].textContent = t.ao5;
+                if (averageLabels[1]) averageLabels[1].textContent = t.ao12;
+                if (averageLabels[2]) averageLabels[2].textContent = t.ao100;
                 
                 // Settings modal
                 const settingsTitle = document.querySelector('#settingsOverlay .settings-title');
@@ -451,6 +570,14 @@
                 _st('st-stat-penalty-pie',    t.penaltyPieTitle);
                 _st('st-stat-discipline-pie', t.disciplinePieTitle);
                 _st('st-stat-subsession-pie', t.subsessionPieTitle);
+                setText('.chart-section-title', t.progressChart);
+                _st('chartZoomHint', t.chartZoomHint);
+                if (DOM('chartResetZoom')) DOM('chartResetZoom').textContent = `⊡ ${t.resetZoom}`;
+                _st('trendLabel', t.trendNeedMore.replace('{n}', '20'));
+                const trendCompareLabels = document.querySelectorAll('.trend-compare-label');
+                if (trendCompareLabels[0]) trendCompareLabels[0].textContent = t.trendFirst.replace('{n}', '10');
+                if (trendCompareLabels[1]) trendCompareLabels[1].textContent = t.trendLast.replace('{n}', '10');
+                _st('heatmapHint', t.heatmapHint);
 
                 // Subsession modal
                 _st('subsessionModalTitleEl',  t.subsessionModalTitle);
@@ -477,6 +604,8 @@
                 _st('exportOptTrendEl',        t.exportOptTrend);
                 _st('exportOptCountEl',        t.exportOptCount);
                 _st('exportOptDisciplineEl',   t.exportOptDiscipline);
+                _st('exportSessionLabelEl',    t.exportSessionLabel);
+                _st('exportImgCancelBtn',      t.cancel);
                 const dlBtn = DOM('exportImgDownloadBtn');
                 if (dlBtn) dlBtn.textContent = t.exportDownloadBtn;
 
@@ -536,6 +665,18 @@
                 if (sessionStatLabels[3]) sessionStatLabels[3].textContent = 'AO12';
                 if (sessionStatLabels[4]) sessionStatLabels[4].textContent = 'AO100';
                 if (sessionStatLabels[5]) sessionStatLabels[5].textContent = 'AVG';
+                if (sessionStatLabels[5]) sessionStatLabels[5].textContent = t.averageShort;
+
+                _st('sessionDetailsTitle', t.noSession);
+                _st('sessionDetailsSubtitle', t.defaultSession);
+
+                _st('hotkeySessionsLabel', t.hotkeySessions);
+                _st('hotkeySettingsLabel', t.hotkeySettings);
+                _st('hotkeyStatsLabel', t.hotkeyStats);
+                _st('hotkeyDnfLabel', t.dnf);
+                _st('hotkeyPlusTwoLabel', t.plusTwo);
+                _st('hotkeyDeleteLabel', t.hotkeyDelete);
+                _st('hotkeyEditLabel', t.hotkeyEdit);
                 
                 // Update language selector active state
                 document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -1432,7 +1573,213 @@
                 if (ao100BestItem) ao100BestItem.classList.toggle('hidden', !this.settings.showAo100);
             }
 
+            _customPhrasesCopy() {
+                const ru = this.settings.language === 'ru';
+                return ru ? {
+                    openTitle: 'Добавить свои фразы',
+                    openDesc: 'Личные реплики для каждого режима и события',
+                    title: 'Свои фразы комментатора',
+                    subtitle: 'Они добавляются к встроенным фразам — стандартные реплики не пропадут.',
+                    mood: 'Режим бота', category: 'Категория события', phrase: 'Фраза',
+                    placeholder: 'Напишите, что должен сказать бот…', add: 'Добавить фразу',
+                    listTitle: 'Добавленные фразы', listHint: 'Показаны фразы только для выбранного режима и категории.',
+                    empty: 'Здесь пока нет своих фраз.', remove: 'Удалить',
+                    added: 'Фраза добавлена', removed: 'Фраза удалена', duplicate: 'Такая фраза уже есть',
+                    invalid: 'Введите фразу', limit: 'Достигнут лимит пользовательских фраз',
+                    synced: 'Сохранено и отправлено в синхронизацию', local: 'Сохранено на этом устройстве',
+                    back: 'Вернуться к настройкам'
+                } : {
+                    openTitle: 'Add your own phrases',
+                    openDesc: 'Personal replies for every bot mood and event',
+                    title: 'Your commentary phrases',
+                    subtitle: 'They are added to the built-in collection — default phrases remain available.',
+                    mood: 'Bot mood', category: 'Event category', phrase: 'Phrase',
+                    placeholder: 'Type what the bot should say…', add: 'Add phrase',
+                    listTitle: 'Added phrases', listHint: 'Only phrases for the selected mood and category are shown.',
+                    empty: 'No custom phrases here yet.', remove: 'Delete',
+                    added: 'Phrase added', removed: 'Phrase deleted', duplicate: 'This phrase already exists',
+                    invalid: 'Enter a phrase', limit: 'The custom phrase limit has been reached',
+                    synced: 'Saved and sent to sync', local: 'Saved on this device',
+                    back: 'Back to settings'
+                };
+            }
+
+            _customPhraseCategories() {
+                const ru = this.settings.language === 'ru';
+                const labels = ru ? {
+                    neutral: 'Обычный результат', fast_time: 'Быстрое время', slow_time: 'Медленное время',
+                    pb_single: 'Новый личный рекорд', pb_average: 'Новый рекорд среднего',
+                    worse_average: 'Среднее ухудшилось', dnf: 'DNF', plus_two: 'Штраф +2',
+                    delete: 'Удаление результата', target_success: 'Цель достигнута', target_fail: 'Цель не достигнута'
+                } : {
+                    neutral: 'Regular result', fast_time: 'Fast time', slow_time: 'Slow time',
+                    pb_single: 'New personal best', pb_average: 'New average PB',
+                    worse_average: 'Average got worse', dnf: 'DNF', plus_two: '+2 penalty',
+                    delete: 'Solve deleted', target_success: 'Target reached', target_fail: 'Target missed'
+                };
+                return Object.entries(labels);
+            }
+
+            _applyCustomPhrasesCopy() {
+                const copy = this._customPhrasesCopy();
+                const set = (id, value) => { const el = DOM(id); if (el) el.textContent = value; };
+                set('customPhrasesOpenTitle', copy.openTitle);
+                set('customPhrasesOpenDesc', copy.openDesc);
+                set('customPhrasesTitle', copy.title);
+                set('customPhrasesSubtitle', copy.subtitle);
+                set('customPhrasesMoodLabel', copy.mood);
+                set('customPhrasesCategoryLabel', copy.category);
+                set('customPhrasesTextLabel', copy.phrase);
+                set('addCustomPhrase', copy.add);
+                set('customPhrasesListTitle', copy.listTitle);
+                set('customPhrasesListHint', copy.listHint);
+                const input = DOM('customPhrasesInput');
+                if (input) input.placeholder = copy.placeholder;
+                const closeButton = DOM('closeCustomPhrases');
+                if (closeButton) closeButton.setAttribute('aria-label', copy.back);
+
+                const moodLabels = translations[this.settings.language] || translations.en;
+                const moodNames = {
+                    friend: `😊 ${moodLabels.moodFriend}`,
+                    teaser: `😏 ${moodLabels.moodTeaser}`,
+                    trainer: `🧠 ${moodLabels.moodTrainer}`,
+                    enemy: `😈 ${moodLabels.moodEnemy}`,
+                    rival: `♟️ ${moodLabels.moodRival}`
+                };
+                const moodSelect = DOM('customPhrasesMood');
+                if (moodSelect) {
+                    [...moodSelect.options].forEach(option => {
+                        if (moodNames[option.value]) option.textContent = moodNames[option.value];
+                    });
+                }
+
+                const categorySelect = DOM('customPhrasesCategory');
+                if (categorySelect) {
+                    const selected = categorySelect.value || 'neutral';
+                    categorySelect.replaceChildren(...this._customPhraseCategories().map(([value, label]) => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = label;
+                        return option;
+                    }));
+                    categorySelect.value = this._customPhraseCategories().some(([value]) => value === selected) ? selected : 'neutral';
+                }
+            }
+
+            _renderCustomPhrases() {
+                if (!window.commentary) return;
+                const mood = DOM('customPhrasesMood')?.value || 'friend';
+                const category = DOM('customPhrasesCategory')?.value || 'neutral';
+                const phrases = window.commentary.customPhrases?.[mood]?.[category] || [];
+                const list = DOM('customPhrasesList');
+                const copy = this._customPhrasesCopy();
+                if (!list) return;
+                list.replaceChildren();
+                DOM('customPhrasesCount').textContent = String(phrases.length);
+
+                if (!phrases.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'custom-phrases-empty';
+                    empty.textContent = copy.empty;
+                    list.appendChild(empty);
+                    return;
+                }
+
+                phrases.forEach((phrase, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'custom-phrase-row';
+                    const text = document.createElement('p');
+                    text.textContent = phrase;
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'custom-phrase-remove';
+                    remove.textContent = copy.remove;
+                    remove.dataset.index = String(index);
+                    row.append(text, remove);
+                    list.appendChild(row);
+                });
+            }
+
+            _setCustomPhrasesMessage(message, isError = false) {
+                const el = DOM('customPhrasesMessage');
+                if (!el) return;
+                el.textContent = message;
+                el.classList.toggle('error', isError);
+            }
+
+            initCustomPhrasesUI() {
+                const layer = DOM('customPhrasesLayer');
+                if (!layer || layer.dataset.initialized) return;
+                layer.dataset.initialized = 'true';
+                this._applyCustomPhrasesCopy();
+
+                const open = () => {
+                    this._applyCustomPhrasesCopy();
+                    DOM('customPhrasesMood').value = this.settings.timerMood || 'friend';
+                    this._setCustomPhrasesMessage('');
+                    this._renderCustomPhrases();
+                    layer.classList.add('visible');
+                    layer.setAttribute('aria-hidden', 'false');
+                    setTimeout(() => DOM('customPhrasesInput')?.focus(), 180);
+                };
+                const close = () => {
+                    layer.classList.remove('visible');
+                    layer.setAttribute('aria-hidden', 'true');
+                    DOM('customPhrasesInput').value = '';
+                    this._setCustomPhrasesMessage('');
+                };
+
+                DOM('openCustomPhrases').addEventListener('click', open);
+                DOM('closeCustomPhrases').addEventListener('click', close);
+                DOM('customPhrasesMood').addEventListener('change', () => this._renderCustomPhrases());
+                DOM('customPhrasesCategory').addEventListener('change', () => this._renderCustomPhrases());
+
+                const addPhrase = async () => {
+                    const copy = this._customPhrasesCopy();
+                    const result = window.commentary?.addCustomPhrase(
+                        DOM('customPhrasesMood').value,
+                        DOM('customPhrasesCategory').value,
+                        DOM('customPhrasesInput').value
+                    );
+                    if (!result?.ok) {
+                        this._setCustomPhrasesMessage(copy[result?.reason] || copy.invalid, true);
+                        return;
+                    }
+                    DOM('customPhrasesInput').value = '';
+                    this._renderCustomPhrases();
+                    const synced = await window.AppSync?.pushCustomPhrasesNow?.();
+                    this._setCustomPhrasesMessage(`${copy.added}. ${synced ? copy.synced : copy.local}`);
+                };
+
+                DOM('addCustomPhrase').addEventListener('click', addPhrase);
+                DOM('customPhrasesInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        addPhrase();
+                    }
+                });
+
+                DOM('customPhrasesList').addEventListener('click', async (e) => {
+                    const button = e.target.closest('.custom-phrase-remove');
+                    if (!button) return;
+                    const copy = this._customPhrasesCopy();
+                    const result = window.commentary?.removeCustomPhrase(
+                        DOM('customPhrasesMood').value,
+                        DOM('customPhrasesCategory').value,
+                        Number(button.dataset.index)
+                    );
+                    if (!result?.ok) return;
+                    this._renderCustomPhrases();
+                    const synced = await window.AppSync?.pushCustomPhrasesNow?.();
+                    this._setCustomPhrasesMessage(`${copy.removed}. ${synced ? copy.synced : copy.local}`);
+                });
+
+                window.addEventListener('customphraseschange', () => this._renderCustomPhrases());
+                this._closeCustomPhrases = close;
+            }
+
             initEventListeners() {
+                this.initCustomPhrasesUI();
                 // Open/Close Settings
                 document.getElementById('settingsBtn').addEventListener('click', () => {
                     DOM('settingsOverlay').classList.add('visible');
@@ -1450,6 +1797,7 @@
                 });
 
                 document.getElementById('closeSettings').addEventListener('click', () => {
+                    this._closeCustomPhrases?.();
                     DOM('settingsOverlay').classList.remove('visible');
                 });
 
@@ -1484,6 +1832,12 @@
                 // ESC key to close
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
+                        if (DOM('customPhrasesLayer')?.classList.contains('visible')) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            this._closeCustomPhrases?.();
+                            return;
+                        }
                         DOM('settingsOverlay').classList.remove('visible');
                         DOM('statisticsOverlay').classList.remove('visible');
                         DOM('sessionsOverlay').classList.remove('visible');
@@ -1734,6 +2088,7 @@
                         
                         // Apply translations
                         this.applyTranslations();
+                        this._applyCustomPhrasesCopy();
                         
                         this.saveSettings();
                     });
@@ -1751,6 +2106,7 @@
                         
                         // Apply translations
                         this.applyTranslations();
+                        this._applyCustomPhrasesCopy();
                         
                         this.saveSettings();
                     });
@@ -2139,6 +2495,9 @@
                 this.solvesList = document.getElementById('solvesList');
                 this.titleStrip = document.getElementById('titleStrip');
                 this.recordTitle = document.getElementById('recordTitle');
+                this.activeDailyChallenge = null;
+                this.activeDailyChallengeConsumed = false;
+                this._dailyChallengeCache = null;
                 
                 this._scrambleRequestId = 0;
                 this.initEventListeners();
@@ -2321,6 +2680,21 @@
                 // Button controls
                 document.getElementById('newScrambleBtn').addEventListener('click', () => {
                     this.generateScramble();
+                });
+
+                DOM('fireMenuDailyChallenge')?.addEventListener('click', () => {
+                    this.openDailyChallenge();
+                });
+                DOM('dailyChallengeCloseBtn')?.addEventListener('click', () => {
+                    DOM('dailyChallengeOverlay')?.classList.remove('visible');
+                });
+                DOM('dailyChallengeSolveBtn')?.addEventListener('click', () => {
+                    this.startDailyChallenge();
+                });
+                DOM('dailyChallengeOverlay')?.addEventListener('click', (e) => {
+                    if (e.target.id === 'dailyChallengeOverlay') {
+                        e.currentTarget.classList.remove('visible');
+                    }
                 });
 
                 document.getElementById('dnfBtn').addEventListener('click', () => {
@@ -3281,6 +3655,7 @@
                     : null; // null = Target Time wasn't active for this solve
 
                 const now = Date.now();
+                const dailyChallengeTag = this._consumeDailyChallengeTag();
                 const solve = {
                     id: `s_${now}_${Math.random().toString(36).slice(2,7)}`,
                     time: time,
@@ -3292,7 +3667,8 @@
                     scramble: DOM('scrambleText').textContent,
                     penalty: null,
                     dnf: false,
-                    targetMet
+                    targetMet,
+                    ...dailyChallengeTag
                 };
 
                 const currentSession = this.sessions[this.currentSessionId];
@@ -3321,6 +3697,7 @@
             // WCA mode: inspection expired → save DNF automatically
             saveSolveDNF() {
                 const now = Date.now();
+                const dailyChallengeTag = this._consumeDailyChallengeTag();
                 const solve = {
                     id: `s_${now}_${Math.random().toString(36).slice(2,7)}`,
                     time: 0,
@@ -3330,7 +3707,8 @@
                     updatedAt: now,
                     scramble: DOM('scrambleText').textContent,
                     penalty: null,
-                    dnf: true
+                    dnf: true,
+                    ...dailyChallengeTag
                 };
 
                 const currentSession = this.sessions[this.currentSessionId];
@@ -4511,6 +4889,9 @@
                         : solve.targetMet === false ? 'sh-target-missed' : '';
 
                     const honestLocked = this._isSolveHonestLocked(session, solve);
+                    const dailyChallengeBadge = solve.dailyChallenge
+                        ? `<span class="solve-daily-challenge-badge">\u{1F4C5} ${this._dailyChallengeTranslations().dailyChallengeActive}</span>`
+                        : '';
                     const deleteBtnHtml = honestLocked
                         ? `<button class="solve-action-btn delete" data-index="${index}" data-action="delete" disabled title="Locked by Honest Mode">🔒</button>`
                         : `<button class="solve-action-btn delete" data-index="${index}" data-action="delete">Delete</button>`;
@@ -4522,6 +4903,7 @@
                         <td>${ao12 !== null ? this.formatTime(ao12) : '–'}</td>
                         <td>${ao100 !== null ? this.formatTime(ao100) : '–'}</td>
                         <td>
+                            ${dailyChallengeBadge}
                             <span class="solve-scramble">${solve.scramble || 'No scramble'}</span>
                             <div class="solve-actions">
                                 ${deleteBtnHtml}
@@ -5307,6 +5689,7 @@
             renderSessionsList() {
                 const container = document.getElementById('sessionsList');
                 container.innerHTML = '';
+                const sessionTranslations = translations[getLang()] || translations.en;
 
                 Object.values(this.sessions).forEach(session => {
                     const item = document.createElement('div');
@@ -5324,14 +5707,16 @@
                     const disciplineLabel = ScrambleGenerator.getLabel(discipline);
                     // Show short label: strip " Cube" suffix for compactness
                     const shortLabel = disciplineLabel.replace(' Cube', '');
+                    const displayName = session.isDefault ? sessionTranslations.noSession : session.name;
+                    const countLabel = sessionTranslations.solvesCount.replace('{n}', count);
 
                     item.innerHTML = `
                         <div class="session-item-name">
                             <span class="session-item-icon">${icon}</span>
-                            <span>${session.name}</span>
+                            <span>${displayName}</span>
                             <span class="session-discipline-badge">${shortLabel}</span>
                         </div>
-                        <div class="session-item-count">${count} solve${count !== 1 ? 's' : ''}</div>
+                        <div class="session-item-count">${countLabel}</div>
                     `;
 
                     item.onclick = () => {
@@ -5378,9 +5763,13 @@
                 const session = this.sessions[this.currentSessionId];
                 if (!session) return;
 
-                document.getElementById('sessionDetailsTitle').textContent = session.name;
-                document.getElementById('sessionDetailsSubtitle').textContent = 
-                    session.isDefault ? 'Default session' : `${session.solves.length} solves`;
+                document.getElementById('sessionDetailsTitle').textContent = session.isDefault
+                    ? sessionTranslations.noSession
+                    : session.name;
+                const sessionTranslations = translations[getLang()] || translations.en;
+                document.getElementById('sessionDetailsSubtitle').textContent = session.isDefault
+                    ? sessionTranslations.defaultSession
+                    : sessionTranslations.solvesCount.replace('{n}', session.solves.length);
 
                 const solves = session.solves;
                 const validSolves = solves.filter(s => !s.dnf);
@@ -5596,6 +5985,7 @@
                         solvesHTML.push(`
                             <li class="solve-item">
                                 <span class="solve-number">${i + 1}.</span>
+                                ${solve.dailyChallenge ? `<span class="solve-daily-challenge-icon" title="${this._dailyChallengeTranslations().dailyChallengeActive}">\u{1F4C5}</span>` : ''}
                                 <span class="solve-time ${classes}">${timeStr}</span>
                             </li>
                         `);
@@ -5954,7 +6344,118 @@
                 }
             }
 
+            _getLocalDateKey(date = new Date()) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            _dailyChallengeTranslations() {
+                return translations[getLang()] || translations.en;
+            }
+
+            _setDailyChallengeState(state, message = '') {
+                const status = DOM('dailyChallengeStatus');
+                const content = DOM('dailyChallengeContent');
+                const solveButton = DOM('dailyChallengeSolveBtn');
+                if (status) {
+                    status.textContent = message;
+                    status.classList.toggle('hidden', state === 'ready');
+                    status.classList.toggle('error', state === 'error');
+                }
+                content?.classList.toggle('hidden', state !== 'ready');
+                solveButton?.classList.toggle('hidden', state !== 'ready');
+            }
+
+            async openDailyChallenge() {
+                const overlay = DOM('dailyChallengeOverlay');
+                if (!overlay) return;
+                const t = this._dailyChallengeTranslations();
+                const dateKey = this._getLocalDateKey();
+                this._loadedDailyChallenge = null;
+                const date = new Date(`${dateKey}T12:00:00`);
+                DOM('dailyChallengeTitle').textContent = t.dailyChallengeTitle;
+                DOM('dailyChallengeDate').textContent = new Intl.DateTimeFormat(
+                    getLang() === 'ru' ? 'ru-RU' : 'en-US',
+                    { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+                ).format(date);
+                DOM('dailyChallengeCloseBtn').textContent = t.dailyChallengeClose;
+                DOM('dailyChallengeSolveBtn').textContent = t.dailyChallengeSolve;
+                this._setDailyChallengeState('loading', t.dailyChallengeLoading);
+                overlay.classList.add('visible');
+
+                try {
+                    let challenge;
+                    if (this._dailyChallengeCache?.date === dateKey) {
+                        challenge = this._dailyChallengeCache.data;
+                    } else {
+                        if (!window.CubeSync?.loadDailyChallenge) throw new Error('Daily Challenge API is unavailable');
+                        challenge = await window.CubeSync.loadDailyChallenge(dateKey);
+                        this._dailyChallengeCache = { date: dateKey, data: challenge };
+                    }
+
+                    if (!challenge) {
+                        this._setDailyChallengeState('missing', t.dailyChallengeMissing);
+                        return;
+                    }
+
+                    const scramble = typeof challenge.scramble === 'string' ? challenge.scramble.trim() : '';
+                    if (scramble.length < 5 || scramble.length > 500) {
+                        throw new Error('Daily Challenge scramble is invalid');
+                    }
+                    const puzzle = typeof challenge.puzzle === 'string' && challenge.puzzle.trim()
+                        ? challenge.puzzle.trim()
+                        : '3x3';
+                    const note = getLang() === 'ru'
+                        ? (challenge.noteRu || challenge.note || challenge.noteEn || '')
+                        : (challenge.noteEn || challenge.note || challenge.noteRu || '');
+
+                    this._loadedDailyChallenge = { date: dateKey, puzzle, scramble, note };
+                    DOM('dailyChallengePuzzle').textContent = `${t.dailyChallengePuzzle}: ${puzzle}`;
+                    DOM('dailyChallengeScramble').textContent = scramble;
+                    DOM('dailyChallengeNote').textContent = note;
+                    DOM('dailyChallengeNote').classList.toggle('hidden', !note);
+                    this._setDailyChallengeState('ready');
+                } catch (error) {
+                    console.error('Daily Challenge load failed:', error);
+                    this._setDailyChallengeState('error', t.dailyChallengeError);
+                }
+            }
+
+            startDailyChallenge() {
+                if (!this._loadedDailyChallenge) return;
+                this.activeDailyChallenge = { ...this._loadedDailyChallenge };
+                this.activeDailyChallengeConsumed = false;
+                // Invalidate a normal scramble request that may still be loading.
+                this._scrambleRequestId++;
+                DOM('scrambleText').textContent = this.activeDailyChallenge.scramble;
+                const badge = DOM('dailyChallengeActiveBadge');
+                if (badge) {
+                    badge.textContent = `\u{1F4C5} ${this._dailyChallengeTranslations().dailyChallengeActive}`;
+                    badge.classList.remove('hidden');
+                }
+                DOM('dailyChallengeOverlay')?.classList.remove('visible');
+            }
+
+            _consumeDailyChallengeTag() {
+                if (!this.activeDailyChallenge || this.activeDailyChallengeConsumed) return {};
+                this.activeDailyChallengeConsumed = true;
+                return {
+                    dailyChallenge: true,
+                    dailyChallengeDate: this.activeDailyChallenge.date,
+                    dailyChallengePuzzle: this.activeDailyChallenge.puzzle
+                };
+            }
+
+            _clearDailyChallenge() {
+                this.activeDailyChallenge = null;
+                this.activeDailyChallengeConsumed = false;
+                DOM('dailyChallengeActiveBadge')?.classList.add('hidden');
+            }
+
             async generateScramble() {
+                this._clearDailyChallenge();
                 const session = this.sessions[this.currentSessionId];
                 const discipline = session?.discipline || '3x3';
                 // Real WCA-engine scrambles load async (cubing.js), so show a
@@ -7879,12 +8380,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const commentary = new CommentarySystem();
             const settingsManager = new SettingsManager();
+            // CubeTimer reads the selected language during its constructor.
+            window.settingsManager = settingsManager;
             const timer = new CubeTimer();
             const hotkeyManager = new HotkeyManager();
             
             // Make globally accessible
             window.commentary = commentary;
-            window.settingsManager = settingsManager;
             window.timer = timer;
             window.sessionsManager = timer; // Alias for solve history
             window.hotkeyManager = hotkeyManager;
@@ -8661,6 +9163,7 @@ const AlgsDiagram = (function() {
         const map = {
             fireMenuTargetTime: T === ALGS_I18N.ru ? 'Целевое время' : 'Target Time',
             fireMenuHonestMode: T === ALGS_I18N.ru ? 'Честный режим' : 'Honest Mode',
+            fireMenuDailyChallenge: T === ALGS_I18N.ru ? 'Скрамбл дня' : 'Daily Scramble',
             fireMenuAlgsTrainer: T === ALGS_I18N.ru ? 'Тренер алгоритмов' : 'Algs Trainer',
             fireMenuMultiplayer: T === ALGS_I18N.ru ? 'Мультиплеер' : 'Multiplayer',
             fireMenuSoon: T.soon,

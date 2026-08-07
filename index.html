@@ -34,7 +34,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2.2.2">
 
     <script type="application/ld+json">
     {
@@ -96,6 +96,9 @@
                         <button class="fire-menu-item honest-mode-btn" id="honestModeBtn">
                             <span>🟢</span><span id="honestModeBtnLabel">Honest Mode</span>
                         </button>
+                        <button class="fire-menu-item" id="fireMenuDailyChallenge">
+                            <span>📅</span><span id="dailyChallengeMenuLabel" data-i18n="fireMenuDailyChallenge">Daily Scramble</span>
+                        </button>
                         <div class="fire-menu-divider"></div>
                         <button class="fire-menu-item" id="fireMenuAlgsTrainer">
                             <span>&#129513;</span><span data-i18n="fireMenuAlgsTrainer">Algs Trainer</span>
@@ -151,6 +154,7 @@
             <!-- Center Column - Timer -->
             <div class="center-column">
                 <div class="scramble-section">
+                    <div class="daily-challenge-active-badge hidden" id="dailyChallengeActiveBadge">📅 Daily Scramble</div>
                     <div class="scramble-text" id="scrambleText">L' U' R' F2 D' L2 U R' B2 D' R2 U'</div>
                 </div>
                 <button class="new-scramble-btn" id="newScrambleBtn">
@@ -546,6 +550,14 @@
                                     <span class="mood-card-label">Rival</span>
                                 </button>
                             </div>
+                            <button class="custom-phrases-open-btn" id="openCustomPhrases" type="button">
+                                <span class="custom-phrases-open-icon">✍</span>
+                                <span>
+                                    <strong id="customPhrasesOpenTitle">Add your own phrases</strong>
+                                    <small id="customPhrasesOpenDesc">Personal replies for every bot mood and event</small>
+                                </span>
+                                <span class="custom-phrases-open-arrow">→</span>
+                            </button>
                         </div>
                         
                         <!-- Inspection Setting -->
@@ -674,6 +686,81 @@
                     </div>
 
                 </div>
+            </div>
+
+            <div class="custom-phrases-layer" id="customPhrasesLayer" aria-hidden="true">
+                <div class="custom-phrases-header">
+                    <div>
+                        <h2 class="settings-title-new" id="customPhrasesTitle">Your commentary phrases</h2>
+                        <p class="custom-phrases-subtitle" id="customPhrasesSubtitle">Add phrases to the built-in collection. Default phrases remain available.</p>
+                    </div>
+                    <button class="settings-close-new" id="closeCustomPhrases" type="button" aria-label="Back to settings">×</button>
+                </div>
+
+                <div class="custom-phrases-content">
+                    <div class="custom-phrases-form">
+                        <div class="custom-phrases-select-grid">
+                            <label class="custom-phrases-field">
+                                <span id="customPhrasesMoodLabel">Bot mood</span>
+                                <select class="custom-phrases-select" id="customPhrasesMood">
+                                    <option value="friend">😊 Friend</option>
+                                    <option value="teaser">😏 Teaser</option>
+                                    <option value="trainer">🧠 Trainer</option>
+                                    <option value="enemy">😈 Enemy</option>
+                                    <option value="rival">♟️ Rival</option>
+                                </select>
+                            </label>
+                            <label class="custom-phrases-field">
+                                <span id="customPhrasesCategoryLabel">Event category</span>
+                                <select class="custom-phrases-select" id="customPhrasesCategory"></select>
+                            </label>
+                        </div>
+
+                        <label class="custom-phrases-field custom-phrases-text-field">
+                            <span id="customPhrasesTextLabel">Phrase</span>
+                            <textarea class="custom-phrases-textarea" id="customPhrasesInput" maxlength="300" rows="3" placeholder="Type what the bot should say…"></textarea>
+                        </label>
+
+                        <div class="custom-phrases-actions">
+                            <span class="custom-phrases-message" id="customPhrasesMessage" role="status"></span>
+                            <button class="custom-phrases-add-btn" id="addCustomPhrase" type="button">Add phrase</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-phrases-list-head">
+                        <div>
+                            <h3 id="customPhrasesListTitle">Added phrases</h3>
+                            <p id="customPhrasesListHint">Only phrases for the selected mood and category are shown.</p>
+                        </div>
+                        <span class="custom-phrases-count" id="customPhrasesCount">0</span>
+                    </div>
+                    <div class="custom-phrases-list" id="customPhrasesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Scramble -->
+    <div class="new-session-overlay" id="dailyChallengeOverlay">
+        <div class="new-session-modal daily-challenge-modal">
+            <div class="daily-challenge-heading">
+                <div>
+                    <div class="new-session-title" id="dailyChallengeTitle">Daily Scramble</div>
+                    <div class="daily-challenge-date" id="dailyChallengeDate"></div>
+                </div>
+                <span class="daily-challenge-calendar">📅</span>
+            </div>
+
+            <div class="daily-challenge-status" id="dailyChallengeStatus">Loading today’s scramble…</div>
+            <div class="daily-challenge-content hidden" id="dailyChallengeContent">
+                <div class="daily-challenge-puzzle" id="dailyChallengePuzzle"></div>
+                <div class="daily-challenge-scramble" id="dailyChallengeScramble"></div>
+                <div class="daily-challenge-note hidden" id="dailyChallengeNote"></div>
+            </div>
+
+            <div class="new-session-actions daily-challenge-actions">
+                <button class="new-session-btn cancel" id="dailyChallengeCloseBtn">Close</button>
+                <button class="new-session-btn primary hidden" id="dailyChallengeSolveBtn">Solve this scramble</button>
             </div>
         </div>
     </div>
@@ -950,13 +1037,13 @@
 
     <!-- Hotkey Hint Bar -->
     <div class="hotkey-hint" id="hotkeyHint">
-        <kbd>S</kbd> Sessions &nbsp;·&nbsp;
-        <kbd>N</kbd> Settings &nbsp;·&nbsp;
-        <kbd>C</kbd> Stats &nbsp;·&nbsp;
-        <kbd>D</kbd> DNF &nbsp;·&nbsp;
-        <kbd>+</kbd> +2 &nbsp;·&nbsp;
-        <kbd>Del</kbd> Delete &nbsp;·&nbsp;
-        <kbd>E</kbd> Edit
+        <kbd>S</kbd> <span id="hotkeySessionsLabel">Sessions</span> &nbsp;·&nbsp;
+        <kbd>N</kbd> <span id="hotkeySettingsLabel">Settings</span> &nbsp;·&nbsp;
+        <kbd>C</kbd> <span id="hotkeyStatsLabel">Stats</span> &nbsp;·&nbsp;
+        <kbd>D</kbd> <span id="hotkeyDnfLabel">DNF</span> &nbsp;·&nbsp;
+        <kbd>+</kbd> <span id="hotkeyPlusTwoLabel">+2</span> &nbsp;·&nbsp;
+        <kbd>Del</kbd> <span id="hotkeyDeleteLabel">Delete</span> &nbsp;·&nbsp;
+        <kbd>E</kbd> <span id="hotkeyEditLabel">Edit</span>
     </div>
 
     <!-- New Session Modal -->
@@ -1214,7 +1301,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.2.1</div>
+    <div class="version-display">2.3.0</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1332,17 +1419,17 @@
         </div>
     </div>
 
-    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="firebase-init.js?v=2.2.2"></script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
     <script defer src="sync.js"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js"></script>
+    <script defer src="translations.js?v=2.2.2"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js"></script>
+    <script defer src="script.js?v=2.2.2"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">

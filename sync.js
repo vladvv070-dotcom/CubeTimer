@@ -221,11 +221,13 @@ const CloudSync = {
         }
     },
     async pushMeta(meta) {
-        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return false;
         try {
             await window.CubeSync.saveSessionsMeta(meta);
+            return true;
         } catch (e) {
             console.error('CloudSync.pushMeta failed:', e);
+            return false;
         }
     },
 
@@ -319,6 +321,8 @@ async function flushPendingSync() {
 }
 
 // ---- Orchestration ------------------------------------------------------
+let _customPhrasesUnsubscribe = null;
+
 const AppSync = {
     // Call this right after a successful login, and once on page load if
     // a session was restored. The FULL solve history is only ever read
@@ -357,6 +361,12 @@ const AppSync = {
             // to diff against the previous account's marker.
             AppStorage.setRaw('lastSyncedAt', '');
             timer.sessions = {};
+            if (window.commentary?.setCustomPhrases) {
+                window.commentary.setCustomPhrases({}, 0);
+            } else {
+                AppStorage.setJSON('customPhrases', {});
+                AppStorage.setRaw('customPhrasesUpdatedAt', '0');
+            }
         }
         AppStorage.setRaw('lastSyncedUid', user.uid);
 
@@ -380,6 +390,24 @@ const AppSync = {
             CloudSync.pullMeta(),
             isFullSync ? CloudSync.pullAllSolvesOnce() : CloudSync.pullSolvesDelta(lastSyncedAt)
         ]);
+
+        // Custom commentary phrases are small account metadata. Use a
+        // last-write-wins timestamp so additions and deletions made on one
+        // device are reflected on every other signed-in device.
+        const localCustomPhrases = AppStorage.getJSON('customPhrases', {});
+        const localCustomPhrasesUpdatedAt = Number(AppStorage.getRaw('customPhrasesUpdatedAt', '0')) || 0;
+        const remoteCustomPhrasesUpdatedAt = Number(remoteMeta?.customPhrasesUpdatedAt) || 0;
+        let shouldPushCustomPhrases = localCustomPhrasesUpdatedAt > remoteCustomPhrasesUpdatedAt;
+
+        if (remoteMeta?.customPhrases && remoteCustomPhrasesUpdatedAt >= localCustomPhrasesUpdatedAt) {
+            if (window.commentary?.setCustomPhrases) {
+                window.commentary.setCustomPhrases(remoteMeta.customPhrases, remoteCustomPhrasesUpdatedAt || Date.now());
+            } else {
+                AppStorage.setJSON('customPhrases', remoteMeta.customPhrases);
+                AppStorage.setRaw('customPhrasesUpdatedAt', String(remoteCustomPhrasesUpdatedAt || Date.now()));
+            }
+            shouldPushCustomPhrases = false;
+        }
 
         // Fold in tombstones from Firestore FIRST -- otherwise a solve/session
         // deleted on another device looks, from this device's point of view,
@@ -479,6 +507,8 @@ const AppSync = {
         for (const { sessionId, solve } of localSolvesNotYetRemote) {
             await CloudSync.pushNewSolve(sessionId, solve);
         }
+        if (shouldPushCustomPhrases) await AppSync.pushCustomPhrasesNow();
+        AppSync.startCustomPhrasesLiveSync();
     },
 
     // ---- Point-write helpers, called directly from Timer on each action ----
@@ -490,6 +520,38 @@ const AppSync = {
     },
     pushSolveDelete(solveId) {
         CloudSync.pushSolveDelete(solveId);
+    },
+
+    async pushCustomPhrasesNow() {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return false;
+        const customPhrases = AppStorage.getJSON('customPhrases', {});
+        const customPhrasesUpdatedAt = Number(AppStorage.getRaw('customPhrasesUpdatedAt', '0')) || Date.now();
+        return CloudSync.pushMeta({ customPhrases, customPhrasesUpdatedAt });
+    },
+
+    startCustomPhrasesLiveSync() {
+        if (_customPhrasesUnsubscribe || !window.CubeAuth?.getCurrentUser?.() || !window.CubeSync?.subscribeUserData) return;
+        try {
+            _customPhrasesUnsubscribe = window.CubeSync.subscribeUserData((remote) => {
+                const remoteUpdatedAt = Number(remote?.customPhrasesUpdatedAt) || 0;
+                const localUpdatedAt = Number(AppStorage.getRaw('customPhrasesUpdatedAt', '0')) || 0;
+                if (!remote?.customPhrases || remoteUpdatedAt <= localUpdatedAt) return;
+                if (window.commentary?.setCustomPhrases) {
+                    window.commentary.setCustomPhrases(remote.customPhrases, remoteUpdatedAt);
+                } else {
+                    AppStorage.setJSON('customPhrases', remote.customPhrases);
+                    AppStorage.setRaw('customPhrasesUpdatedAt', String(remoteUpdatedAt));
+                    window.dispatchEvent(new CustomEvent('customphraseschange'));
+                }
+            });
+        } catch (e) {
+            console.error('Custom phrases live sync failed:', e);
+        }
+    },
+
+    stopCustomPhrasesLiveSync() {
+        if (_customPhrasesUnsubscribe) _customPhrasesUnsubscribe();
+        _customPhrasesUnsubscribe = null;
     },
 
     // Metadata (session names/disciplines/current session) is small and

@@ -184,6 +184,13 @@ window.CubeSync = {
     return snap.exists() ? snap.data() : null;
   },
 
+  // Public daily challenge. The Firestore document id is the local calendar
+  // date in YYYY-MM-DD format, e.g. dailyChallenge/2026-08-07.
+  loadDailyChallenge: async (dateKey) => {
+    const snap = await getDoc(doc(db, "dailyChallenge", dateKey));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  },
+
   // Живая подписка на изменения (в т.ч. с другого устройства).
   // Возвращает функцию отписки.
   subscribeUserData: (callback) => {
@@ -281,7 +288,11 @@ window.CubeSync = {
 // полный ресинк один раз. AppSync.runSync() сам читает и метаданные,
 // и историю сборок — второй getDoc здесь был бы лишним чтением.
 onAuthStateChanged(auth, async (user) => {
-  if (!user || !window.AppStorage) return;
+  if (!user) {
+    window.AppSync?.stopCustomPhrasesLiveSync?.();
+    return;
+  }
+  if (!window.AppStorage) return;
   try {
     if (window.AppSync && window.AppSync.runSync) {
       await window.AppSync.runSync();
