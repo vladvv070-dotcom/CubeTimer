@@ -293,6 +293,23 @@
                 setText('#dailyChallengeCloseBtn', t.dailyChallengeClose);
                 setText('#dailyChallengeSolveBtn', t.dailyChallengeSolve);
                 setText('#dailyChallengeActiveBadge', `\u{1F4C5} ${t.dailyChallengeActive}`);
+                setText('#streakModalTitle', t.streakTitle);
+                setText('#streakModalSubtitle', t.streakSubtitle);
+                setText('#currentStreakLabel', t.streakCurrent);
+                setText('#bestStreakLabel', t.streakBest);
+                setText('#activeDaysLabel', t.streakActiveDays);
+                setText('#streakCalendarHint', t.streakHint);
+                setText('#streakLessLabel', t.streakLess);
+                setText('#streakMoreLabel', t.streakMore);
+                const streakButton = DOM('streakButton');
+                if (streakButton) {
+                    streakButton.title = t.streakOpen;
+                    streakButton.setAttribute('aria-label', t.streakOpen);
+                }
+                const streakClose = DOM('streakCloseIcon');
+                if (streakClose) streakClose.setAttribute('aria-label', t.close);
+                DOM('streakPrevMonth')?.setAttribute('aria-label', t.streakPreviousMonth);
+                DOM('streakNextMonth')?.setAttribute('aria-label', t.streakNextMonth);
                 
                 // Timer hint (reflects Mouse Start setting / touch devices)
                 const timerHint = document.querySelector('.timer-hint');
@@ -2695,6 +2712,22 @@
                     if (e.target.id === 'dailyChallengeOverlay') {
                         e.currentTarget.classList.remove('visible');
                     }
+                });
+                DOM('streakButton')?.addEventListener('click', () => this.openStreakCalendar());
+                DOM('streakPrevMonth')?.addEventListener('click', () => {
+                    this._streakCalendarMonth?.setMonth(this._streakCalendarMonth.getMonth() - 1);
+                    this._renderStreakMonth();
+                });
+                DOM('streakNextMonth')?.addEventListener('click', () => {
+                    if (!this._streakCalendarMonth) return;
+                    this._streakCalendarMonth.setMonth(this._streakCalendarMonth.getMonth() + 1);
+                    this._renderStreakMonth();
+                });
+                DOM('streakCloseIcon')?.addEventListener('click', () => {
+                    DOM('streakOverlay')?.classList.remove('visible');
+                });
+                DOM('streakOverlay')?.addEventListener('click', (e) => {
+                    if (e.target.id === 'streakOverlay') e.currentTarget.classList.remove('visible');
                 });
 
                 document.getElementById('dnfBtn').addEventListener('click', () => {
@@ -6000,6 +6033,7 @@
                 }
                 
                 this.solvesList.innerHTML = solvesHTML.join('');
+                this.updateActivityStreakButton();
 
                 // Calculate and update averages and best times
                 this.updateAverages();
@@ -6349,6 +6383,141 @@
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const day = String(date.getDate()).padStart(2, '0');
                 return `${year}-${month}-${day}`;
+            }
+
+            _getActivityByDay() {
+                const activity = new Map();
+                Object.values(this.sessions || {}).forEach(session => {
+                    (session.solves || []).forEach(solve => {
+                        const timestamp = Number(solve.timestamp);
+                        if (!Number.isFinite(timestamp) || timestamp <= 0) return;
+                        const key = this._getLocalDateKey(new Date(timestamp));
+                        activity.set(key, (activity.get(key) || 0) + 1);
+                    });
+                });
+                return activity;
+            }
+
+            _dateFromLocalKey(key) {
+                const [year, month, day] = key.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            _calculateStreakMetrics(activity = this._getActivityByDay()) {
+                const keys = [...activity.keys()].sort();
+                let best = 0;
+                let run = 0;
+                let previous = null;
+                keys.forEach(key => {
+                    const date = this._dateFromLocalKey(key);
+                    if (previous && Math.round((date - previous) / 86400000) === 1) run++;
+                    else run = 1;
+                    best = Math.max(best, run);
+                    previous = date;
+                });
+
+                const cursor = new Date();
+                cursor.setHours(0, 0, 0, 0);
+                if (!activity.has(this._getLocalDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+                let current = 0;
+                while (activity.has(this._getLocalDateKey(cursor))) {
+                    current++;
+                    cursor.setDate(cursor.getDate() - 1);
+                }
+                return { current, best, activeDays: keys.length };
+            }
+
+            updateActivityStreakButton() {
+                const metrics = this._calculateStreakMetrics();
+                const count = DOM('streakButtonCount');
+                if (count) count.textContent = metrics.current;
+                return metrics;
+            }
+
+            _activityLevel(count) {
+                if (!count) return 0;
+                if (count <= 2) return 1;
+                if (count <= 5) return 2;
+                if (count <= 10) return 3;
+                return 4;
+            }
+
+            openStreakCalendar() {
+                const overlay = DOM('streakOverlay');
+                if (!overlay || !DOM('streakCalendar')) return;
+                const activity = this._getActivityByDay();
+                const metrics = this._calculateStreakMetrics(activity);
+                DOM('currentStreakValue').textContent = metrics.current;
+                DOM('bestStreakValue').textContent = metrics.best;
+                DOM('activeDaysValue').textContent = metrics.activeDays;
+                const now = new Date();
+                this._streakCalendarMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                overlay.classList.add('visible');
+                this._renderStreakMonth(activity);
+            }
+
+            _renderStreakMonth(activity = this._getActivityByDay()) {
+                const calendar = DOM('streakCalendar');
+                const weekdays = DOM('streakWeekdays');
+                const monthTitle = DOM('streakMonthTitle');
+                if (!calendar || !weekdays || !monthTitle || !this._streakCalendarMonth) return;
+                const t = this._dailyChallengeTranslations();
+                const locale = getLang() === 'ru' ? 'ru-RU' : 'en-US';
+                const displayed = this._streakCalendarMonth;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayKey = this._getLocalDateKey(today);
+
+                const monthName = new Intl.DateTimeFormat(locale, { month: 'long' }).format(displayed);
+                monthTitle.textContent = `${monthName} ${displayed.getFullYear()}`;
+                const nextButton = DOM('streakNextMonth');
+                const isCurrentMonth = displayed.getFullYear() === today.getFullYear()
+                    && displayed.getMonth() === today.getMonth();
+                if (nextButton) nextButton.disabled = isCurrentMonth;
+
+                weekdays.innerHTML = '';
+                const weekdayLabels = locale === 'ru-RU'
+                    ? ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
+                    : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                weekdayLabels.forEach(text => {
+                    const label = document.createElement('span');
+                    label.textContent = text;
+                    weekdays.appendChild(label);
+                });
+
+                const first = new Date(displayed.getFullYear(), displayed.getMonth(), 1);
+                const gridStart = new Date(first);
+                gridStart.setDate(first.getDate() - first.getDay());
+                calendar.innerHTML = '';
+                for (let weekIndex = 0; weekIndex < 6; weekIndex++) {
+                    const week = document.createElement('div');
+                    week.className = 'streak-month-week';
+                    let perfectWeek = true;
+                    for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                        const date = new Date(gridStart);
+                        date.setDate(gridStart.getDate() + weekIndex * 7 + dayIndex);
+                        const key = this._getLocalDateKey(date);
+                        const count = activity.get(key) || 0;
+                        if (!count || date > today) perfectWeek = false;
+                        const cell = document.createElement('span');
+                        cell.className = 'streak-month-day';
+                        cell.dataset.level = String(this._activityLevel(count));
+                        cell.textContent = date.getDate();
+                        if (date.getMonth() !== displayed.getMonth()) cell.classList.add('outside-month');
+                        if (date > today) cell.classList.add('future');
+                        if (key === todayKey) cell.classList.add('today');
+                        const formatted = new Intl.DateTimeFormat(locale, {
+                            year: 'numeric', month: 'long', day: 'numeric'
+                        }).format(date);
+                        cell.title = `${formatted}: ${count} ${t.streakSolves}`;
+                        week.appendChild(cell);
+                    }
+                    if (perfectWeek) {
+                        week.classList.add('perfect-week');
+                        week.title = t.streakPerfectWeek;
+                    }
+                    calendar.appendChild(week);
+                }
             }
 
             _dailyChallengeTranslations() {

@@ -34,7 +34,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=2.2.2">
+    <link rel="stylesheet" href="styles.css?v=2.4.4">
 
     <script type="application/ld+json">
     {
@@ -75,6 +75,7 @@
                         </div>
                     </div>
                 </div>
+                <button class="streak-button" id="streakButton" type="button" aria-label="Open activity calendar">🔥<span id="streakButtonCount">0</span></button>
                 <div class="control-window">
                     <div class="header-icon-row">
                         <button class="icon-btn" id="settingsBtn" title="Settings">
@@ -765,6 +766,49 @@
         </div>
     </div>
 
+    <!-- Activity streak calendar -->
+    <div class="new-session-overlay" id="streakOverlay">
+        <div class="new-session-modal streak-modal" role="dialog" aria-modal="true" aria-labelledby="streakModalTitle">
+            <div class="streak-modal-heading">
+                <div>
+                    <div class="new-session-title" id="streakModalTitle">Activity</div>
+                    <div class="streak-modal-subtitle" id="streakModalSubtitle">Your solving activity across all sessions</div>
+                </div>
+                <button class="streak-close-icon" id="streakCloseIcon" type="button" aria-label="Close">×</button>
+            </div>
+
+            <div class="streak-summary">
+                <div class="streak-summary-card current">
+                    <span class="streak-summary-icon">🔥</span>
+                    <div><strong id="currentStreakValue">0</strong><span id="currentStreakLabel">Current streak</span></div>
+                </div>
+                <div class="streak-summary-card best">
+                    <span class="streak-summary-icon">🏆</span>
+                    <div><strong id="bestStreakValue">0</strong><span id="bestStreakLabel">Best streak</span></div>
+                </div>
+                <div class="streak-summary-card total">
+                    <span class="streak-summary-icon">📅</span>
+                    <div><strong id="activeDaysValue">0</strong><span id="activeDaysLabel">Active days</span></div>
+                </div>
+            </div>
+
+            <div class="streak-calendar-shell">
+                <div class="streak-month-navigation">
+                    <button class="streak-month-arrow" id="streakPrevMonth" type="button" aria-label="Previous month">‹</button>
+                    <strong id="streakMonthTitle"></strong>
+                    <button class="streak-month-arrow" id="streakNextMonth" type="button" aria-label="Next month">›</button>
+                </div>
+                <div class="streak-month-weekdays" id="streakWeekdays"></div>
+                <div class="streak-month-calendar" id="streakCalendar"></div>
+            </div>
+
+            <div class="streak-footer">
+                <span id="streakCalendarHint">Each square is one day</span>
+                <div class="streak-legend"><span id="streakLessLabel">Less</span><i data-level="0"></i><i data-level="1"></i><i data-level="2"></i><i data-level="3"></i><i data-level="4"></i><span id="streakMoreLabel">More</span></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Modal -->
     <div class="statistics-overlay" id="statisticsOverlay">
         <div class="statistics-modal">
@@ -1301,7 +1345,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.3.0</div>
+    <div class="version-display">2.4.4</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1419,17 +1463,17 @@
         </div>
     </div>
 
-    <script type="module" src="firebase-init.js?v=2.2.2"></script>
+    <script type="module" src="firebase-init.js?v=2.4.4"></script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
     <script defer src="sync.js"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js?v=2.2.2"></script>
+    <script defer src="translations.js?v=2.4.4"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js?v=2.2.2"></script>
+    <script defer src="script.js?v=2.4.4"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">

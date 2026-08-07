@@ -26,6 +26,10 @@
             --accent-danger: #ef4444;
             
             --timer-glow: rgba(74, 158, 255, 0.3);
+            --timer-panel-surface: color-mix(in srgb, var(--bg-card) 90%, var(--bg-primary));
+            --timer-panel-surface-deep: color-mix(in srgb, var(--bg-card) 76%, var(--bg-primary));
+            --timer-panel-accent-soft: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+            --timer-panel-accent-border: rgba(30, 181, 226, 0.42);
             
             --border-radius: 16px;
             --border-radius-sm: 12px;
@@ -103,6 +107,7 @@
             gap: 10px;
             width: 220px;
             flex-shrink: 0;
+            position: relative;
         }
 
         .title-badge {
@@ -173,6 +178,36 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            gap: 0.55rem;
+        }
+
+        .streak-button {
+            position: absolute;
+            top: 14px;
+            left: calc(100% + 14px);
+            z-index: 3;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.12rem;
+            min-width: 62px;
+            height: 52px;
+            justify-content: center;
+            padding: 0 0.75rem;
+            border: 1px solid rgba(249, 115, 22, 0.28);
+            border-radius: 999px;
+            background: rgba(249, 115, 22, 0.1);
+            color: #fb923c;
+            -webkit-text-fill-color: initial;
+            font: 850 1rem/1 'Manrope', sans-serif;
+            cursor: pointer;
+            transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+        }
+
+        .streak-button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(249, 115, 22, 0.55);
+            background: rgba(249, 115, 22, 0.17);
         }
 
         .header-controls {
@@ -543,18 +578,22 @@
         }
 
         .timer-container {
+            --timer-panel-surface: color-mix(in srgb, var(--bg-card) 90%, var(--bg-primary));
+            --timer-panel-surface-deep: color-mix(in srgb, var(--bg-card) 76%, var(--bg-primary));
+            --timer-panel-accent-soft: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+            --timer-panel-accent-border: rgba(30, 181, 226, 0.42);
             background:
-                radial-gradient(circle at 50% 42%, rgba(92, 196, 255, 0.075), transparent 48%),
-                linear-gradient(145deg, rgba(12, 25, 43, 0.98), rgba(5, 14, 27, 0.98));
+                radial-gradient(circle at 50% 42%, var(--timer-panel-accent-soft), transparent 50%),
+                linear-gradient(145deg, var(--timer-panel-surface), var(--timer-panel-surface-deep));
             backdrop-filter: blur(30px);
             border-radius: var(--border-radius-lg);
             padding: clamp(1.75rem, 4vw, 3.5rem) clamp(1.5rem, 6vw, 5.5rem);
-            border: 1px solid rgba(30, 181, 226, 0.42);
+            border: 1px solid var(--timer-panel-accent-border);
             box-shadow:
                 0 0 0 1px rgba(0, 174, 232, 0.05),
                 0 0 26px rgba(0, 174, 232, 0.09),
                 0 18px 45px rgba(0, 0, 0, 0.34),
-                inset 0 0 30px rgba(7, 34, 58, 0.24);
+                inset 0 0 30px color-mix(in srgb, var(--accent-primary) 7%, transparent);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -748,8 +787,8 @@
             letter-spacing: -0.02em;
             line-height: 1;
             text-shadow:
-                0 0 8px rgba(214, 247, 255, 0.62),
-                0 0 24px rgba(102, 196, 232, 0.48);
+                0 0 8px color-mix(in srgb, var(--text-primary) 58%, transparent),
+                0 0 24px color-mix(in srgb, var(--accent-primary) 48%, transparent);
             position: relative;
             z-index: 1;
             user-select: none;
@@ -2454,14 +2493,14 @@
 
         body.light-theme .timer-container {
             background:
-                radial-gradient(circle at 50% 40%, rgba(90, 197, 242, 0.1), transparent 50%),
-                linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(244, 250, 254, 0.98));
+                radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent-primary) 11%, transparent), transparent 50%),
+                linear-gradient(145deg, rgba(255, 255, 255, 0.98), color-mix(in srgb, var(--accent-primary) 5%, white));
             border: 1px solid rgba(14, 165, 233, 0.52);
             box-shadow:
                 0 0 0 1px rgba(14, 165, 233, 0.08),
                 0 0 28px rgba(14, 165, 233, 0.2),
                 0 18px 38px rgba(43, 73, 103, 0.17),
-                inset 0 0 28px rgba(14, 165, 233, 0.045);
+                inset 0 0 28px color-mix(in srgb, var(--accent-primary) 5%, transparent);
         }
 
         body.light-theme .timer-container::before {
@@ -2484,7 +2523,7 @@
 
         body.light-theme .timer-display {
             color: #172033;
-            text-shadow: 0 0 9px rgba(255, 255, 255, 0.9), 0 0 20px rgba(14, 165, 233, 0.16);
+            text-shadow: 0 0 9px rgba(255, 255, 255, 0.9), 0 0 20px color-mix(in srgb, var(--accent-primary) 18%, transparent);
         }
 
         body.light-theme .timer-hint {
@@ -4419,7 +4458,7 @@
                 0 8px 32px rgba(0,0,0,0.4) !important;
         }
         body[data-bg="dark-neon"] .timer-display {
-            text-shadow: 0 0 30px rgba(6, 182, 212, 0.5) !important;
+            text-shadow: 0 0 30px color-mix(in srgb, var(--accent-primary) 50%, transparent) !important;
         }
         body[data-bg="dark-neon"] .timer-display.ready {
             text-shadow: 0 0 40px rgba(34, 197, 94, 0.7) !important;
@@ -8378,6 +8417,263 @@ body.light-theme .daily-challenge-active-badge {
     .daily-challenge-actions {
         flex-direction: column-reverse;
     }
+}
+
+/* ===== Activity streak calendar ===== */
+.streak-modal {
+    width: min(680px, calc(100vw - 2rem));
+    max-width: 680px;
+}
+
+.streak-modal-heading,
+.streak-footer,
+.streak-calendar-body {
+    display: flex;
+    align-items: center;
+}
+
+.streak-modal-heading {
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.streak-modal-subtitle {
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font: 500 0.78rem/1.4 'Manrope', sans-serif;
+}
+
+.streak-close-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(120, 140, 170, 0.2);
+    border-radius: 10px;
+    background: rgba(120, 140, 170, 0.08);
+    color: var(--text-secondary);
+    font-size: 1.35rem;
+    cursor: pointer;
+}
+
+.streak-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: 1.35rem 0 1.2rem;
+}
+
+.streak-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid rgba(120, 140, 170, 0.17);
+    border-radius: 13px;
+    background: rgba(120, 140, 170, 0.055);
+}
+
+.streak-summary-card.current {
+    border-color: rgba(249, 115, 22, 0.38);
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.14), rgba(234, 88, 12, 0.055));
+}
+
+.streak-summary-icon { font-size: 1.25rem; }
+.streak-summary-card div { min-width: 0; }
+.streak-summary-card strong {
+    display: block;
+    color: var(--text-primary);
+    font: 800 1.3rem/1.1 'Manrope', sans-serif;
+}
+.streak-summary-card span:last-child {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--text-muted);
+    font: 600 0.68rem/1.25 'Manrope', sans-serif;
+}
+
+.streak-calendar-shell {
+    overflow: hidden;
+    padding: 1rem;
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(249, 115, 22, 0.035), rgba(120, 140, 170, 0.025));
+    scrollbar-width: thin;
+}
+
+.streak-month-navigation {
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+.streak-month-navigation strong {
+    color: var(--text-primary);
+    text-align: center;
+    text-transform: capitalize;
+    font: 800 1.05rem 'Manrope', sans-serif;
+}
+
+.streak-month-arrow {
+    width: 42px;
+    height: 38px;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    border-radius: 11px;
+    background: rgba(249, 115, 22, 0.07);
+    color: #fb923c;
+    font: 700 1.5rem/1 'Manrope', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.streak-month-arrow:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(249, 115, 22, 0.48);
+    background: rgba(249, 115, 22, 0.14);
+}
+
+.streak-month-arrow:disabled {
+    cursor: default;
+    opacity: 0.28;
+}
+
+.streak-month-weekdays,
+.streak-month-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+}
+
+.streak-month-weekdays {
+    padding: 0 5px;
+    margin-bottom: 0.45rem;
+    color: var(--text-muted);
+    text-align: center;
+    font: 700 0.68rem 'Manrope', sans-serif;
+}
+
+.streak-month-calendar {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.streak-month-week {
+    position: relative;
+    padding: 4px;
+    border: 2px solid transparent;
+    border-radius: 15px;
+}
+
+.streak-month-week.perfect-week {
+    border-color: #ff7a00;
+    box-shadow: 0 0 0 1px rgba(255, 122, 0, 0.2), 0 0 14px rgba(255, 107, 0, 0.22);
+}
+
+.streak-month-day {
+    min-width: 0;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(120, 140, 170, 0.13);
+    border-radius: 11px;
+    background: rgba(120, 140, 170, 0.08);
+    color: var(--text-secondary);
+    font: 750 0.78rem 'Manrope', sans-serif;
+    transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.streak-month-day:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.streak-month-day.outside-month { opacity: 0.42; }
+.streak-month-day.future { color: var(--text-muted); opacity: 0.34; }
+.streak-month-day.today { outline: 2px solid #fb923c; outline-offset: 1px; font-weight: 900; }
+.streak-month-day[data-level="1"] { background: #7c2d12; border-color: #9a3412; color: #ffedd5; }
+.streak-month-day[data-level="2"] { background: #c2410c; border-color: #ea580c; color: #fff7ed; }
+.streak-month-day[data-level="3"] { background: #f97316; border-color: #fb923c; color: #fff; }
+.streak-month-day[data-level="4"] { background: #fdba74; border-color: #fed7aa; color: #7c2d12; box-shadow: 0 0 8px rgba(249, 115, 22, 0.35); }
+
+body.light-theme .streak-month-arrow { color: #c2410c; }
+body.light-theme .streak-month-day { background: #f5f6f8; border-color: #e3e6eb; color: #475569; }
+body.light-theme .streak-month-day[data-level="1"] { background: #ffedd5; border-color: #fed7aa; color: #9a3412; }
+body.light-theme .streak-month-day[data-level="2"] { background: #fdba74; border-color: #fb923c; color: #7c2d12; }
+body.light-theme .streak-month-day[data-level="3"] { background: #f97316; border-color: #ea580c; color: #fff; }
+body.light-theme .streak-month-day[data-level="4"] { background: #c2410c; border-color: #9a3412; color: #fff; }
+
+.streak-months {
+    display: grid;
+    grid-template-columns: repeat(53, 11px);
+    column-gap: 4px;
+    min-width: 791px;
+    height: 22px;
+    margin-left: 38px;
+    color: var(--text-muted);
+    font: 600 0.62rem 'Manrope', sans-serif;
+}
+
+.streak-month-label { color: var(--text-secondary); white-space: nowrap; }
+.streak-calendar-body { align-items: flex-start; gap: 10px; }
+.streak-weekdays {
+    width: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    grid-template-rows: repeat(7, 11px);
+    row-gap: 4px;
+    color: var(--text-muted);
+    font: 600 0.56rem/11px 'Manrope', sans-serif;
+}
+
+.streak-calendar {
+    display: grid;
+    grid-template-rows: repeat(7, 11px);
+    grid-auto-columns: 11px;
+    grid-auto-flow: column;
+    gap: 4px;
+    min-width: 791px;
+}
+
+.streak-day,
+.streak-legend i {
+    width: 11px;
+    height: 11px;
+    border: 1px solid rgba(120, 140, 170, 0.11);
+    border-radius: 3px;
+    background: rgba(120, 140, 170, 0.1);
+}
+.streak-day.future { visibility: hidden; }
+.streak-day.today { outline: 1px solid #fb923c; outline-offset: 1px; }
+.streak-day[data-level="1"], .streak-legend i[data-level="1"] { background: #7c2d12; border-color: #9a3412; }
+.streak-day[data-level="2"], .streak-legend i[data-level="2"] { background: #c2410c; border-color: #ea580c; }
+.streak-day[data-level="3"], .streak-legend i[data-level="3"] { background: #f97316; border-color: #fb923c; }
+.streak-day[data-level="4"], .streak-legend i[data-level="4"] { background: #fdba74; border-color: #fed7aa; box-shadow: 0 0 7px rgba(249, 115, 22, 0.5); }
+
+.streak-footer {
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    color: var(--text-muted);
+    font: 600 0.65rem 'Manrope', sans-serif;
+}
+.streak-legend { display: flex; align-items: center; gap: 4px; }
+
+body.light-theme .streak-button {
+    border-color: rgba(234, 88, 12, 0.3);
+    background: rgba(249, 115, 22, 0.1);
+    color: #c2410c;
+}
+body.light-theme .streak-calendar-shell { border-color: rgba(234, 88, 12, 0.18); background: #fffaf6; }
+body.light-theme .streak-day[data-level="1"], body.light-theme .streak-legend i[data-level="1"] { background: #ffedd5; border-color: #fed7aa; }
+body.light-theme .streak-day[data-level="2"], body.light-theme .streak-legend i[data-level="2"] { background: #fdba74; border-color: #fb923c; }
+body.light-theme .streak-day[data-level="3"], body.light-theme .streak-legend i[data-level="3"] { background: #f97316; border-color: #ea580c; }
+body.light-theme .streak-day[data-level="4"], body.light-theme .streak-legend i[data-level="4"] { background: #c2410c; border-color: #9a3412; box-shadow: 0 0 6px rgba(234, 88, 12, 0.24); }
+
+@media (max-width: 620px) {
+    .streak-summary { grid-template-columns: 1fr; }
+    .streak-footer { align-items: flex-start; flex-direction: column; }
+    .streak-modal { width: calc(100vw - 1rem); padding: 1rem; }
+    .streak-month-day { height: 36px; border-radius: 9px; }
+    .streak-calendar-shell { padding: 0.7rem; }
 }
 
 /* ===== Telegram channel promo button (top-right corner) ===== */
