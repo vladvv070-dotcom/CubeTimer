@@ -2135,6 +2135,7 @@
                 this.previousAverageAo5 = null;
                 
                 this.timerDisplay = document.getElementById('timerDisplay');
+                this.timerContainer = this.timerDisplay?.closest('.timer-container');
                 this.solvesList = document.getElementById('solvesList');
                 this.titleStrip = document.getElementById('titleStrip');
                 this.recordTitle = document.getElementById('recordTitle');
@@ -2870,11 +2871,20 @@
                 this.isReady = false;
                 this.holdStartTime = Date.now();
                 this.timerDisplay.classList.remove('target-met', 'target-missed');
+                if (this.timerContainer) {
+                    this.timerContainer.style.setProperty('--hold-duration', `${this.HOLD_DURATION}ms`);
+                    this.timerContainer.classList.remove('ready');
+                    this.timerContainer.classList.add('holding');
+                }
 
                 // Set timeout for ready state
                 this.holdTimeout = setTimeout(() => {
                     this.isReady = true;
                     this.timerDisplay.classList.add('ready');
+                    if (this.timerContainer) {
+                        this.timerContainer.classList.remove('holding');
+                        this.timerContainer.classList.add('ready');
+                    }
                     // Clear any inline color to let CSS take over
                     this.timerDisplay.style.color = '';
                 }, this.HOLD_DURATION);
@@ -2911,6 +2921,10 @@
                     }
                 }
 
+                if (this.timerContainer) {
+                    this.timerContainer.classList.remove('holding', 'ready');
+                }
+
                 this.isHolding = false;
                 this.isReady = false;
             }
@@ -2924,6 +2938,7 @@
                 this.isRunning = true;
                 this.startTime = performance.now();
                 this.timerDisplay.classList.remove('ready');
+                this.timerContainer?.classList.remove('holding', 'ready');
                 this.timerDisplay.classList.remove('target-met', 'target-missed');
                 this.timerDisplay.classList.add('running');
                 this.hideNewBestIndicator();
