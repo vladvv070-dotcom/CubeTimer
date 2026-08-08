@@ -8,13 +8,14 @@
             this.timer = timer;
             this.settingsManager = settingsManager;
             this.catalog = window.PROGRESSION_CATALOG;
+            this.titleCatalog = window.TITLE_CATALOG || { tiers: {}, titles: [] };
             this.state = this._load();
             this._timer = null;
             this.sessionStartedAt = Date.now();
         }
 
         _defaultState() {
-            return { version: 1, rewardLedger: {}, inventoryLedger: {}, unlocked: {}, events: {}, frozenDays: {}, activeBoostUntil: 0, daily: null, updatedAt: 0 };
+            return { version: 1, rewardLedger: {}, inventoryLedger: {}, unlocked: {}, events: {}, frozenDays: {}, activeBoostUntil: 0, ownedTitles: {}, equippedTitle: null, titleUpdatedAt: 0, daily: null, updatedAt: 0 };
         }
         _load() { return { ...this._defaultState(), ...(AppStorage.getJSON(STORAGE_KEY, {}) || {}) }; }
         _save(push = true) {
@@ -22,6 +23,7 @@
             AppStorage.setJSON(STORAGE_KEY, this.state);
             if (push) window.AppSync?.pushProgressionNow?.();
             this.render();
+            window.dispatchEvent(new CustomEvent('titlechange', { detail: { title: this.getEquippedTitle() } }));
         }
         exportState() { return JSON.parse(JSON.stringify(this.state)); }
         clearLocalState() { this.state=this._defaultState();AppStorage.setJSON(STORAGE_KEY,this.state);this.ensureDaily();this.render(); }
@@ -34,6 +36,14 @@
             merged.unlocked = { ...(remote.unlocked || {}), ...(local.unlocked || {}) };
             merged.events = { ...(remote.events || {}), ...(local.events || {}) };
             merged.frozenDays = { ...(remote.frozenDays || {}), ...(local.frozenDays || {}) };
+            merged.ownedTitles = { ...(remote.ownedTitles || {}), ...(local.ownedTitles || {}) };
+            if (Number(remote.titleUpdatedAt || 0) > Number(local.titleUpdatedAt || 0)) {
+                merged.equippedTitle = remote.equippedTitle || null;
+                merged.titleUpdatedAt = Number(remote.titleUpdatedAt || 0);
+            } else {
+                merged.equippedTitle = local.equippedTitle || null;
+                merged.titleUpdatedAt = Number(local.titleUpdatedAt || 0);
+            }
             merged.activeBoostUntil = Math.max(Number(remote.activeBoostUntil)||0,Number(local.activeBoostUntil)||0);
             if (remote.daily?.date === local.daily?.date) {
                 const currentOwner=window.CubeAuth?.getCurrentUser?.()?.uid;
@@ -50,6 +60,7 @@
             this.state = merged;
             AppStorage.setJSON(STORAGE_KEY, merged);
             this.ensureDaily();
+            window.dispatchEvent(new CustomEvent('titlechange', { detail: { title: this.getEquippedTitle() } }));
             this.scheduleEvaluation('cloud');
         }
 
@@ -67,6 +78,12 @@
         _assetIcon(type, className = 'economy-icon') {
             const files = { coins: 'coin.png', freezes: 'streak-freeze.png', dnfInsurance: 'dnf-insurance.png', coinBoosters: 'coin-booster.png' };
             return files[type] ? `<img class="${className}" src="./images/shop/${files[type]}" alt="">` : '';
+        }
+        getTitle(id = this.state.equippedTitle) { return this.titleCatalog.titles.find(title => title.id === id) || null; }
+        getEquippedTitle() { return this.getTitle(); }
+        _titleMarkup(title, className = '') {
+            if (!title) return '';
+            return `<span class="title-visual title-${title.tier} ${className}">${this._text(title.name)}</span>`;
         }
         _dateKey(date = new Date()) {
             return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -176,6 +193,26 @@
             const names=this._lang()==='ru'?{freezes:'Заморозка куплена',dnfInsurance:'Страховка DNF куплена',coinBoosters:'Удвоитель монет куплен'}:{freezes:'Streak Freeze purchased',dnfInsurance:'DNF Insurance purchased',coinBoosters:'Coin Doubler purchased'};
             this._toast(names[type]||'✓','success');return true;
         }
+        purchaseTitle(titleId) {
+            const title=this.getTitle(titleId);if(!title)return false;
+            if(this.state.ownedTitles?.[titleId])return this.equipTitle(titleId);
+            if(this.coins<title.price){this._toast(this._lang()==='ru'?'Недостаточно монет':'Not enough coins');return false;}
+            const ledgerId=`titlePurchase:${titleId}`;
+            if(!this.state.rewardLedger[ledgerId])this.state.rewardLedger[ledgerId]={amount:-title.price,at:Date.now(),kind:'titlePurchase',titleId};
+            this.state.ownedTitles={...(this.state.ownedTitles||{}),[titleId]:Date.now()};
+            this.state.events.shopPurchase=Date.now();this._save();this.scheduleEvaluation('shopPurchase');
+            this._toast(this._lang()==='ru'?`Титул «${title.name.ru}» куплен`:`Title “${title.name.en}” purchased`,'success');return true;
+        }
+        equipTitle(titleId) {
+            const title=this.getTitle(titleId);if(!title||!this.state.ownedTitles?.[titleId])return false;
+            this.state.equippedTitle=titleId;this.state.titleUpdatedAt=Date.now();this._save();
+            this._toast(this._lang()==='ru'?`Титул «${title.name.ru}» используется`:`Title “${title.name.en}” equipped`,'success');return true;
+        }
+        unequipTitle() {
+            if(!this.state.equippedTitle)return false;
+            this.state.equippedTitle=null;this.state.titleUpdatedAt=Date.now();this._save();
+            this._toast(this._lang()==='ru'?'Титул снят':'Title unequipped','success');return true;
+        }
         activateCoinBooster() {
             if(this.inventory.coinBoosters<1||this.isBoostActive())return false;
             const id=`boosterUsed:${Date.now()}`;this._grantInventory(id,'coinBoosters',-1);this.state.activeBoostUntil=Date.now()+86400000;this._toast(this._lang()==='ru'?'⚡ Удвоитель активирован на 24 часа':'⚡ Coin doubler active for 24 hours');this._save();return true;
@@ -251,6 +288,9 @@
             DOM('shopClose')?.addEventListener('click',()=>DOM('shopOverlay')?.classList.remove('visible'));
             DOM('shopOverlay')?.addEventListener('click',e=>{if(e.target.id==='shopOverlay')e.currentTarget.classList.remove('visible');});
             DOM('shopItemsGrid')?.addEventListener('click',e=>{const buy=e.target.closest('[data-buy-item]'),use=e.target.closest('[data-use-item]');if(buy)this.requestPurchase(buy.dataset.buyItem);if(use?.dataset.useItem==='coinBoosters')this.activateCoinBooster();});
+            document.querySelectorAll('[data-shop-section]').forEach(button=>button.addEventListener('click',()=>{this.shopSection=button.dataset.shopSection;this.renderShop();}));
+            DOM('shopTitlesList')?.addEventListener('click',e=>{const buy=e.target.closest('[data-buy-title]'),equip=e.target.closest('[data-equip-title]');if(buy)this.requestTitlePurchase(buy.dataset.buyTitle);if(equip)this.equipTitle(equip.dataset.equipTitle);});
+            DOM('shopTitleUnequip')?.addEventListener('click',()=>this.unequipTitle());
             DOM('shopConfirmCancel')?.addEventListener('click',()=>this.cancelPurchaseConfirmation());
             DOM('shopConfirmBuy')?.addEventListener('click',()=>this.confirmPurchase());
             DOM('shopConfirmOverlay')?.addEventListener('click',e=>{if(e.target.id==='shopConfirmOverlay')this.cancelPurchaseConfirmation();});
@@ -260,24 +300,51 @@
             const products={freezes:{price:1000},dnfInsurance:{price:600},coinBoosters:{price:800}},product=products[type];if(!product)return;
             const ru=this._lang()==='ru',names=ru?{freezes:'Заморозка ударного режима',dnfInsurance:'Страховка от DNF',coinBoosters:'Удвоитель монет'}:{freezes:'Streak Freeze',dnfInsurance:'DNF Insurance',coinBoosters:'Coin Doubler'};
             this.pendingPurchaseType=type;
+            this.pendingTitlePurchase=null;
             const set=(id,value)=>{if(DOM(id))DOM(id).textContent=value};
             DOM('shopConfirmIcon').innerHTML=this._assetIcon(type,'shop-confirm-product-image');set('shopConfirmTitle',ru?'Подтвердить покупку':'Confirm purchase');
             set('shopConfirmText',ru?`Купить «${names[type]}» за ${product.price.toLocaleString('ru-RU')} монет?`:`Buy “${names[type]}” for ${product.price.toLocaleString('en-US')} coins?`);
             set('shopConfirmCancel',ru?'Отмена':'Cancel');set('shopConfirmBuy',ru?'Купить':'Buy');
             DOM('shopConfirmOverlay')?.classList.add('visible');
         }
-        cancelPurchaseConfirmation(){this.pendingPurchaseType=null;DOM('shopConfirmOverlay')?.classList.remove('visible');}
-        confirmPurchase(){const type=this.pendingPurchaseType;this.cancelPurchaseConfirmation();if(type)this.purchaseItem(type);}
+        requestTitlePurchase(titleId){
+            const title=this.getTitle(titleId);if(!title||this.state.ownedTitles?.[titleId])return;
+            const ru=this._lang()==='ru';this.pendingTitlePurchase=titleId;this.pendingPurchaseType=null;
+            DOM('shopConfirmIcon').innerHTML=this._titleMarkup(title,'shop-confirm-title-preview');
+            DOM('shopConfirmTitle').textContent=ru?'Подтвердить покупку':'Confirm purchase';
+            DOM('shopConfirmText').textContent=ru?`Купить титул «${title.name.ru}» за ${title.price.toLocaleString('ru-RU')} монет?`:`Buy the “${title.name.en}” title for ${title.price.toLocaleString('en-US')} coins?`;
+            DOM('shopConfirmCancel').textContent=ru?'Отмена':'Cancel';DOM('shopConfirmBuy').textContent=ru?'Купить':'Buy';DOM('shopConfirmOverlay')?.classList.add('visible');
+        }
+        cancelPurchaseConfirmation(){this.pendingPurchaseType=null;this.pendingTitlePurchase=null;DOM('shopConfirmOverlay')?.classList.remove('visible');}
+        confirmPurchase(){const type=this.pendingPurchaseType,titleId=this.pendingTitlePurchase;this.cancelPurchaseConfirmation();if(type)this.purchaseItem(type);else if(titleId)this.purchaseTitle(titleId);}
         open(tab='achievements') { this.ensureDaily();this.activeTab=tab;DOM('progressionOverlay')?.classList.add('visible');this.render(); }
         openShop(){this.ensureDaily();DOM('shopOverlay')?.classList.add('visible');this.renderShop();}
         renderShop(){
             const root=DOM('shopOverlay');if(!root)return;const ru=this._lang()==='ru',inv=this.inventory;
             const text=ru?{title:'Магазин',skins:'Скины',effects:'Эффекты',items:'Предметы',titles:'Титулы',soon:'Скоро',owned:'В инвентаре',buy:'Купить',use:'Активировать',active:'Удвоитель активен до',freeze:['Заморозка ударного режима','Автоматически спасает стрик, если пропущен один день. Замороженный день становится синим и не засчитывается в идеальную неделю.'],insurance:['Страховка от DNF','Одноразово позволяет исправить DNF или +2. Сгорает сразу после исправления штрафа.'],booster:['Удвоитель монет','После активации удваивает награды за достижения и задания дня в течение 24 часов.']}:{title:'Shop',skins:'Skins',effects:'Effects',items:'Items',titles:'Titles',soon:'Soon',owned:'In inventory',buy:'Buy',use:'Activate',active:'Coin doubler active until',freeze:['Streak Freeze','Automatically saves your streak after one missed day. The frozen day is blue and prevents a perfect week.'],insurance:['DNF Insurance','Lets you correct one DNF or +2. Consumed immediately when the penalty is corrected.'],booster:['Coin Doubler','After activation, doubles achievement and daily-task rewards for 24 hours.']};
-            const set=(id,v)=>{if(DOM(id))DOM(id).textContent=v};set('shopTitle',text.title);set('shopSkinsTab',text.skins);set('shopEffectsTab',text.effects);set('shopItemsTab',text.items);set('shopTitlesTab',text.titles);set('shopItemsTitle',text.items);['shopSkinsSoon','shopEffectsSoon','shopTitlesSoon'].forEach(id=>set(id,text.soon));
+            const set=(id,v)=>{if(DOM(id))DOM(id).textContent=v};set('shopTitle',text.title);set('shopSkinsTab',text.skins);set('shopEffectsTab',text.effects);set('shopItemsTab',text.items);set('shopTitlesTab',text.titles);set('shopItemsTitle',text.items);set('shopTitlesTitle',text.titles);['shopSkinsSoon','shopEffectsSoon'].forEach(id=>set(id,text.soon));
+            const section=this.shopSection||'items';
+            document.querySelectorAll('[data-shop-section]').forEach(button=>button.classList.toggle('active',button.dataset.shopSection===section));
+            DOM('shop-section-items')?.classList.toggle('active',section==='items');DOM('shop-section-titles')?.classList.toggle('active',section==='titles');
             set('shopCoins',this.coins);set('shopFreezes',inv.freezes);set('shopBoosters',inv.coinBoosters);set('shopInsurance',inv.dnfInsurance);
             const boost=DOM('shopActiveBoost');boost?.classList.toggle('hidden',!this.isBoostActive());if(boost&&this.isBoostActive())boost.innerHTML=`${this._assetIcon('coinBoosters')}<span>${text.active} ${new Intl.DateTimeFormat(ru?'ru-RU':'en-US',{dateStyle:'short',timeStyle:'short'}).format(new Date(this.state.activeBoostUntil))}</span>`;
             const cards=[['freezes',text.freeze,1000,inv.freezes],['dnfInsurance',text.insurance,600,inv.dnfInsurance],['coinBoosters',text.booster,800,inv.coinBoosters]];
             DOM('shopItemsGrid').innerHTML=cards.map(([type,copy,price,owned])=>`<article class="shop-item-card"><div class="shop-item-icon">${this._assetIcon(type,'shop-product-image')}</div><h4>${copy[0]}</h4><p>${copy[1]}</p><div class="shop-item-owned">${text.owned}: ${owned}</div><div class="shop-item-actions"><button class="shop-buy-btn" data-buy-item="${type}" ${this.coins<price?'disabled':''}>${text.buy} · ${price} ${this._assetIcon('coins','inline-economy-icon')}</button>${type==='coinBoosters'?`<button class="shop-use-btn" data-use-item="${type}" ${owned<1||this.isBoostActive()?'disabled':''}>${text.use}</button>`:''}</div></article>`).join('');
+            this.renderTitlesShop();
+        }
+        renderTitlesShop(){
+            const list=DOM('shopTitlesList');if(!list)return;const ru=this._lang()==='ru',owned=this.state.ownedTitles||{},equipped=this.state.equippedTitle;
+            const copy=ru?{buy:'Купить',use:'Использовать',using:'Используется',unequip:'Снять титул'}:{buy:'Buy',use:'Equip',using:'Equipped',unequip:'Unequip title'};
+            DOM('shopTitleUnequip').textContent=copy.unequip;DOM('shopTitleUnequip').classList.toggle('hidden',!equipped);
+            const tiers=Object.entries(this.titleCatalog.tiers).sort((a,b)=>a[1].order-b[1].order);
+            list.innerHTML=tiers.map(([tier,tierData])=>{
+                const rows=this.titleCatalog.titles.filter(title=>title.tier===tier).map(title=>{
+                    const isOwned=!!owned[title.id],isEquipped=equipped===title.id;
+                    const action=isOwned?`<button class="shop-title-action ${isEquipped?'equipped':''}" data-equip-title="${title.id}" ${isEquipped?'disabled':''}>${isEquipped?copy.using:copy.use}</button>`:`<button class="shop-title-action buy" data-buy-title="${title.id}" ${this.coins<title.price?'disabled':''}>${copy.buy} · ${title.price.toLocaleString(ru?'ru-RU':'en-US')} ${this._assetIcon('coins','inline-economy-icon')}</button>`;
+                    return `<article class="shop-title-row tier-${tier}"><div class="shop-title-preview">${this._titleMarkup(title)}</div><div class="shop-title-price">${isOwned?'✓':`${title.price.toLocaleString(ru?'ru-RU':'en-US')} ${this._assetIcon('coins','inline-economy-icon')}`}</div>${action}</article>`;
+                }).join('');
+                return `<section class="shop-title-tier"><h4>${tierData.order}. ${this._text(tierData.name)}</h4>${rows}</section>`;
+            }).join('');
         }
         render() {
             const root=DOM('progressionOverlay');if(!root)return;const lang=this._lang(),inv=this.inventory;

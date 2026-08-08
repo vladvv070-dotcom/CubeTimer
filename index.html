@@ -39,9 +39,9 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700;900&family=Cinzel:wght@900&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=2.6.11">
+    <link rel="stylesheet" href="styles.css?v=2.7.0">
 
     <script type="application/ld+json">
     {
@@ -65,6 +65,22 @@
     </script>
 </head>
 <body>
+    <svg class="title-texture-filters" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="lava-texture" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" result="noise"></feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+            <filter id="gold-texture" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise"></feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+            <filter id="crystal-texture" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="3" result="noise"></feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+        </defs>
+    </svg>
     <div class="app-background-image"></div>
     <div class="app-container">
         <!-- Header -->
@@ -243,7 +259,7 @@
             </div>
 
             <div class="auth-buttons">
-                <button class="export-btn" id="authBtn">👤 Войти</button>
+                <button class="export-btn auth-profile-btn" id="authBtn"><span class="auth-profile-icon">👤</span><span class="auth-profile-copy"><strong>Войти</strong><small class="hidden"></small></span></button>
             </div>
         </div>
 
@@ -858,7 +874,7 @@
                     <button class="settings-nav-item shop-nav-locked" disabled><span>🎨</span><span id="shopSkinsTab">Skins</span><small id="shopSkinsSoon">Soon</small></button>
                     <button class="settings-nav-item shop-nav-locked" disabled><span>✨</span><span id="shopEffectsTab">Effects</span><small id="shopEffectsSoon">Soon</small></button>
                     <button class="settings-nav-item active" data-shop-section="items"><span>🎒</span><span id="shopItemsTab">Items</span></button>
-                    <button class="settings-nav-item shop-nav-locked" disabled><span>🏷️</span><span id="shopTitlesTab">Titles</span><small id="shopTitlesSoon">Soon</small></button>
+                    <button class="settings-nav-item" data-shop-section="titles"><span>🏷️</span><span id="shopTitlesTab">Titles</span></button>
                 </div>
                 <div class="settings-content-area shop-content">
                     <div class="shop-wallet-line"><span><img class="economy-icon" src="./images/shop/coin.png" alt=""><strong id="shopCoins">0</strong></span><span><img class="economy-icon" src="./images/shop/streak-freeze.png" alt=""><strong id="shopFreezes">0</strong></span><span><img class="economy-icon" src="./images/shop/coin-booster.png" alt=""><strong id="shopBoosters">0</strong></span><span><img class="economy-icon" src="./images/shop/dnf-insurance.png" alt=""><strong id="shopInsurance">0</strong></span></div>
@@ -866,6 +882,13 @@
                         <h3 class="section-title" id="shopItemsTitle">Items</h3>
                         <p class="shop-active-boost hidden" id="shopActiveBoost"></p>
                         <div class="shop-items-grid" id="shopItemsGrid"></div>
+                    </div>
+                    <div class="settings-section-content" id="shop-section-titles">
+                        <div class="shop-titles-heading">
+                            <h3 class="section-title" id="shopTitlesTitle">Titles</h3>
+                            <button class="shop-title-unequip hidden" id="shopTitleUnequip" type="button">Unequip title</button>
+                        </div>
+                        <div class="shop-titles-list" id="shopTitlesList"></div>
                     </div>
                 </div>
             </div>
@@ -1316,7 +1339,10 @@
     <div class="new-session-overlay" id="authAccountOverlay">
         <div class="new-session-modal auth-warning-modal">
             <div id="authAccountView">
-                <div class="new-session-title" id="authAccountTitle">Вы вошли</div>
+                <div class="auth-account-identity">
+                    <div class="new-session-title" id="authAccountTitle">Ник</div>
+                    <div class="auth-account-title-preview hidden" id="authAccountEquippedTitle"></div>
+                </div>
                 <p class="auth-warning-text auth-account-email" id="authAccountEmail"></p>
                 <div class="auth-sync-status" id="authSyncStatus" data-state="checking">
                     <span class="auth-sync-dot"></span>
@@ -1427,7 +1453,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.6.11</div>
+    <div class="version-display">2.7.0</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1546,20 +1572,21 @@
     </div>
 
     <script type="module">
-        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.6.11');
+        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.7.0');
     </script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
-    <script defer src="sync.js?v=2.6.11"></script>
+    <script defer src="sync.js?v=2.7.0"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js?v=2.6.11"></script>
-    <script defer src="progression-data.js?v=2.6.11"></script>
-    <script defer src="progression-system.js?v=2.6.11"></script>
+    <script defer src="translations.js?v=2.7.0"></script>
+    <script defer src="progression-data.js?v=2.7.0"></script>
+    <script defer src="titles-data.js?v=2.7.0"></script>
+    <script defer src="progression-system.js?v=2.7.0"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js?v=2.6.11"></script>
+    <script defer src="script.js?v=2.7.0"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">

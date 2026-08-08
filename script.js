@@ -378,9 +378,10 @@
                 const authLogoutConfirmBtn = document.querySelector('#authLogoutConfirmBtn');
                 if (authBtn) {
                     const authUser = AppStorage.getJSON('authUser');
-                    authBtn.textContent = authUser
-                        ? `👤 ${authUser.nickname || authUser.email}`
-                        : `👤 ${t.authBtn}`;
+                    const equippedTitle = authUser ? window.progression?.getEquippedTitle?.() : null;
+                    authBtn.innerHTML = '<span class="auth-profile-icon">👤</span><span class="auth-profile-copy"><strong></strong><small></small></span>';
+                    authBtn.querySelector('strong').textContent = authUser ? (authUser.nickname || authUser.email) : t.authBtn;
+                    const titleSlot=authBtn.querySelector('small');titleSlot.classList.toggle('hidden',!equippedTitle);titleSlot.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
                 }
                 if (authRegisterTitle) authRegisterTitle.textContent = t.authRegisterTitle;
                 if (authNicknameLabel) authNicknameLabel.textContent = t.authNicknameLabel;
@@ -2799,13 +2800,15 @@
                     const authUser = AppStorage.getJSON('authUser');
                     const btn = document.getElementById('authBtn');
                     if (btn) {
-                        btn.textContent = authUser
-                            ? `👤 ${authUser.nickname || authUser.email}`
-                            : `👤 ${t.authBtn}`;
+                        const equippedTitle=authUser?window.progression?.getEquippedTitle?.():null;
+                        btn.innerHTML='<span class="auth-profile-icon">👤</span><span class="auth-profile-copy"><strong></strong><small></small></span>';
+                        btn.querySelector('strong').textContent=authUser?(authUser.nickname||authUser.email):t.authBtn;
+                        const titleSlot=btn.querySelector('small');titleSlot.classList.toggle('hidden',!equippedTitle);titleSlot.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
                     }
                 };
                 this._updateAuthBtnUI = updateAuthBtnUI;
                 updateAuthBtnUI();
+                window.addEventListener('titlechange',updateAuthBtnUI);
 
                 const updateSyncStatus = (state, code = '') => {
                     const root = DOM('authSyncStatus');
@@ -2860,7 +2863,9 @@
                         if (authUser) {
                             const lang = getLang();
                             const t = translations[lang];
-                            DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${authUser.nickname || ''}`.trim();
+                            DOM('authAccountTitle').textContent = authUser.nickname || authUser.email || '';
+                            const equippedTitle=window.progression?.getEquippedTitle?.(),titlePreview=DOM('authAccountEquippedTitle');
+                            titlePreview.classList.toggle('hidden',!equippedTitle);titlePreview.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
                             DOM('authSyncNowBtn').textContent = getLang() === 'ru' ? 'Синхронизировать сейчас' : 'Sync now';
@@ -2944,7 +2949,7 @@
                                 const updatedUser = { ...(authUser || {}), nickname: updatedNickname };
                                 AppStorage.setJSON('authUser', updatedUser);
                                 updateAuthBtnUI();
-                                DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${updatedNickname}`.trim();
+                                DOM('authAccountTitle').textContent = updatedNickname;
                                 DOM('authChangeNicknameView').style.display = 'none';
                                 DOM('authAccountView').style.display = '';
                             } catch (error) {
