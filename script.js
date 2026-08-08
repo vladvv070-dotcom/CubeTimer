@@ -2803,6 +2803,52 @@
                 this._updateAuthBtnUI = updateAuthBtnUI;
                 updateAuthBtnUI();
 
+                const updateSyncStatus = (state, code = '') => {
+                    const root = DOM('authSyncStatus');
+                    const label = DOM('authSyncStatusText');
+                    if (!root || !label) return;
+                    const ru = getLang() === 'ru';
+                    const messages = ru
+                        ? { checking: 'Проверка облака…', syncing: 'Синхронизация…', synced: 'Облако подключено', disconnected: 'Firebase не авторизован', error: `Ошибка синхронизации${code ? `: ${code}` : ''}` }
+                        : { checking: 'Checking cloud…', syncing: 'Syncing…', synced: 'Cloud connected', disconnected: 'Firebase is not signed in', error: `Sync error${code ? `: ${code}` : ''}` };
+                    root.dataset.state = state;
+                    label.textContent = messages[state] || messages.checking;
+                };
+                window.addEventListener('sync-status', event => updateSyncStatus(event.detail?.state || 'checking', event.detail?.code || ''));
+
+                const applyFirebaseAuthState = (firebaseUser) => {
+                    if (firebaseUser) {
+                        const existing = AppStorage.getJSON('authUser') || {};
+                        const sameUser = existing.uid === firebaseUser.uid;
+                        AppStorage.setJSON('authUser', {
+                            uid: firebaseUser.uid,
+                            nickname: firebaseUser.displayName || (sameUser ? existing.nickname : '') || firebaseUser.email,
+                            email: firebaseUser.email || (sameUser ? existing.email : '')
+                        });
+                        updateSyncStatus('syncing');
+                    } else {
+                        AppStorage.setJSON('authUser', null);
+                        updateSyncStatus('disconnected');
+                    }
+                    updateAuthBtnUI();
+                };
+                window.addEventListener('firebase-auth-state', event => applyFirebaseAuthState(event.detail?.user || null));
+                if (window.CubeAuth?.getCurrentUser) applyFirebaseAuthState(window.CubeAuth.getCurrentUser());
+
+                DOM('authSyncNowBtn')?.addEventListener('click', async () => {
+                    const button = DOM('authSyncNowBtn');
+                    const user = window.CubeAuth?.getCurrentUser?.();
+                    if (!user) {
+                        applyFirebaseAuthState(null);
+                        DOM('authAccountOverlay')?.classList.remove('visible');
+                        DOM('authOverlay')?.classList.add('visible');
+                        return;
+                    }
+                    button.disabled = true;
+                    await window.AppSync?.requestSync?.();
+                    button.disabled = false;
+                });
+
                 const authBtn = document.getElementById('authBtn');
                 if (authBtn) {
                     authBtn.addEventListener('click', () => {
@@ -2813,6 +2859,7 @@
                             DOM('authAccountTitle').textContent = `${t.authAccountTitle} ${authUser.nickname || ''}`.trim();
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
+                            DOM('authSyncNowBtn').textContent = getLang() === 'ru' ? 'Синхронизировать сейчас' : 'Sync now';
                             DOM('authChangeNicknameBtn').textContent = t.authChangeNicknameBtn;
                             DOM('authLogoutBtn').textContent = t.authLogoutBtn;
                             DOM('authLogoutConfirmTitle').textContent = t.authLogoutConfirm;

@@ -268,44 +268,53 @@ const CloudSync = {
     async pushNewSolve(sessionId, solve) {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
             PendingSync.addPendingSolve(sessionId, solve.id);
-            return;
+            return false;
         }
         try {
             await window.CubeSync.saveSolve(sessionId, solve);
             PendingSync.removePendingSolve(solve.id);
+            return true;
         } catch (e) {
             console.error('CloudSync.pushNewSolve failed:', e);
             PendingSync.addPendingSolve(sessionId, solve.id);
+            window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-write-failed' } }));
+            return false;
         }
     },
     async pushSolveUpdate(solveId, patch) {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
             const sessionId = findSessionIdForSolve(solveId);
             if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
-            return;
+            return false;
         }
         try {
             await window.CubeSync.updateSolve(solveId, patch);
             PendingSync.removePendingSolve(solveId);
+            return true;
         } catch (e) {
             console.error('CloudSync.pushSolveUpdate failed:', e);
             const sessionId = findSessionIdForSolve(solveId);
             if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
+            window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-update-failed' } }));
+            return false;
         }
     },
     async pushSolveDelete(solveId) {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
             PendingSync.addPendingDelete(solveId);
             PendingSync.removePendingSolve(solveId);
-            return;
+            return false;
         }
         try {
             await window.CubeSync.deleteSolveRemote(solveId);
             PendingSync.removePendingDelete(solveId);
             PendingSync.removePendingSolve(solveId); // no longer relevant if it was also queued as a pending create/update
+            return true;
         } catch (e) {
             console.error('CloudSync.pushSolveDelete failed:', e);
             PendingSync.addPendingDelete(solveId);
+            window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-delete-failed' } }));
+            return false;
         }
     }
 };
@@ -324,11 +333,11 @@ async function flushPendingSync() {
             PendingSync.removePendingSolve(id);
             continue;
         }
-        await CloudSync.pushNewSolve(sessionId, solve);
+        if (!(await CloudSync.pushNewSolve(sessionId, solve))) throw Object.assign(new Error('Pending solve write failed'), { code: 'solve-write-failed' });
     }
 
     for (const id of PendingSync.getPendingDeletes()) {
-        await CloudSync.pushSolveDelete(id);
+        if (!(await CloudSync.pushSolveDelete(id))) throw Object.assign(new Error('Pending delete failed'), { code: 'solve-delete-failed' });
     }
 }
 
@@ -339,9 +348,14 @@ const AppSync = {
     _requestedSync: null,
     requestSync() {
         if (this._requestedSync) return this._requestedSync;
+        window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'syncing' } }));
         this._requestedSync = Promise.resolve()
             .then(() => this.runSync())
-            .catch(error => console.error('Automatic sync failed:', error))
+            .then(() => window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'synced', at: Date.now() } })))
+            .catch(error => {
+                console.error('Automatic sync failed:', error);
+                window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: error?.code || 'unknown' } }));
+            })
             .finally(() => { this._requestedSync = null; });
         return this._requestedSync;
     },
@@ -552,13 +566,13 @@ const AppSync = {
         // any solves that were created locally but never reached Firestore
         // at all (e.g. made while offline before the very first sign-in on
         // this device). Each solve is still exactly one write either way.
-        AppSync.pushSessionsMetaNow();
+        if (!(await AppSync.pushSessionsMetaNow())) throw Object.assign(new Error('Session metadata write failed'), { code: 'metadata-write-failed' });
         for (const { sessionId, solve } of localSolvesNotYetRemote) {
-            await CloudSync.pushNewSolve(sessionId, solve);
+            if (!(await CloudSync.pushNewSolve(sessionId, solve))) throw Object.assign(new Error('Solve backfill failed'), { code: 'solve-write-failed' });
         }
-        if (shouldPushCustomPhrases) await AppSync.pushCustomPhrasesNow();
+        if (shouldPushCustomPhrases && !(await AppSync.pushCustomPhrasesNow())) throw Object.assign(new Error('Custom phrases write failed'), { code: 'phrases-write-failed' });
         window.progression?.ensureDaily?.();
-        await AppSync.pushProgressionNow();
+        if (window.progression && !(await AppSync.pushProgressionNow())) throw Object.assign(new Error('Progression write failed'), { code: 'progression-write-failed' });
         AppSync.startCustomPhrasesLiveSync();
     },
 
@@ -619,15 +633,15 @@ const AppSync = {
     // same way the old blob push was, just without the solve history
     // riding along with it.
     pushSessionsMetaNow() {
-        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return false;
         const timer = window.timer;
-        if (!timer) return;
+        if (!timer) return false;
         const sessionsMeta = {};
         for (const [id, session] of Object.entries(timer.sessions)) {
             const { solves, ...meta } = session; // eslint-disable-line no-unused-vars
             sessionsMeta[id] = meta;
         }
-        CloudSync.pushMeta({
+        return CloudSync.pushMeta({
             sessions: sessionsMeta,
             currentSessionId: timer.currentSessionId,
             deletedSessionIds: SyncTombstones.getDeletedSessionEntries()
