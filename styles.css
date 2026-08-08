@@ -8753,7 +8753,26 @@ body.light-theme .shop-title-row{background:#f8fafc}
 @media(prefers-reduced-motion:reduce){.title-legend{animation:none}}
 body.light-theme .shop-confirm-overlay{background:rgba(226,232,240,.45)}body.light-theme .shop-confirm-modal{border-color:rgba(255,255,255,.9);background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(241,245,249,.82));box-shadow:0 28px 75px rgba(15,23,42,.2),inset 0 1px 0 #fff}
 .auth-sync-status{display:flex;align-items:center;gap:.55rem;margin:.75rem 0;padding:.68rem .78rem;border:1px solid color-mix(in srgb,var(--text-muted) 18%,transparent);border-radius:12px;background:color-mix(in srgb,var(--bg-card) 72%,transparent);color:var(--text-secondary);font:700 .72rem Manrope,sans-serif}.auth-sync-dot{width:9px;height:9px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 4px rgba(148,163,184,.12)}.auth-sync-status[data-state="syncing"] .auth-sync-dot,.auth-sync-status[data-state="checking"] .auth-sync-dot{background:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.13);animation:authSyncPulse 1.1s ease-in-out infinite}.auth-sync-status[data-state="synced"] .auth-sync-dot{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.13)}.auth-sync-status[data-state="error"] .auth-sync-dot,.auth-sync-status[data-state="disconnected"] .auth-sync-dot{background:#ef4444;box-shadow:0 0 0 4px rgba(239,68,68,.13)}@keyframes authSyncPulse{50%{opacity:.45;transform:scale(.78)}}
-@media(max-width:760px){.shop-items-grid{grid-template-columns:1fr}.shop-modal{width:calc(100vw - 1rem);height:calc(100vh - 1rem)}.shop-body{display:grid;grid-template-columns:125px 1fr}.shop-sidebar{width:auto}.shop-content{padding:.8rem}.shop-sidebar .settings-nav-item{grid-template-columns:20px 1fr}.shop-sidebar small{display:none}}
+@media(max-width:760px){
+    .shop-modal{width:calc(100vw - 1rem);height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem)}
+    .shop-body{display:flex;flex-direction:column;height:calc(100% - 64px);min-height:0}
+    .shop-sidebar{display:flex;width:100%;flex:0 0 auto;flex-direction:row;gap:.35rem;padding:.45rem .55rem;overflow-x:auto;overflow-y:hidden;border-right:0;border-bottom:1px solid color-mix(in srgb,var(--text-muted) 14%,transparent);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .shop-sidebar::-webkit-scrollbar{display:none}
+    .shop-sidebar .settings-nav-item{display:flex;grid-template-columns:none;flex:0 0 auto;align-items:center;gap:.4rem;min-width:max-content;padding:.58rem .72rem;border-left:0;border-bottom:2px solid transparent;border-radius:9px;font-size:.76rem}
+    .shop-sidebar .settings-nav-item.active{border-left-color:transparent;border-bottom-color:var(--accent-primary)}
+    .shop-sidebar small{display:none}
+    .shop-content{width:100%;min-width:0;min-height:0;flex:1;padding:.8rem .85rem 1.1rem;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .shop-wallet-line{position:sticky;top:-.8rem;z-index:4;justify-content:flex-end;gap:.7rem;margin:0 0 .8rem;padding:.75rem 0 .65rem;background:var(--bg-primary)}
+    .shop-wallet-line .economy-icon{width:21px;height:21px}.shop-wallet-line>span{font-size:.7rem}
+    .shop-items-grid{grid-template-columns:1fr;gap:.75rem}.shop-item-card{min-height:0;padding:.9rem}.shop-item-card .shop-item-icon{width:52px;height:52px}.shop-product-image{width:46px;height:46px}
+    .shop-title-tier{gap:.4rem}.shop-title-row{padding:.7rem;min-height:0}
+    .bottom-left-buttons{left:.6rem;right:.6rem;bottom:.65rem;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.45fr);width:auto;gap:.5rem}
+    .bottom-left-buttons .export-buttons,.bottom-left-buttons .auth-buttons{display:flex;min-width:0;width:100%}
+    .bottom-left-buttons .export-btn{width:100%;min-width:0;padding:.55rem .6rem}
+    .right-column .card:nth-child(2){bottom:4.45rem}
+    .auth-profile-btn{overflow:hidden;gap:.38rem}.auth-profile-copy{flex:1;width:0;align-items:center}.auth-profile-copy>strong{max-width:100%;font-size:.7rem}.auth-profile-copy>small{width:100%;max-width:100%;overflow:hidden;text-align:center}.auth-profile-copy .title-visual{max-width:100%;font-size:.46rem;letter-spacing:0;-webkit-text-stroke-width:.25px}
+    .version-display{display:block;left:.75rem;bottom:4.15rem;z-index:51;font-size:.65rem;opacity:.5}
+}
 @media(max-width:520px){.progression-toast{right:1rem;bottom:1rem}.shop-confirm-actions{grid-template-columns:1fr}}
 
 /* ===== Telegram channel promo button (top-right corner) ===== */
