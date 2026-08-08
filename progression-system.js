@@ -83,7 +83,8 @@
         getEquippedTitle() { return this.getTitle(); }
         _titleMarkup(title, className = '') {
             if (!title) return '';
-            return `<span class="title-visual title-${title.tier} ${className}">${this._text(title.name)}</span>`;
+            const label=this._text(title.name),lengthClass=label.length>26?'title-extra-long':label.length>20?'title-long':'';
+            return `<span class="title-visual title-${title.tier} ${lengthClass} ${className}">${label}</span>`;
         }
         _dateKey(date = new Date()) {
             return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -341,7 +342,7 @@
                 const rows=this.titleCatalog.titles.filter(title=>title.tier===tier).map(title=>{
                     const isOwned=!!owned[title.id],isEquipped=equipped===title.id;
                     const action=isOwned?`<button class="shop-title-action ${isEquipped?'equipped':''}" data-equip-title="${title.id}" ${isEquipped?'disabled':''}>${isEquipped?copy.using:copy.use}</button>`:`<button class="shop-title-action buy" data-buy-title="${title.id}" ${this.coins<title.price?'disabled':''}>${copy.buy} · ${title.price.toLocaleString(ru?'ru-RU':'en-US')} ${this._assetIcon('coins','inline-economy-icon')}</button>`;
-                    return `<article class="shop-title-row tier-${tier}"><div class="shop-title-preview">${this._titleMarkup(title)}</div><div class="shop-title-price">${isOwned?'✓':`${title.price.toLocaleString(ru?'ru-RU':'en-US')} ${this._assetIcon('coins','inline-economy-icon')}`}</div>${action}</article>`;
+                    return `<article class="shop-title-row tier-${tier}"><div class="shop-title-preview">${this._titleMarkup(title)}</div>${action}</article>`;
                 }).join('');
                 return `<section class="shop-title-tier"><h4>${tierData.order}. ${this._text(tierData.name)}</h4>${rows}</section>`;
             }).join('');
