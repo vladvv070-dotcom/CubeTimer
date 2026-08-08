@@ -279,6 +279,15 @@ window.CubeSync = {
       }
       await batch.commit();
     }
+    const verification = await getDocs(query(collection(db, "users", user.uid, "solves"), where("sessionId", "==", sessionId)));
+    const expectedIds = new Set(solves.map(s => s?.id).filter(Boolean));
+    const savedIds = new Set(verification.docs.map(d => d.id));
+    if ([...expectedIds].some(id => !savedIds.has(id))) {
+      const error = new Error("Не все импортированные сборки сохранились");
+      error.code = "import-verification-failed";
+      throw error;
+    }
+    return expectedIds.size;
   },
 
   // Ровно 1 write: точечное изменение полей существующего solve

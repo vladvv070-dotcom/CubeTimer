@@ -392,7 +392,7 @@ const AppSync = {
 
         // v3 uses Firestore server timestamps. Client clocks can differ by
         // hours without making synchronization one-directional.
-        const syncProtocolVersion = '4';
+        const syncProtocolVersion = '5';
         if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
@@ -626,7 +626,16 @@ const AppSync = {
     },
 
     async pushImportedSessions(sessionGroups) {
-        if (!window.CubeAuth?.getCurrentUser?.() || !window.CubeSync?.saveSolvesBatch) return false;
+        const queueAll = () => (sessionGroups || []).forEach(group => (group.solves || []).forEach(solve => PendingSync.addPendingSolve(group.sessionId, solve.id)));
+        if (!window.CubeAuth?.getCurrentUser?.()) {
+            queueAll();
+            return false;
+        }
+        if (!window.CubeSync?.saveSolvesBatch) {
+            queueAll();
+            window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: 'batch-api-unavailable' } }));
+            return false;
+        }
         window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'syncing' } }));
         try {
             for (const group of (sessionGroups || [])) {
@@ -638,7 +647,7 @@ const AppSync = {
             return true;
         } catch (error) {
             console.error('Imported solve upload failed:', error);
-            (sessionGroups || []).forEach(group => (group.solves || []).forEach(solve => PendingSync.addPendingSolve(group.sessionId, solve.id)));
+            queueAll();
             window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: error?.code || 'import-upload-failed' } }));
             return false;
         }
