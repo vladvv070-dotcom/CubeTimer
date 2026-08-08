@@ -374,6 +374,22 @@ const AppSync = {
         const user = window.CubeAuth?.getCurrentUser?.();
         if (!user) return;
 
+        // A recoverable local snapshot is written before any cloud merge or
+        // account switch can replace the in-memory session map.
+        const safetyBackup = JSON.parse(JSON.stringify(timer.sessions || {}));
+        const safetySolveCount = Object.values(safetyBackup).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0);
+        const previousBackupInfo = AppStorage.getJSON('cubeTimerSessionsSafetyBackupInfo', {}) || {};
+        if (safetySolveCount >= Number(previousBackupInfo.solveCount || 0)) {
+            if (!AppStorage.setJSON('cubeTimerSessionsSafetyBackup', safetyBackup)) {
+                throw Object.assign(new Error('Could not create local safety backup'), { code: 'backup-failed' });
+            }
+            AppStorage.setJSON('cubeTimerSessionsSafetyBackupInfo', {
+                uid: user.uid,
+                createdAt: Date.now(),
+                solveCount: safetySolveCount
+            });
+        }
+
         // v3 uses Firestore server timestamps. Client clocks can differ by
         // hours without making synchronization one-directional.
         const syncProtocolVersion = '3';
@@ -406,7 +422,9 @@ const AppSync = {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
             AppStorage.setRaw('cloudSyncInitializedV3', '');
-            timer.sessions = {};
+            timer.sessions = {
+                'no-session': { id: 'no-session', name: 'No Session', solves: [], subsessions: [], isDefault: true, discipline: '3x3', honestMode: null }
+            };
             if (window.commentary?.setCustomPhrases) {
                 window.commentary.setCustomPhrases({}, 0);
             } else {
@@ -527,6 +545,8 @@ const AppSync = {
                 solvesWithLegacy = SyncMerge.mergeSolves(localSolves, legacySolves, deletedSolveIds);
             }
             mergedSessions[sessionId].solves = SyncMerge.mergeSolves(solvesWithLegacy, remoteSolves, deletedSolveIds);
+            mergedSessions[sessionId].id = sessionId;
+            mergedSessions[sessionId].subsessions = Array.isArray(mergedSessions[sessionId].subsessions) ? mergedSessions[sessionId].subsessions : [];
 
             if (isFullSync) {
                 const remoteIds = new Set(remoteSolves.map(s => s.id));
@@ -536,6 +556,10 @@ const AppSync = {
                     }
                 }
             }
+        }
+
+        if (!Object.keys(mergedSessions).length) {
+            mergedSessions['no-session'] = { id: 'no-session', name: 'No Session', solves: [], subsessions: [], isDefault: true, discipline: '3x3', honestMode: null };
         }
 
         timer.sessions = mergedSessions;

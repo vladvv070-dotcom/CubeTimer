@@ -5803,10 +5803,15 @@
 
             renderSessionsList() {
                 const container = document.getElementById('sessionsList');
+                if (!container) return;
                 container.innerHTML = '';
                 const sessionTranslations = translations[getLang()] || translations.en;
 
                 Object.entries(this.sessions).forEach(([sessionId, session]) => {
+                    if (!session || typeof session !== 'object') return;
+                    session.id = sessionId;
+                    session.solves = Array.isArray(session.solves) ? session.solves : [];
+                    session.subsessions = Array.isArray(session.subsessions) ? session.subsessions : [];
                     const item = document.createElement('div');
                     item.className = 'session-item';
                     if (sessionId === this.currentSessionId) {
@@ -5822,8 +5827,9 @@
                     const disciplineLabel = ScrambleGenerator.getLabel(discipline);
                     // Show short label: strip " Cube" suffix for compactness
                     const shortLabel = disciplineLabel.replace(' Cube', '');
-                    const displayName = session.isDefault ? sessionTranslations.noSession : session.name;
-                    const countLabel = sessionTranslations.solvesCount.replace('{n}', count);
+                    const displayName = session.isDefault ? sessionTranslations.noSession : (session.name || 'Session');
+                    const countTemplate = sessionTranslations.solvesCount || '{n} solves';
+                    const countLabel = countTemplate.replace('{n}', count);
 
                     item.innerHTML = `
                         <div class="session-item-name">
@@ -5881,11 +5887,13 @@
             updateSessionDetails() {
                 const session = this.sessions[this.currentSessionId];
                 if (!session) return;
+                const sessionTranslations = translations[getLang()] || translations.en;
+                session.solves = Array.isArray(session.solves) ? session.solves : [];
+                session.subsessions = Array.isArray(session.subsessions) ? session.subsessions : [];
 
                 document.getElementById('sessionDetailsTitle').textContent = session.isDefault
                     ? sessionTranslations.noSession
-                    : session.name;
-                const sessionTranslations = translations[getLang()] || translations.en;
+                    : (session.name || 'Session');
                 document.getElementById('sessionDetailsSubtitle').textContent = session.isDefault
                     ? sessionTranslations.defaultSession
                     : sessionTranslations.solvesCount.replace('{n}', session.solves.length);
