@@ -27,14 +27,21 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="./images/android-chrome-192x192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
-    <link rel="manifest" href="./manifest.json">
+    <script>
+        if (location.protocol !== 'file:') {
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = './manifest.json';
+            document.head.appendChild(manifestLink);
+        }
+    </script>
     <meta name="theme-color" content="#0d0f14">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=2.4.4">
+    <link rel="stylesheet" href="styles.css?v=2.6.3">
 
     <script type="application/ld+json">
     {
@@ -99,6 +106,12 @@
                         </button>
                         <button class="fire-menu-item" id="fireMenuDailyChallenge">
                             <span>📅</span><span id="dailyChallengeMenuLabel" data-i18n="fireMenuDailyChallenge">Daily Scramble</span>
+                        </button>
+                        <button class="fire-menu-item" id="fireMenuAchievements">
+                            <span>🏆</span><span id="achievementsMenuLabel">Achievements</span>
+                        </button>
+                        <button class="fire-menu-item" id="fireMenuShop">
+                            <span>🛒</span><span id="shopMenuLabel">Shop</span>
                         </button>
                         <div class="fire-menu-divider"></div>
                         <button class="fire-menu-item" id="fireMenuAlgsTrainer">
@@ -809,6 +822,67 @@
         </div>
     </div>
 
+    <!-- Achievements and Daily Tasks -->
+    <div class="new-session-overlay" id="progressionOverlay">
+        <div class="new-session-modal progression-modal" role="dialog" aria-modal="true" aria-labelledby="progressionTitle">
+            <div class="progression-heading">
+                <div><div class="new-session-title" id="progressionTitle">Progress</div></div>
+                <button class="streak-close-icon" id="progressionClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="progression-wallet">
+                <div><span>🪙</span><strong id="progressionCoins">0</strong><small>Coins</small></div>
+                <div><span>❄️</span><strong id="progressionFreezes">0</strong><small>Freezes</small></div>
+                <div class="inactive"><span>⚡</span><strong id="progressionBoosters">0</strong><small>x2 Boosters</small></div>
+                <div class="inactive"><span>🛡️</span><strong id="progressionDnfInsurance">0</strong><small>DNF Insurance</small></div>
+            </div>
+            <div class="progression-tabs">
+                <button id="progressionAchievementsTab" data-progression-tab="achievements" class="active">Achievements</button>
+                <button id="progressionDailyTab" data-progression-tab="daily">Daily Tasks</button>
+            </div>
+            <div class="progression-scroll">
+                <div class="progression-achievements" id="progressionAchievements"></div>
+                <div class="progression-daily hidden" id="progressionDaily"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop -->
+    <div class="settings-overlay" id="shopOverlay">
+        <div class="settings-modal-new shop-modal">
+            <div class="settings-header-new">
+                <h2 class="settings-title-new" id="shopTitle">Shop</h2>
+                <button class="settings-close-new" id="shopClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="settings-body shop-body">
+                <div class="settings-sidebar shop-sidebar">
+                    <button class="settings-nav-item shop-nav-locked" disabled><span>🎨</span><span id="shopSkinsTab">Skins</span><small id="shopSkinsSoon">Soon</small></button>
+                    <button class="settings-nav-item shop-nav-locked" disabled><span>✨</span><span id="shopEffectsTab">Effects</span><small id="shopEffectsSoon">Soon</small></button>
+                    <button class="settings-nav-item active" data-shop-section="items"><span>🎒</span><span id="shopItemsTab">Items</span></button>
+                    <button class="settings-nav-item shop-nav-locked" disabled><span>🏷️</span><span id="shopTitlesTab">Titles</span><small id="shopTitlesSoon">Soon</small></button>
+                </div>
+                <div class="settings-content-area shop-content">
+                    <div class="shop-wallet-line"><span>🪙 <strong id="shopCoins">0</strong></span><span>❄️ <strong id="shopFreezes">0</strong></span><span>⚡ <strong id="shopBoosters">0</strong></span><span>🛡️ <strong id="shopInsurance">0</strong></span></div>
+                    <div class="settings-section-content active" id="shop-section-items">
+                        <h3 class="section-title" id="shopItemsTitle">Items</h3>
+                        <p class="shop-active-boost hidden" id="shopActiveBoost"></p>
+                        <div class="shop-items-grid" id="shopItemsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="new-session-overlay shop-confirm-overlay" id="shopConfirmOverlay">
+        <div class="new-session-modal shop-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="shopConfirmTitle">
+            <div class="shop-confirm-icon" id="shopConfirmIcon">🛒</div>
+            <h2 id="shopConfirmTitle">Confirm purchase</h2>
+            <p id="shopConfirmText"></p>
+            <div class="shop-confirm-actions">
+                <button class="new-session-btn secondary" id="shopConfirmCancel" type="button">Cancel</button>
+                <button class="new-session-btn" id="shopConfirmBuy" type="button">Buy</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Modal -->
     <div class="statistics-overlay" id="statisticsOverlay">
         <div class="statistics-modal">
@@ -1082,7 +1156,8 @@
     <!-- Hotkey Hint Bar -->
     <div class="hotkey-hint" id="hotkeyHint">
         <kbd>S</kbd> <span id="hotkeySessionsLabel">Sessions</span> &nbsp;·&nbsp;
-        <kbd>N</kbd> <span id="hotkeySettingsLabel">Settings</span> &nbsp;·&nbsp;
+        <kbd>N</kbd> <span id="hotkeyAchievementsLabel">Achievements</span> &nbsp;·&nbsp;
+        <kbd>M</kbd> <span id="hotkeyShopLabel">Shop</span> &nbsp;·&nbsp;
         <kbd>C</kbd> <span id="hotkeyStatsLabel">Stats</span> &nbsp;·&nbsp;
         <kbd>D</kbd> <span id="hotkeyDnfLabel">DNF</span> &nbsp;·&nbsp;
         <kbd>+</kbd> <span id="hotkeyPlusTwoLabel">+2</span> &nbsp;·&nbsp;
@@ -1345,7 +1420,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.4.4</div>
+    <div class="version-display">2.6.3</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1463,17 +1538,21 @@
         </div>
     </div>
 
-    <script type="module" src="firebase-init.js?v=2.4.4"></script>
+    <script type="module">
+        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.6.3');
+    </script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
-    <script defer src="sync.js"></script>
+    <script defer src="sync.js?v=2.6.3"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js?v=2.4.4"></script>
+    <script defer src="translations.js?v=2.6.3"></script>
+    <script defer src="progression-data.js?v=2.6.3"></script>
+    <script defer src="progression-system.js?v=2.6.3"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js?v=2.4.4"></script>
+    <script defer src="script.js?v=2.6.3"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">

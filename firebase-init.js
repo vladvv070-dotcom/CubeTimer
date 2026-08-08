@@ -290,16 +290,12 @@ window.CubeSync = {
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.AppSync?.stopCustomPhrasesLiveSync?.();
+    window.dispatchEvent(new CustomEvent("firebase-auth-state", { detail: { user: null } }));
     return;
   }
-  if (!window.AppStorage) return;
-  try {
-    if (window.AppSync && window.AppSync.runSync) {
-      await window.AppSync.runSync();
-    }
-  } catch (e) {
-    console.error("Firebase: не удалось восстановить сессию", e);
-  }
+  // AppSync and the timer may still be loading. The sync layer listens for
+  // this event and starts as soon as all three pieces are ready.
+  window.dispatchEvent(new CustomEvent("firebase-auth-state", { detail: { user } }));
 });
 
 window.dispatchEvent(new Event("firebase-ready"));

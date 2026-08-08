@@ -248,6 +248,7 @@
                 };
                 
                 this.loadSettings();
+                this._lastThemeSignature = JSON.stringify([this.settings.darkTheme, this.settings.accentColor, this.settings.customFont, this.settings.customBg]);
                 this.applySettings();
                 this.applyTranslations();
                 this.initEventListeners();
@@ -288,6 +289,8 @@
                 setText('.fire-menu-item-disabled span:nth-child(2)', t.multiplayer);
                 setText('.fire-menu-item-disabled .fire-menu-soon', t.soon);
                 setText('#dailyChallengeMenuLabel', t.dailyChallengeMenu);
+                setText('#achievementsMenuLabel', t.achievementsMenu);
+                setText('#shopMenuLabel', t.shopMenu);
                 setText('#newScrambleBtn span:last-child', t.newScramble);
                 setText('#dailyChallengeTitle', t.dailyChallengeTitle);
                 setText('#dailyChallengeCloseBtn', t.dailyChallengeClose);
@@ -688,7 +691,8 @@
                 _st('sessionDetailsSubtitle', t.defaultSession);
 
                 _st('hotkeySessionsLabel', t.hotkeySessions);
-                _st('hotkeySettingsLabel', t.hotkeySettings);
+                _st('hotkeyAchievementsLabel', t.hotkeyAchievements);
+                _st('hotkeyShopLabel', t.hotkeyShop);
                 _st('hotkeyStatsLabel', t.hotkeyStats);
                 _st('hotkeyDnfLabel', t.dnf);
                 _st('hotkeyPlusTwoLabel', t.plusTwo);
@@ -714,6 +718,14 @@
 
             saveSettings() {
                 AppStorage.setJSON('cubeTimerSettings', this.settings);
+                if (window.progression) {
+                    window.dispatchEvent(new CustomEvent('progressionevent', { detail: { type: 'settingsChanged' } }));
+                    const signature = JSON.stringify([this.settings.darkTheme, this.settings.accentColor, this.settings.customFont, this.settings.customBg]);
+                    if (signature !== this._lastThemeSignature) {
+                        window.dispatchEvent(new CustomEvent('progressionevent', { detail: { type: 'themeChanged' } }));
+                    }
+                    this._lastThemeSignature = signature;
+                }
             }
 
             applySettings() {
@@ -1849,6 +1861,12 @@
                 // ESC key to close
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') {
+                        if (DOM('shopConfirmOverlay')?.classList.contains('visible')) {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            window.progression?.cancelPurchaseConfirmation?.();
+                            return;
+                        }
                         if (DOM('customPhrasesLayer')?.classList.contains('visible')) {
                             e.preventDefault();
                             e.stopImmediatePropagation();
@@ -1858,6 +1876,8 @@
                         DOM('settingsOverlay').classList.remove('visible');
                         DOM('statisticsOverlay').classList.remove('visible');
                         DOM('sessionsOverlay').classList.remove('visible');
+                        DOM('shopOverlay')?.classList.remove('visible');
+                        DOM('progressionOverlay')?.classList.remove('visible');
                     }
                 });
 
@@ -2536,7 +2556,11 @@
                     const sessions = saved;
                     // ── Migration: add discipline to old sessions ──
                     let needsSave = false;
-                    Object.values(sessions).forEach(s => {
+                    Object.entries(sessions).forEach(([sessionId, s]) => {
+                        if (!s.id || s.id !== sessionId) {
+                            s.id = sessionId;
+                            needsSave = true;
+                        }
                         if (!s.discipline) {
                             s.discipline = '3x3';
                             needsSave = true;
@@ -2967,7 +2991,7 @@
                                 const user = await window.CubeAuth.registerWithNickname(nickname, email, password);
                                 AppStorage.setJSON('authUser', { uid: user.uid, nickname, email });
                                 updateAuthBtnUI();
-                                await window.AppSync.runSync();
+                                await window.AppSync.requestSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');
                             } catch (error) {
@@ -3016,7 +3040,7 @@
                                     email: cred.user.email
                                 });
                                 updateAuthBtnUI();
-                                await window.AppSync.runSync();
+                                await window.AppSync.requestSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');
                             } catch (error) {
@@ -3053,7 +3077,7 @@
                                     email: cred.user.email
                                 });
                                 updateAuthBtnUI();
-                                await window.AppSync.runSync();
+                                await window.AppSync.requestSync();
                                 DOM('authOverlay').classList.remove('visible');
                                 DOM('authWarningOverlay').classList.remove('visible');
                             } catch (error) {
@@ -4807,9 +4831,14 @@
             }
 
             openSessions() {
-                this.renderSessionsList();
-                this.updateSessionDetails();
-                DOM('sessionsOverlay').classList.add('visible');
+                DOM('shopConfirmOverlay')?.classList.remove('visible');
+                DOM('shopOverlay')?.classList.remove('visible');
+                DOM('progressionOverlay')?.classList.remove('visible');
+                DOM('sessionsOverlay')?.classList.add('visible');
+                try { this.renderSessionsList(); }
+                catch (error) { console.error('Could not render sessions list:', error); }
+                try { this.updateSessionDetails(); }
+                catch (error) { console.error('Could not render session details:', error); }
 
                 // Setup session action buttons
                 document.getElementById('newSessionBtn').onclick = () => this.createNewSession();
@@ -5670,12 +5699,17 @@
             togglePenaltyFromHistory(index) {
                 const session = this.sessions[this.currentSessionId];
                 const solve = session.solves[index];
+                const removedPlusTwo = solve.penalty === 2;
+                if (removedPlusTwo && window.progression && !window.progression.useDnfInsurance()) return;
                 
                 if (solve.dnf) {
                     solve.dnf = false;
                 }
                 
                 solve.penalty = solve.penalty ? null : 2;
+                if (removedPlusTwo && solve.penalty === null) {
+                    window.dispatchEvent(new CustomEvent('progressionevent', { detail: { type: 'plusTwoRemoved' } }));
+                }
                 solve.updatedAt = Date.now();
                 this.saveSessions();
                 this.populateSolveHistory();
@@ -5696,6 +5730,7 @@
             toggleDNFFromHistory(index) {
                 const session = this.sessions[this.currentSessionId];
                 const solve = session.solves[index];
+                if (solve.dnf && window.progression && !window.progression.useDnfInsurance()) return;
                 
                 solve.dnf = !solve.dnf;
                 if (solve.dnf) {
@@ -5724,10 +5759,10 @@
                 container.innerHTML = '';
                 const sessionTranslations = translations[getLang()] || translations.en;
 
-                Object.values(this.sessions).forEach(session => {
+                Object.entries(this.sessions).forEach(([sessionId, session]) => {
                     const item = document.createElement('div');
                     item.className = 'session-item';
-                    if (session.id === this.currentSessionId) {
+                    if (sessionId === this.currentSessionId) {
                         item.classList.add('active');
                     }
                     if (session.isDefault) {
@@ -5753,7 +5788,7 @@
                     `;
 
                     item.onclick = () => {
-                        this.switchSession(session.id);
+                        this.switchSession(sessionId);
                     };
 
                     container.appendChild(item);
@@ -5761,6 +5796,10 @@
             }
 
             switchSession(sessionId) {
+                if (!sessionId || !this.sessions[sessionId]) {
+                    console.warn('Session switch ignored: unknown session', sessionId);
+                    return;
+                }
                 this.currentSessionId = sessionId;
                 this.saveSessions();
                 this.renderSessionsList();
@@ -6039,6 +6078,7 @@
                 this.updateAverages();
                 this.updateBestTimes();
                 this.drawChart();
+                window.progression?.scheduleEvaluation('ui');
             }
 
             updateAverages() {
@@ -6154,6 +6194,7 @@
                 if (this.solves.length === 0) return;
                 
                 const currentSession = this.sessions[this.currentSessionId];
+                if (currentSession.solves[0].dnf && window.progression && !window.progression.useDnfInsurance()) return;
                 currentSession.solves[0].dnf = !currentSession.solves[0].dnf;
                 if (currentSession.solves[0].dnf) {
                     currentSession.solves[0].penalty = null;
@@ -6181,12 +6222,17 @@
                 const currentSession = this.sessions[this.currentSessionId];
                 if (currentSession.solves[0].dnf) return;
                 
-                if (currentSession.solves[0].penalty === 2) {
+                const removedPlusTwo = currentSession.solves[0].penalty === 2;
+                if (removedPlusTwo && window.progression && !window.progression.useDnfInsurance()) return;
+                if (removedPlusTwo) {
                     currentSession.solves[0].penalty = null;
                 } else {
                     currentSession.solves[0].penalty = 2;
                 }
                 currentSession.solves[0].updatedAt = Date.now();
+                if (removedPlusTwo) {
+                    window.dispatchEvent(new CustomEvent('progressionevent', { detail: { type: 'plusTwoRemoved' } }));
+                }
                 this.hideNewBestIndicator();
                 this.saveSessions();
                 this.updateUI();
@@ -6404,7 +6450,8 @@
             }
 
             _calculateStreakMetrics(activity = this._getActivityByDay()) {
-                const keys = [...activity.keys()].sort();
+                const frozenDays = window.progression?.getFrozenDays?.() || new Set();
+                const keys = [...new Set([...activity.keys(), ...frozenDays])].sort();
                 let best = 0;
                 let run = 0;
                 let previous = null;
@@ -6418,13 +6465,14 @@
 
                 const cursor = new Date();
                 cursor.setHours(0, 0, 0, 0);
-                if (!activity.has(this._getLocalDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+                const streakDays = new Set(keys);
+                if (!streakDays.has(this._getLocalDateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
                 let current = 0;
-                while (activity.has(this._getLocalDateKey(cursor))) {
+                while (streakDays.has(this._getLocalDateKey(cursor))) {
                     current++;
                     cursor.setDate(cursor.getDate() - 1);
                 }
-                return { current, best, activeDays: keys.length };
+                return { current, best, activeDays: activity.size };
             }
 
             updateActivityStreakButton() {
@@ -6467,6 +6515,7 @@
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const todayKey = this._getLocalDateKey(today);
+                const frozenDays = window.progression?.getFrozenDays?.() || new Set();
 
                 const monthName = new Intl.DateTimeFormat(locale, { month: 'long' }).format(displayed);
                 monthTitle.textContent = `${monthName} ${displayed.getFullYear()}`;
@@ -6498,7 +6547,8 @@
                         date.setDate(gridStart.getDate() + weekIndex * 7 + dayIndex);
                         const key = this._getLocalDateKey(date);
                         const count = activity.get(key) || 0;
-                        if (!count || date > today) perfectWeek = false;
+                        const frozen = frozenDays.has(key);
+                        if (!count || frozen || date > today) perfectWeek = false;
                         const cell = document.createElement('span');
                         cell.className = 'streak-month-day';
                         cell.dataset.level = String(this._activityLevel(count));
@@ -6506,10 +6556,11 @@
                         if (date.getMonth() !== displayed.getMonth()) cell.classList.add('outside-month');
                         if (date > today) cell.classList.add('future');
                         if (key === todayKey) cell.classList.add('today');
+                        if (frozen) cell.classList.add('frozen');
                         const formatted = new Intl.DateTimeFormat(locale, {
                             year: 'numeric', month: 'long', day: 'numeric'
                         }).format(date);
-                        cell.title = `${formatted}: ${count} ${t.streakSolves}`;
+                        cell.title = frozen ? `${formatted}: ${t.streakFrozen}` : `${formatted}: ${count} ${t.streakSolves}`;
                         week.appendChild(cell);
                     }
                     if (perfectWeek) {
@@ -8110,6 +8161,21 @@
 
                     // ══ STATISTICS OVERLAY OPEN ══
                     if (this._overlayVisible('statisticsOverlay')) return;
+                    if (this._overlayVisible('shopConfirmOverlay')) return;
+                    if (this._overlayVisible('progressionOverlay')) {
+                        if (e.key.toLowerCase() === 'n' && !e.ctrlKey && !e.metaKey) {
+                            e.preventDefault();
+                            DOM('progressionOverlay')?.classList.remove('visible');
+                        }
+                        return;
+                    }
+                    if (this._overlayVisible('shopOverlay')) {
+                        if (e.key.toLowerCase() === 'm' && !e.ctrlKey && !e.metaKey) {
+                            e.preventDefault();
+                            DOM('shopOverlay')?.classList.remove('visible');
+                        }
+                        return;
+                    }
 
                     // ══ GLOBAL HOTKEYS (main screen only) ══
                     // Block hotkeys during timer running or inspection
@@ -8125,14 +8191,12 @@
                     }
                     if (key.toLowerCase() === 'n' && !e.ctrlKey && !e.metaKey) {
                         e.preventDefault();
-                        this._toggleOverlay('settingsOverlay', () => {
-                            const overlay = DOM('settingsOverlay');
-                            overlay?.classList.add('visible');
-                            // Reset sidebar state, but do NOT focus — kb-nav activates only via arrows
-                            this.settingsFocus = 'sidebar';
-                            this.sidebarIndex = 0;
-                            this._clearAllFocus();
-                        });
+                        window.progression?.open('achievements');
+                        return;
+                    }
+                    if (key.toLowerCase() === 'm' && !e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        window.progression?.openShop();
                         return;
                     }
                     if (key.toLowerCase() === 'c' && !e.ctrlKey && !e.metaKey) {
@@ -8491,6 +8555,9 @@
 
             // Lazily loads the cubing.js scramble module once and reuses it.
             static _loadEngine() {
+                if (location.protocol === 'file:') {
+                    return Promise.reject(new Error('file-protocol'));
+                }
                 if (!this._enginePromise) {
                     this._enginePromise = import('https://cdn.cubing.net/v0/js/cubing/scramble');
                 }
@@ -8508,7 +8575,9 @@
                     const alg = await randomScrambleForEvent(eventId);
                     return this._normalize(alg.toString());
                 } catch (err) {
-                    console.error('WCA scramble engine unavailable, using local fallback generator:', err);
+                    if (err?.message !== 'file-protocol') {
+                        console.error('WCA scramble engine unavailable, using local fallback generator:', err);
+                    }
                     return this._fallbackScramble(discipline);
                 }
             }
@@ -8559,6 +8628,10 @@
             window.timer = timer;
             window.sessionsManager = timer; // Alias for solve history
             window.hotkeyManager = hotkeyManager;
+            const progression = new ProgressionSystem(timer, settingsManager);
+            window.progression = progression;
+            progression.init();
+            window.dispatchEvent(new Event('timer-ready'));
 
             // Init subsession UI (context menu, modal handlers)
             timer.initSubsessionUI();

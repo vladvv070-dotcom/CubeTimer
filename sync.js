@@ -202,6 +202,7 @@ const SyncMerge = {
             } else {
                 merged[id] = local || remote;
             }
+            if (merged[id]) merged[id].id = id;
         }
         return merged;
     }
@@ -265,7 +266,10 @@ const CloudSync = {
     // need to scan the full remote history to notice something never
     // made it up (e.g. the write happened while offline).
     async pushNewSolve(sessionId, solve) {
-        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
+            PendingSync.addPendingSolve(sessionId, solve.id);
+            return;
+        }
         try {
             await window.CubeSync.saveSolve(sessionId, solve);
             PendingSync.removePendingSolve(solve.id);
@@ -275,7 +279,11 @@ const CloudSync = {
         }
     },
     async pushSolveUpdate(solveId, patch) {
-        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
+            const sessionId = findSessionIdForSolve(solveId);
+            if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
+            return;
+        }
         try {
             await window.CubeSync.updateSolve(solveId, patch);
             PendingSync.removePendingSolve(solveId);
@@ -286,7 +294,11 @@ const CloudSync = {
         }
     },
     async pushSolveDelete(solveId) {
-        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return;
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
+            PendingSync.addPendingDelete(solveId);
+            PendingSync.removePendingSolve(solveId);
+            return;
+        }
         try {
             await window.CubeSync.deleteSolveRemote(solveId);
             PendingSync.removePendingDelete(solveId);
@@ -324,6 +336,15 @@ async function flushPendingSync() {
 let _customPhrasesUnsubscribe = null;
 
 const AppSync = {
+    _requestedSync: null,
+    requestSync() {
+        if (this._requestedSync) return this._requestedSync;
+        this._requestedSync = Promise.resolve()
+            .then(() => this.runSync())
+            .catch(error => console.error('Automatic sync failed:', error))
+            .finally(() => { this._requestedSync = null; });
+        return this._requestedSync;
+    },
     // Call this right after a successful login, and once on page load if
     // a session was restored. The FULL solve history is only ever read
     // here once per account+device (when there's no local "lastSyncedAt"
@@ -367,6 +388,7 @@ const AppSync = {
                 AppStorage.setJSON('customPhrases', {});
                 AppStorage.setRaw('customPhrasesUpdatedAt', '0');
             }
+            window.progression?.clearLocalState?.();
         }
         AppStorage.setRaw('lastSyncedUid', user.uid);
 
@@ -408,6 +430,7 @@ const AppSync = {
             }
             shouldPushCustomPhrases = false;
         }
+        if (remoteMeta?.progressionState) window.progression?.mergeCloudState?.(remoteMeta.progressionState);
 
         // Fold in tombstones from Firestore FIRST -- otherwise a solve/session
         // deleted on another device looks, from this device's point of view,
@@ -508,18 +531,23 @@ const AppSync = {
             await CloudSync.pushNewSolve(sessionId, solve);
         }
         if (shouldPushCustomPhrases) await AppSync.pushCustomPhrasesNow();
+        window.progression?.ensureDaily?.();
+        await AppSync.pushProgressionNow();
         AppSync.startCustomPhrasesLiveSync();
     },
 
     // ---- Point-write helpers, called directly from Timer on each action ----
     pushNewSolve(sessionId, solve) {
         CloudSync.pushNewSolve(sessionId, solve);
+        window.dispatchEvent(new CustomEvent('timerdatachange', { detail: { type: 'solve', solveId: solve?.id } }));
     },
     pushSolveUpdate(solveId, patch) {
         CloudSync.pushSolveUpdate(solveId, patch);
+        window.dispatchEvent(new CustomEvent('timerdatachange', { detail: { type: 'update', solveId } }));
     },
     pushSolveDelete(solveId) {
         CloudSync.pushSolveDelete(solveId);
+        window.dispatchEvent(new CustomEvent('timerdatachange', { detail: { type: 'delete', solveId } }));
     },
 
     async pushCustomPhrasesNow() {
@@ -529,10 +557,16 @@ const AppSync = {
         return CloudSync.pushMeta({ customPhrases, customPhrasesUpdatedAt });
     },
 
+    async pushProgressionNow() {
+        if (!window.CubeAuth || !window.CubeAuth.getCurrentUser() || !window.progression) return false;
+        return CloudSync.pushMeta({ progressionState: window.progression.exportState() });
+    },
+
     startCustomPhrasesLiveSync() {
         if (_customPhrasesUnsubscribe || !window.CubeAuth?.getCurrentUser?.() || !window.CubeSync?.subscribeUserData) return;
         try {
             _customPhrasesUnsubscribe = window.CubeSync.subscribeUserData((remote) => {
+                if (remote?.progressionState) window.progression?.mergeCloudState?.(remote.progressionState);
                 const remoteUpdatedAt = Number(remote?.customPhrasesUpdatedAt) || 0;
                 const localUpdatedAt = Number(AppStorage.getRaw('customPhrasesUpdatedAt', '0')) || 0;
                 if (!remote?.customPhrases || remoteUpdatedAt <= localUpdatedAt) return;
@@ -597,6 +631,17 @@ window.SyncTombstones = SyncTombstones;
 window.SyncMerge = SyncMerge;
 window.CloudSync = CloudSync;
 window.AppSync = AppSync;
+
+// Firebase, AppSync and CubeTimer are loaded by separate scripts. Whichever
+// becomes ready last triggers one deduplicated synchronization pass.
+const requestSyncWhenReady = () => {
+    if (!window.timer || !window.CubeAuth?.getCurrentUser?.()) return;
+    AppSync.requestSync();
+};
+window.addEventListener('firebase-ready', requestSyncWhenReady);
+window.addEventListener('firebase-auth-state', requestSyncWhenReady);
+window.addEventListener('timer-ready', requestSyncWhenReady);
+if (document.readyState !== 'loading') queueMicrotask(requestSyncWhenReady);
 
 // ---- Auth error messages -------------------------------------------------
 // Maps Firebase Auth error codes to a friendly, translated message.
