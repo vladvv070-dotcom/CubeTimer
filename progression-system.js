@@ -86,6 +86,19 @@
             const label=this._text(title.name),lengthClass=label.length>26?'title-extra-long':label.length>20?'title-long':'';
             return `<span class="title-visual title-${title.tier} ${lengthClass} ${className}">${label}</span>`;
         }
+        fitTitleElements(scope = document) {
+            const run=()=>{
+                const elements=[...(scope.matches?.('.title-visual')?[scope]:[]),...scope.querySelectorAll('.title-visual')];
+                elements.forEach(element=>{
+                    element.style.fontSize='';
+                    const container=element.parentElement,available=Math.max(1,(container?.clientWidth||0)-8);
+                    if(!available)return;
+                    const naturalSize=parseFloat(getComputedStyle(element).fontSize)||16,naturalWidth=element.scrollWidth;
+                    if(naturalWidth>available)element.style.fontSize=`${Math.max(7,naturalSize*(available/naturalWidth)*.97).toFixed(2)}px`;
+                });
+            };
+            requestAnimationFrame(run);
+        }
         _dateKey(date = new Date()) {
             return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
         }
@@ -174,6 +187,8 @@
             this.ensureDaily(); this.evaluate(true);
             window.addEventListener('timerdatachange',e=>{if(e.detail?.type==='delete'&&this.state.daily)this.state.daily.deletedCount++;this.scheduleEvaluation(e.detail?.type||'data');});
             window.addEventListener('progressionevent',e=>this.recordEvent(e.detail?.type));
+            window.addEventListener('resize',()=>{clearTimeout(this._titleResizeTimer);this._titleResizeTimer=setTimeout(()=>this.fitTitleElements(),80);});
+            document.fonts?.ready?.then(()=>this.fitTitleElements());
             this._bindUI(); this.render(); this._scheduleMidnightReset();
         }
         _scheduleMidnightReset() {
@@ -303,7 +318,7 @@
             this.pendingPurchaseType=type;
             this.pendingTitlePurchase=null;
             const set=(id,value)=>{if(DOM(id))DOM(id).textContent=value};
-            DOM('shopConfirmIcon').innerHTML=this._assetIcon(type,'shop-confirm-product-image');set('shopConfirmTitle',ru?'Подтвердить покупку':'Confirm purchase');
+            DOM('shopConfirmIcon').classList.remove('title-preview-mode');DOM('shopConfirmIcon').innerHTML=this._assetIcon(type,'shop-confirm-product-image');set('shopConfirmTitle',ru?'Подтвердить покупку':'Confirm purchase');
             set('shopConfirmText',ru?`Купить «${names[type]}» за ${product.price.toLocaleString('ru-RU')} монет?`:`Buy “${names[type]}” for ${product.price.toLocaleString('en-US')} coins?`);
             set('shopConfirmCancel',ru?'Отмена':'Cancel');set('shopConfirmBuy',ru?'Купить':'Buy');
             DOM('shopConfirmOverlay')?.classList.add('visible');
@@ -311,10 +326,10 @@
         requestTitlePurchase(titleId){
             const title=this.getTitle(titleId);if(!title||this.state.ownedTitles?.[titleId])return;
             const ru=this._lang()==='ru';this.pendingTitlePurchase=titleId;this.pendingPurchaseType=null;
-            DOM('shopConfirmIcon').innerHTML=this._titleMarkup(title,'shop-confirm-title-preview');
+            DOM('shopConfirmIcon').classList.add('title-preview-mode');DOM('shopConfirmIcon').innerHTML=this._titleMarkup(title,'shop-confirm-title-preview');
             DOM('shopConfirmTitle').textContent=ru?'Подтвердить покупку':'Confirm purchase';
             DOM('shopConfirmText').textContent=ru?`Купить титул «${title.name.ru}» за ${title.price.toLocaleString('ru-RU')} монет?`:`Buy the “${title.name.en}” title for ${title.price.toLocaleString('en-US')} coins?`;
-            DOM('shopConfirmCancel').textContent=ru?'Отмена':'Cancel';DOM('shopConfirmBuy').textContent=ru?'Купить':'Buy';DOM('shopConfirmOverlay')?.classList.add('visible');
+            DOM('shopConfirmCancel').textContent=ru?'Отмена':'Cancel';DOM('shopConfirmBuy').textContent=ru?'Купить':'Buy';DOM('shopConfirmOverlay')?.classList.add('visible');this.fitTitleElements(DOM('shopConfirmIcon'));
         }
         cancelPurchaseConfirmation(){this.pendingPurchaseType=null;this.pendingTitlePurchase=null;DOM('shopConfirmOverlay')?.classList.remove('visible');}
         confirmPurchase(){const type=this.pendingPurchaseType,titleId=this.pendingTitlePurchase;this.cancelPurchaseConfirmation();if(type)this.purchaseItem(type);else if(titleId)this.purchaseTitle(titleId);}
@@ -346,6 +361,7 @@
                 }).join('');
                 return `<section class="shop-title-tier"><h4>${tierData.order}. ${this._text(tierData.name)}</h4>${rows}</section>`;
             }).join('');
+            this.fitTitleElements(list);
         }
         render() {
             const root=DOM('progressionOverlay');if(!root)return;const lang=this._lang(),inv=this.inventory;

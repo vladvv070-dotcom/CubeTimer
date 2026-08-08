@@ -382,6 +382,7 @@
                     authBtn.innerHTML = '<span class="auth-profile-icon">👤</span><span class="auth-profile-copy"><strong></strong><small></small></span>';
                     authBtn.querySelector('strong').textContent = authUser ? (authUser.nickname || authUser.email) : t.authBtn;
                     const titleSlot=authBtn.querySelector('small');titleSlot.classList.toggle('hidden',!equippedTitle);titleSlot.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
+                    window.progression?.fitTitleElements?.(authBtn);
                 }
                 if (authRegisterTitle) authRegisterTitle.textContent = t.authRegisterTitle;
                 if (authNicknameLabel) authNicknameLabel.textContent = t.authNicknameLabel;
@@ -2804,6 +2805,7 @@
                         btn.innerHTML='<span class="auth-profile-icon">👤</span><span class="auth-profile-copy"><strong></strong><small></small></span>';
                         btn.querySelector('strong').textContent=authUser?(authUser.nickname||authUser.email):t.authBtn;
                         const titleSlot=btn.querySelector('small');titleSlot.classList.toggle('hidden',!equippedTitle);titleSlot.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
+                        window.progression?.fitTitleElements?.(btn);
                     }
                 };
                 this._updateAuthBtnUI = updateAuthBtnUI;
@@ -2866,6 +2868,7 @@
                             DOM('authAccountTitle').textContent = authUser.nickname || authUser.email || '';
                             const equippedTitle=window.progression?.getEquippedTitle?.(),titlePreview=DOM('authAccountEquippedTitle');
                             titlePreview.classList.toggle('hidden',!equippedTitle);titlePreview.innerHTML=equippedTitle?window.progression._titleMarkup(equippedTitle):'';
+                            window.progression?.fitTitleElements?.(titlePreview);
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
                             DOM('authSyncNowBtn').textContent = getLang() === 'ru' ? 'Синхронизировать сейчас' : 'Sync now';
