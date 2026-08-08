@@ -242,6 +242,9 @@
                 currentTime: 'Current Time',
                 timeOffsetHint: 'If your device clock is correct, leave this as-is. The heatmap uses your system time automatically.',
                 timeOffsetLabel: 'Time offset (hours)',
+                weekStartLabel: 'Streak week starts on',
+                weekStartMonday: 'Monday',
+                weekStartSunday: 'Sunday',
 
                 // Statistics — Trend
                 trendTitle: 'Progress Trend',
@@ -544,6 +547,9 @@
                 currentTime: 'Текущее время',
                 timeOffsetHint: 'Если часы устройства правильные, оставьте как есть. Тепловая карта использует системное время автоматически.',
                 timeOffsetLabel: 'Смещение времени (часы)',
+                weekStartLabel: 'Начало недели ударного режима',
+                weekStartMonday: 'Понедельник',
+                weekStartSunday: 'Воскресенье',
 
                 // Statistics — Trend
                 trendTitle: 'Прогресс',

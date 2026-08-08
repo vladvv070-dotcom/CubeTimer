@@ -235,6 +235,7 @@
                     timeFormat: 'seconds',   // 'seconds' | 'minutes'
                     clockFormat: '24',        // '24' | '12'
                     timeOffset: 0,            // hours offset (-12..+14)
+                    weekStart: 'monday',      // 'monday' | 'sunday'
                     hideUiDuringSolve: false, // hide all UI except timer while solving
                     mouseStart: false,        // start/stop timer with mouse click
                     targetTimeEnabled: false, // beep + color indicator when a goal time is set
@@ -525,6 +526,9 @@
                 _st('st-analytics-currenttime', t.currentTime);
                 _st('st-analytics-offset-label', t.timeOffsetLabel);
                 _st('st-analytics-hint', t.timeOffsetHint);
+                _st('st-analytics-weekstart', t.weekStartLabel);
+                _st('st-weekstart-monday', t.weekStartMonday);
+                _st('st-weekstart-sunday', t.weekStartSunday);
 
                 // Statistics — Trend & Heatmap titles
                 _st('st-stat-trend',   t.trendTitle);
@@ -1545,6 +1549,10 @@
                 document.querySelectorAll('[data-clockfmt]').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.clockfmt === clockFmt);
                 });
+                const weekStart = this.settings.weekStart || 'monday';
+                document.querySelectorAll('[data-weekstart]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.weekstart === weekStart);
+                });
 
                 // Sync hideUi toggle switch
                 const hideUiToggle = DOM('hideUiToggle');
@@ -2214,6 +2222,16 @@
                         this.settings.clockFormat = btn.dataset.clockfmt;
                         this.saveSettings();
                         updateOffsetPreview();
+                    });
+                });
+
+                document.querySelectorAll('[data-weekstart]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-weekstart]').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.settings.weekStart = btn.dataset.weekstart;
+                        this.saveSettings();
+                        window.timer?._renderStreakMonth?.();
                     });
                 });
 
@@ -6592,9 +6610,11 @@
                 if (nextButton) nextButton.disabled = isCurrentMonth;
 
                 weekdays.innerHTML = '';
-                const weekdayLabels = locale === 'ru-RU'
+                const weekStartsMonday=(window.settingsManager?.settings?.weekStart||'monday')==='monday';
+                const sundayFirst = locale === 'ru-RU'
                     ? ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
                     : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const weekdayLabels=weekStartsMonday?[...sundayFirst.slice(1),sundayFirst[0]]:sundayFirst;
                 weekdayLabels.forEach(text => {
                     const label = document.createElement('span');
                     label.textContent = text;
@@ -6603,7 +6623,9 @@
 
                 const first = new Date(displayed.getFullYear(), displayed.getMonth(), 1);
                 const gridStart = new Date(first);
-                gridStart.setDate(first.getDate() - first.getDay());
+                const weekStartIndex=weekStartsMonday?1:0;
+                const leadingDays=(first.getDay()-weekStartIndex+7)%7;
+                gridStart.setDate(first.getDate()-leadingDays);
                 calendar.innerHTML = '';
                 for (let weekIndex = 0; weekIndex < 6; weekIndex++) {
                     const week = document.createElement('div');
