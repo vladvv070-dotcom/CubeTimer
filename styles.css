@@ -154,6 +154,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding-inline: 6px;
+            box-sizing: border-box;
         }
 
         body.light-theme .record-title {
@@ -600,6 +602,11 @@
             gap: 1.1rem;
             position: relative;
             overflow: hidden;
+            width: min(100%, 520px);
+            height: 268px;
+            min-height: 268px;
+            box-sizing: border-box;
+            justify-content: center;
             max-width: 100%;
         }
 
@@ -1139,6 +1146,38 @@
 
         .settings-overlay.visible .settings-modal-new {
             transform: scale(1);
+        }
+
+        .timer-display.inspection-countdown {
+            font-size: clamp(5.5rem, 9vw, 9rem);
+        }
+
+        body.solve-focus-mode .header,
+        body.solve-focus-mode .left-column,
+        body.solve-focus-mode .right-column,
+        body.solve-focus-mode .scramble-section,
+        body.solve-focus-mode .new-scramble-btn,
+        body.solve-focus-mode .commentary-text,
+        body.solve-focus-mode .bottom-left-buttons,
+        body.solve-focus-mode .bottom-controls,
+        body.solve-focus-mode .tg-promo-btn,
+        body.solve-focus-mode .version-display,
+        body.solve-focus-mode .timer-hint,
+        body.solve-focus-mode .target-time-goal-label {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: opacity .2s ease, visibility 0s linear .2s !important;
+        }
+
+        body:not(.solve-focus-mode) .header,
+        body:not(.solve-focus-mode) .left-column,
+        body:not(.solve-focus-mode) .right-column,
+        body:not(.solve-focus-mode) .scramble-section,
+        body:not(.solve-focus-mode) .new-scramble-btn,
+        body:not(.solve-focus-mode) .commentary-text,
+        body:not(.solve-focus-mode) .bottom-left-buttons {
+            transition: opacity .2s ease;
         }
 
         .custom-phrases-open-btn {
@@ -8676,6 +8715,7 @@ body.light-theme .streak-day[data-level="4"], body.light-theme .streak-legend i[
     .streak-modal { width: calc(100vw - 1rem); padding: 1rem; }
     .streak-month-day { height: 36px; border-radius: 9px; }
     .streak-calendar-shell { padding: 0.7rem; }
+    .timer-container { height: 240px; min-height: 240px; }
 }
 
 /* ===== Achievements & Daily Tasks ===== */

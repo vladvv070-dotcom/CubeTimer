@@ -3485,7 +3485,8 @@
                 this.isInspecting = true;
                 this.inspectionTime = 15;
                 this.timerDisplay.textContent = '15';
-                this.timerDisplay.style.fontSize = '10rem';
+                this.timerDisplay.style.fontSize = '';
+                this.timerDisplay.classList.add('inspection-countdown');
                 
                 // Start countdown
                 this.inspectionInterval = setInterval(() => {
@@ -3543,7 +3544,8 @@
                 }
                 this.isInspecting = false;
                 this.timerDisplay.textContent = '0.00';
-                this.timerDisplay.style.fontSize = '7rem';
+                this.timerDisplay.style.fontSize = '';
+                this.timerDisplay.classList.remove('inspection-countdown');
                 
                 // Reset color
                 if (document.body.classList.contains('light-theme')) {
@@ -3860,7 +3862,7 @@
 
                 // Reset display to 0.00
                 this.timerDisplay.textContent = '0.00';
-                this.timerDisplay.style.fontSize = '7rem';
+                this.timerDisplay.style.fontSize = '';
 
                 this.updateUI();
 
@@ -3940,6 +3942,18 @@
 
                 this.recordTitle.textContent = message;
                 this.titleStrip.classList.add('showing-record');
+                requestAnimationFrame(()=>{
+                    this.recordTitle.style.fontSize='';
+                    const wrap=this.titleStrip.closest('.title-strip-wrap');
+                    const available=Math.max(1,(wrap?.clientWidth||this.recordTitle.clientWidth)-12);
+                    const range=document.createRange();range.selectNodeContents(this.recordTitle);
+                    const naturalWidth=range.getBoundingClientRect().width;
+                    if(naturalWidth>available){
+                        const naturalSize=parseFloat(getComputedStyle(this.recordTitle).fontSize)||18;
+                        this.recordTitle.style.fontSize=`${Math.max(8,naturalSize*(available/naturalWidth)*.92).toFixed(2)}px`;
+                    }
+                    range.detach?.();
+                });
 
                 clearTimeout(this._newBestTimeout);
                 this._newBestTimeout = setTimeout(() => {
@@ -5177,25 +5191,7 @@
             }
 
             _setHideUiActive(active) {
-                const elements = [
-                    document.querySelector('.left-column'),
-                    document.querySelector('.right-column'),
-                    document.querySelector('.scramble-section'),
-                    document.querySelector('.bottom-controls'),
-                    document.querySelector('.commentary-box'),
-                    document.querySelector('.app-header'),
-                ].filter(Boolean);
-
-                elements.forEach(el => {
-                    if (active) {
-                        el.style.opacity = '0';
-                        el.style.pointerEvents = 'none';
-                        el.style.transition = 'opacity 0.25s ease';
-                    } else {
-                        el.style.opacity = '';
-                        el.style.pointerEvents = '';
-                    }
-                });
+                document.body.classList.toggle('solve-focus-mode',!!active);
             }
 
             initSubsessionUI() {
