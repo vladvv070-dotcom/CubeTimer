@@ -64,6 +64,10 @@
         _rewardAmount(amount) { return Number(amount) * (this.isBoostActive() ? 2 : 1); }
         _lang() { return getLang() === 'ru' ? 'ru' : 'en'; }
         _text(obj) { return obj?.[this._lang()] || obj?.en || obj?.ru || ''; }
+        _assetIcon(type, className = 'economy-icon') {
+            const files = { coins: 'coin.png', freezes: 'streak-freeze.png', dnfInsurance: 'dnf-insurance.png', coinBoosters: 'coin-booster.png' };
+            return files[type] ? `<img class="${className}" src="./images/shop/${files[type]}" alt="">` : '';
+        }
         _dateKey(date = new Date()) {
             return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
         }
@@ -253,11 +257,11 @@
             document.querySelectorAll('[data-progression-tab]').forEach(b=>b.addEventListener('click',()=>this.open(b.dataset.progressionTab)));
         }
         requestPurchase(type){
-            const products={freezes:{price:1000,icon:'❄️'},dnfInsurance:{price:600,icon:'🛡️'},coinBoosters:{price:800,icon:'⚡'}},product=products[type];if(!product)return;
+            const products={freezes:{price:1000},dnfInsurance:{price:600},coinBoosters:{price:800}},product=products[type];if(!product)return;
             const ru=this._lang()==='ru',names=ru?{freezes:'Заморозка ударного режима',dnfInsurance:'Страховка от DNF',coinBoosters:'Удвоитель монет'}:{freezes:'Streak Freeze',dnfInsurance:'DNF Insurance',coinBoosters:'Coin Doubler'};
             this.pendingPurchaseType=type;
             const set=(id,value)=>{if(DOM(id))DOM(id).textContent=value};
-            set('shopConfirmIcon',product.icon);set('shopConfirmTitle',ru?'Подтвердить покупку':'Confirm purchase');
+            DOM('shopConfirmIcon').innerHTML=this._assetIcon(type,'shop-confirm-product-image');set('shopConfirmTitle',ru?'Подтвердить покупку':'Confirm purchase');
             set('shopConfirmText',ru?`Купить «${names[type]}» за ${product.price.toLocaleString('ru-RU')} монет?`:`Buy “${names[type]}” for ${product.price.toLocaleString('en-US')} coins?`);
             set('shopConfirmCancel',ru?'Отмена':'Cancel');set('shopConfirmBuy',ru?'Купить':'Buy');
             DOM('shopConfirmOverlay')?.classList.add('visible');
@@ -271,9 +275,9 @@
             const text=ru?{title:'Магазин',skins:'Скины',effects:'Эффекты',items:'Предметы',titles:'Титулы',soon:'Скоро',owned:'В инвентаре',buy:'Купить',use:'Активировать',active:'Удвоитель активен до',freeze:['Заморозка ударного режима','Автоматически спасает стрик, если пропущен один день. Замороженный день становится синим и не засчитывается в идеальную неделю.'],insurance:['Страховка от DNF','Одноразово позволяет исправить DNF или +2. Сгорает сразу после исправления штрафа.'],booster:['Удвоитель монет','После активации удваивает награды за достижения и задания дня в течение 24 часов.']}:{title:'Shop',skins:'Skins',effects:'Effects',items:'Items',titles:'Titles',soon:'Soon',owned:'In inventory',buy:'Buy',use:'Activate',active:'Coin doubler active until',freeze:['Streak Freeze','Automatically saves your streak after one missed day. The frozen day is blue and prevents a perfect week.'],insurance:['DNF Insurance','Lets you correct one DNF or +2. Consumed immediately when the penalty is corrected.'],booster:['Coin Doubler','After activation, doubles achievement and daily-task rewards for 24 hours.']};
             const set=(id,v)=>{if(DOM(id))DOM(id).textContent=v};set('shopTitle',text.title);set('shopSkinsTab',text.skins);set('shopEffectsTab',text.effects);set('shopItemsTab',text.items);set('shopTitlesTab',text.titles);set('shopItemsTitle',text.items);['shopSkinsSoon','shopEffectsSoon','shopTitlesSoon'].forEach(id=>set(id,text.soon));
             set('shopCoins',this.coins);set('shopFreezes',inv.freezes);set('shopBoosters',inv.coinBoosters);set('shopInsurance',inv.dnfInsurance);
-            const boost=DOM('shopActiveBoost');boost?.classList.toggle('hidden',!this.isBoostActive());if(boost&&this.isBoostActive())boost.textContent=`⚡ ${text.active} ${new Intl.DateTimeFormat(ru?'ru-RU':'en-US',{dateStyle:'short',timeStyle:'short'}).format(new Date(this.state.activeBoostUntil))}`;
-            const cards=[['freezes','❄️',text.freeze,1000,inv.freezes],['dnfInsurance','🛡️',text.insurance,600,inv.dnfInsurance],['coinBoosters','⚡',text.booster,800,inv.coinBoosters]];
-            DOM('shopItemsGrid').innerHTML=cards.map(([type,icon,copy,price,owned])=>`<article class="shop-item-card"><div class="shop-item-icon">${icon}</div><h4>${copy[0]}</h4><p>${copy[1]}</p><div class="shop-item-owned">${text.owned}: ${owned}</div><div class="shop-item-actions"><button class="shop-buy-btn" data-buy-item="${type}" ${this.coins<price?'disabled':''}>${text.buy} · ${price} 🪙</button>${type==='coinBoosters'?`<button class="shop-use-btn" data-use-item="${type}" ${owned<1||this.isBoostActive()?'disabled':''}>${text.use}</button>`:''}</div></article>`).join('');
+            const boost=DOM('shopActiveBoost');boost?.classList.toggle('hidden',!this.isBoostActive());if(boost&&this.isBoostActive())boost.innerHTML=`${this._assetIcon('coinBoosters')}<span>${text.active} ${new Intl.DateTimeFormat(ru?'ru-RU':'en-US',{dateStyle:'short',timeStyle:'short'}).format(new Date(this.state.activeBoostUntil))}</span>`;
+            const cards=[['freezes',text.freeze,1000,inv.freezes],['dnfInsurance',text.insurance,600,inv.dnfInsurance],['coinBoosters',text.booster,800,inv.coinBoosters]];
+            DOM('shopItemsGrid').innerHTML=cards.map(([type,copy,price,owned])=>`<article class="shop-item-card"><div class="shop-item-icon">${this._assetIcon(type,'shop-product-image')}</div><h4>${copy[0]}</h4><p>${copy[1]}</p><div class="shop-item-owned">${text.owned}: ${owned}</div><div class="shop-item-actions"><button class="shop-buy-btn" data-buy-item="${type}" ${this.coins<price?'disabled':''}>${text.buy} · ${price} ${this._assetIcon('coins','inline-economy-icon')}</button>${type==='coinBoosters'?`<button class="shop-use-btn" data-use-item="${type}" ${owned<1||this.isBoostActive()?'disabled':''}>${text.use}</button>`:''}</div></article>`).join('');
         }
         render() {
             const root=DOM('progressionOverlay');if(!root)return;const lang=this._lang(),inv=this.inventory;
@@ -283,16 +287,16 @@
             root.querySelectorAll('.progression-wallet small').forEach((el,i)=>el.textContent=[labels.coins,labels.freeze,labels.boost,labels.dnf][i]);
             document.querySelectorAll('[data-progression-tab]').forEach(b=>b.classList.toggle('active',b.dataset.progressionTab===(this.activeTab||'achievements')));
             const achPanel=DOM('progressionAchievements'),dayPanel=DOM('progressionDaily');achPanel.classList.toggle('hidden',(this.activeTab||'achievements')!=='achievements');dayPanel.classList.toggle('hidden',this.activeTab!=='daily');
-            achPanel.innerHTML=this.catalog.achievements.map(a=>{const unlocked=!!this.state.unlocked[a.id];return`<article class="achievement-card ${unlocked?'unlocked':''}"><div class="achievement-icon">${unlocked?'🏆':'🔒'}</div><div class="achievement-copy"><h3>${this._text(a.name)}</h3><p>${this._text(a.description)}</p><span>${unlocked?labels.done:labels.locked}</span></div><strong>+${a.reward} 🪙</strong></article>`;}).join('');
+            achPanel.innerHTML=this.catalog.achievements.map(a=>{const unlocked=!!this.state.unlocked[a.id];return`<article class="achievement-card ${unlocked?'unlocked':''}"><div class="achievement-icon">${unlocked?'🏆':'🔒'}</div><div class="achievement-copy"><h3>${this._text(a.name)}</h3><p>${this._text(a.description)}</p><span>${unlocked?labels.done:labels.locked}</span></div><strong>+${a.reward} ${this._assetIcon('coins','inline-economy-icon')}</strong></article>`;}).join('');
             const m=this._metrics(),today=m.solves.filter(s=>this._dateKey(new Date(s.timestamp))===this.state.daily.date);
-            dayPanel.innerHTML=`<p class="daily-perfect-hint">❄️ ${labels.perfect}</p>`+this.state.daily.ids.map(id=>{const a=this.catalog.daily.find(x=>x.id===id),r=this._dailyResult(id,today,this.state.daily.snapshot,m,this.state.daily),done=!!this.state.daily.completed[id],pct=Math.min(100,Math.round(r.current/r.target*100));return`<article class="daily-task-card ${done?'completed':''}"><div><span>${done?'✓':'◆'}</span><h3>${this._text(a.name)}</h3><p>${this._text(a.description)}</p></div><strong>+100 🪙</strong><div class="daily-task-progress"><i style="width:${pct}%"></i></div><small>${r.current} / ${r.target}</small></article>`;}).join('');
+            dayPanel.innerHTML=`<p class="daily-perfect-hint">${this._assetIcon('freezes')}<span>${labels.perfect}</span></p>`+this.state.daily.ids.map(id=>{const a=this.catalog.daily.find(x=>x.id===id),r=this._dailyResult(id,today,this.state.daily.snapshot,m,this.state.daily),done=!!this.state.daily.completed[id],pct=Math.min(100,Math.round(r.current/r.target*100));return`<article class="daily-task-card ${done?'completed':''}"><div><span>${done?'✓':'◆'}</span><h3>${this._text(a.name)}</h3><p>${this._text(a.description)}</p></div><strong>+100 ${this._assetIcon('coins','inline-economy-icon')}</strong><div class="daily-task-progress"><i style="width:${pct}%"></i></div><small>${r.current} / ${r.target}</small></article>`;}).join('');
             if(DOM('shopOverlay')?.classList.contains('visible'))this.renderShop();
         }
         _toast(text,kind='info') {
             let el=DOM('progressionToast');
             if(!el){el=document.createElement('div');el.id='progressionToast';el.className='progression-toast';el.innerHTML='<span class="progression-toast-icon"></span><span class="progression-toast-copy"><strong>Next Cube Pro</strong><span></span></span>';document.body.appendChild(el);}
-            const icons={success:'✓',info:'✨'},icon=/❄️/.test(text)?'❄️':/🛡️/.test(text)?'🛡️':/⚡/.test(text)?'⚡':/🪙/.test(text)?'🪙':icons[kind]||icons.info;
-            el.dataset.kind=kind;el.querySelector('.progression-toast-icon').textContent=icon;el.querySelector('.progression-toast-copy span').textContent=text;
+            const assetType=/❄️/.test(text)?'freezes':/🛡️/.test(text)?'dnfInsurance':/⚡/.test(text)?'coinBoosters':/🪙/.test(text)?'coins':null;
+            const icons={success:'✓',info:'✨'};el.dataset.kind=kind;el.querySelector('.progression-toast-icon').innerHTML=assetType?this._assetIcon(assetType,'toast-economy-icon'):icons[kind]||icons.info;el.querySelector('.progression-toast-copy span').textContent=text.replace(/(?:❄️|🛡️|⚡|🪙)\s*/g,'');
             el.classList.remove('visible');void el.offsetWidth;el.classList.add('visible');clearTimeout(this._toastTimer);this._toastTimer=setTimeout(()=>el.classList.remove('visible'),3800);
         }
     }
