@@ -27,7 +27,9 @@ import {
   updateDoc,
   deleteDoc,
   writeBatch,
-  onSnapshot
+  onSnapshot,
+  serverTimestamp,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 // Публичный ключ веб-приложения — не секретный, доступ ограничивается
@@ -221,8 +223,14 @@ window.CubeSync = {
       getDocs(collection(db, "users", user.uid, "solves")),
       getDocs(collection(db, "users", user.uid, "tombstones"))
     ]);
-    const solves = solvesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const tombstones = tombstonesSnap.docs.map(d => ({ id: d.id, deletedAt: d.data().deletedAt }));
+    const solves = solvesSnap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, ...data, cloudUpdatedAt: data.cloudUpdatedAt?.toMillis?.() || 0 };
+    });
+    const tombstones = tombstonesSnap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, deletedAt: data.deletedAt, cloudDeletedAt: data.cloudDeletedAt?.toMillis?.() || 0 };
+    });
     return { solves, tombstones };
   },
 
@@ -236,11 +244,17 @@ window.CubeSync = {
     const user = auth.currentUser;
     if (!user) throw new Error("Пользователь не авторизован");
     const [solvesSnap, tombstonesSnap] = await Promise.all([
-      getDocs(query(collection(db, "users", user.uid, "solves"), where("updatedAt", ">", sinceTimestamp))),
-      getDocs(query(collection(db, "users", user.uid, "tombstones"), where("deletedAt", ">", sinceTimestamp)))
+      getDocs(query(collection(db, "users", user.uid, "solves"), where("cloudUpdatedAt", ">", Timestamp.fromMillis(Math.max(0, sinceTimestamp))))),
+      getDocs(query(collection(db, "users", user.uid, "tombstones"), where("cloudDeletedAt", ">", Timestamp.fromMillis(Math.max(0, sinceTimestamp)))))
     ]);
-    const solves = solvesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const tombstones = tombstonesSnap.docs.map(d => ({ id: d.id, deletedAt: d.data().deletedAt }));
+    const solves = solvesSnap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, ...data, cloudUpdatedAt: data.cloudUpdatedAt?.toMillis?.() || 0 };
+    });
+    const tombstones = tombstonesSnap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, deletedAt: data.deletedAt, cloudDeletedAt: data.cloudDeletedAt?.toMillis?.() || 0 };
+    });
     return { solves, tombstones };
   },
 
@@ -248,7 +262,8 @@ window.CubeSync = {
   saveSolve: async (sessionId, solve) => {
     const user = auth.currentUser;
     if (!user) return;
-    await setDoc(doc(db, "users", user.uid, "solves", solve.id), { ...solve, sessionId });
+    const { cloudUpdatedAt, ...cleanSolve } = solve;
+    await setDoc(doc(db, "users", user.uid, "solves", solve.id), { ...cleanSolve, sessionId, cloudUpdatedAt: serverTimestamp() });
   },
 
   // Ровно 1 write: точечное изменение полей существующего solve
@@ -257,7 +272,7 @@ window.CubeSync = {
   updateSolve: async (solveId, patch) => {
     const user = auth.currentUser;
     if (!user) return;
-    await updateDoc(doc(db, "users", user.uid, "solves", solveId), patch);
+    await updateDoc(doc(db, "users", user.uid, "solves", solveId), { ...patch, cloudUpdatedAt: serverTimestamp() });
   },
 
   // Ровно 1 delete + 1 write (надгробие), атомарно через batch —
@@ -268,7 +283,7 @@ window.CubeSync = {
     if (!user) return;
     const batch = writeBatch(db);
     batch.delete(doc(db, "users", user.uid, "solves", solveId));
-    batch.set(doc(db, "users", user.uid, "tombstones", solveId), { deletedAt: Date.now() });
+    batch.set(doc(db, "users", user.uid, "tombstones", solveId), { deletedAt: Date.now(), cloudDeletedAt: serverTimestamp() });
     await batch.commit();
   },
 

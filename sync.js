@@ -374,12 +374,13 @@ const AppSync = {
         const user = window.CubeAuth?.getCurrentUser?.();
         if (!user) return;
 
-        // v2 repairs cursors created by older builds that could advance even
-        // after a failed Firestore read. Each device performs one complete
-        // reconciliation after upgrading, then returns to cheap delta reads.
-        const syncProtocolVersion = '2';
+        // v3 uses Firestore server timestamps. Client clocks can differ by
+        // hours without making synchronization one-directional.
+        const syncProtocolVersion = '3';
         if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
             AppStorage.setRaw('lastSyncedAt', '');
+            AppStorage.setRaw('cloudSyncCursorV3', '');
+            AppStorage.setRaw('cloudSyncInitializedV3', '');
         }
 
         // Local tombstones and the local sessions cache live in this browser's
@@ -403,6 +404,8 @@ const AppSync = {
             // device -- force the full-read path below instead of trying
             // to diff against the previous account's marker.
             AppStorage.setRaw('lastSyncedAt', '');
+            AppStorage.setRaw('cloudSyncCursorV3', '');
+            AppStorage.setRaw('cloudSyncInitializedV3', '');
             timer.sessions = {};
             if (window.commentary?.setCustomPhrases) {
                 window.commentary.setCustomPhrases({}, 0);
@@ -420,19 +423,12 @@ const AppSync = {
         // reads the full remote list.
         await flushPendingSync();
 
-        const lastSyncedAtRaw = AppStorage.getRaw('lastSyncedAt');
-        const lastSyncedAt = lastSyncedAtRaw ? Number(lastSyncedAtRaw) : 0;
-        const isFullSync = !lastSyncedAt;
-        // Captured BEFORE the read, and only committed as the new marker
-        // once the sync below fully succeeds -- so a solve written between
-        // this timestamp and the query actually running just gets seen
-        // again (harmless, merge is idempotent) instead of ever being
-        // missed by falling in the gap.
-        const syncStartedAt = Date.now();
+        const cloudCursor = Number(AppStorage.getRaw('cloudSyncCursorV3')) || 0;
+        const isFullSync = AppStorage.getRaw('cloudSyncInitializedV3') !== '1';
 
         const [remoteMeta, remoteHistory] = await Promise.all([
             CloudSync.pullMeta(),
-            isFullSync ? CloudSync.pullAllSolvesOnce() : CloudSync.pullSolvesDelta(lastSyncedAt)
+            isFullSync ? CloudSync.pullAllSolvesOnce() : CloudSync.pullSolvesDelta(cloudCursor)
         ]);
 
         // Custom commentary phrases are small account metadata. Use a
@@ -559,7 +555,10 @@ const AppSync = {
         }
 
         // Everything above succeeded -- safe to advance the delta baseline.
-        AppStorage.setRaw('lastSyncedAt', String(syncStartedAt));
+        const newestSolveCursor = Math.max(0, ...remoteHistory.solves.map(s => Number(s.cloudUpdatedAt) || 0));
+        const newestDeleteCursor = Math.max(0, ...remoteHistory.tombstones.map(t => Number(t.cloudDeletedAt) || 0));
+        AppStorage.setRaw('cloudSyncCursorV3', String(Math.max(cloudCursor, newestSolveCursor, newestDeleteCursor)));
+        AppStorage.setRaw('cloudSyncInitializedV3', '1');
         AppStorage.setRaw('syncProtocolVersion', syncProtocolVersion);
 
         // Push metadata once if it changed, and (full sync only) backfill
