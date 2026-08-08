@@ -218,7 +218,7 @@ const CloudSync = {
             return await window.CubeSync.loadUserData();
         } catch (e) {
             console.error('CloudSync.pullMeta failed:', e);
-            return null;
+            throw e;
         }
     },
     async pushMeta(meta) {
@@ -242,7 +242,7 @@ const CloudSync = {
             return await window.CubeSync.loadAllSolvesOnce();
         } catch (e) {
             console.error('CloudSync.pullAllSolvesOnce failed:', e);
-            return { solves: [], tombstones: [] };
+            throw e;
         }
     },
 
@@ -256,7 +256,7 @@ const CloudSync = {
             return await window.CubeSync.loadSolvesSince(sinceTimestamp);
         } catch (e) {
             console.error('CloudSync.pullSolvesDelta failed:', e);
-            return { solves: [], tombstones: [] };
+            throw e;
         }
     },
 
@@ -359,6 +359,14 @@ const AppSync = {
 
         const user = window.CubeAuth?.getCurrentUser?.();
         if (!user) return;
+
+        // v2 repairs cursors created by older builds that could advance even
+        // after a failed Firestore read. Each device performs one complete
+        // reconciliation after upgrading, then returns to cheap delta reads.
+        const syncProtocolVersion = '2';
+        if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
+            AppStorage.setRaw('lastSyncedAt', '');
+        }
 
         // Local tombstones and the local sessions cache live in this browser's
         // localStorage, which is NOT scoped to a Firebase account -- it's just
@@ -466,6 +474,23 @@ const AppSync = {
             (remoteSolvesBySession[sid] = remoteSolvesBySession[sid] || []).push(solve);
         }
 
+        // A point-written solve can exist even if the small parent metadata
+        // write was interrupted. Never discard that history just because the
+        // session descriptor is temporarily absent.
+        for (const sessionId of Object.keys(remoteSolvesBySession)) {
+            if (!mergedSessions[sessionId] && !deletedSessionIds.has(sessionId)) {
+                mergedSessions[sessionId] = {
+                    id: sessionId,
+                    name: sessionId === 'no-session' ? 'No Session' : 'Recovered Session',
+                    discipline: '3x3',
+                    solves: [],
+                    subsessions: [],
+                    isDefault: sessionId === 'no-session',
+                    honestMode: null
+                };
+            }
+        }
+
         // Solves that exist locally (or only in the legacy embedded field)
         // but never made it to the new subcollection. Only meaningful to
         // compute during a FULL sync -- remoteSolves only holds the whole
@@ -521,6 +546,7 @@ const AppSync = {
 
         // Everything above succeeded -- safe to advance the delta baseline.
         AppStorage.setRaw('lastSyncedAt', String(syncStartedAt));
+        AppStorage.setRaw('syncProtocolVersion', syncProtocolVersion);
 
         // Push metadata once if it changed, and (full sync only) backfill
         // any solves that were created locally but never reached Firestore
@@ -641,6 +667,12 @@ const requestSyncWhenReady = () => {
 window.addEventListener('firebase-ready', requestSyncWhenReady);
 window.addEventListener('firebase-auth-state', requestSyncWhenReady);
 window.addEventListener('timer-ready', requestSyncWhenReady);
+window.addEventListener('online', requestSyncWhenReady);
+window.addEventListener('focus', requestSyncWhenReady);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestSyncWhenReady();
+});
+setInterval(requestSyncWhenReady, 15000);
 if (document.readyState !== 'loading') queueMicrotask(requestSyncWhenReady);
 
 // ---- Auth error messages -------------------------------------------------
