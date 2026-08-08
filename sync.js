@@ -392,7 +392,7 @@ const AppSync = {
 
         // v3 uses Firestore server timestamps. Client clocks can differ by
         // hours without making synchronization one-directional.
-        const syncProtocolVersion = '3';
+        const syncProtocolVersion = '4';
         if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
@@ -422,9 +422,9 @@ const AppSync = {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
             AppStorage.setRaw('cloudSyncInitializedV3', '');
-            timer.sessions = {
-                'no-session': { id: 'no-session', name: 'No Session', solves: [], subsessions: [], isDefault: true, discipline: '3x3', honestMode: null }
-            };
+            // Preserve the visible local history. It is protected by the
+            // safety snapshot above and will be union-merged with the newly
+            // signed-in account instead of being erased on an auth transition.
             if (window.commentary?.setCustomPhrases) {
                 window.commentary.setCustomPhrases({}, 0);
             } else {
@@ -623,6 +623,25 @@ const AppSync = {
     async pushProgressionNow() {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser() || !window.progression) return false;
         return CloudSync.pushMeta({ progressionState: window.progression.exportState() });
+    },
+
+    async pushImportedSessions(sessionGroups) {
+        if (!window.CubeAuth?.getCurrentUser?.() || !window.CubeSync?.saveSolvesBatch) return false;
+        window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'syncing' } }));
+        try {
+            for (const group of (sessionGroups || [])) {
+                await window.CubeSync.saveSolvesBatch(group.sessionId, group.solves || []);
+            }
+            await this.pushSessionsMetaNow();
+            AppStorage.setRaw('cloudSyncInitializedV3', '');
+            await this.requestSync();
+            return true;
+        } catch (error) {
+            console.error('Imported solve upload failed:', error);
+            (sessionGroups || []).forEach(group => (group.solves || []).forEach(solve => PendingSync.addPendingSolve(group.sessionId, solve.id)));
+            window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: error?.code || 'import-upload-failed' } }));
+            return false;
+        }
     },
 
     startCustomPhrasesLiveSync() {

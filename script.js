@@ -2551,7 +2551,10 @@
             }
 
             loadSessions() {
-                const saved = AppStorage.getJSON('cubeTimerSessions');
+                const primary = AppStorage.getJSON('cubeTimerSessions');
+                const safety = AppStorage.getJSON('cubeTimerSessionsSafetyBackup');
+                const countSolves = sessions => Object.values(sessions || {}).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0);
+                const saved = countSolves(safety) > countSolves(primary) ? safety : primary;
                 if (saved) {
                     const sessions = saved;
                     // ── Migration: add discipline to old sessions ──
@@ -2607,6 +2610,7 @@
                     if (needsSave) {
                         AppStorage.setJSON('cubeTimerSessions', sessions);
                     }
+                    if (saved === safety) AppStorage.setJSON('cubeTimerSessions', sessions);
                     return sessions;
                 }
                 // Default: No Session
@@ -7015,12 +7019,24 @@
                 const sessionBreakdown = [];
                 const warnings = [];
                 let importedSolves = 0, skipped = 0;
+                const existingSolveIds = new Set();
+                Object.values(this.sessions || {}).forEach(session => (session?.solves || []).forEach(solve => {
+                    if (solve?.id) existingSolveIds.add(solve.id);
+                }));
 
                 for (const ps of parsedSessions) {
                     if (!ps.solves || ps.solves.length === 0) continue;
 
-                    ps.solves.sort((a, b) => b.timestamp - a.timestamp);
-                    importedSolves += ps.solves.length;
+                    const uniqueSolves = ps.solves.filter(solve => {
+                        if (!solve?.id) return true;
+                        if (existingSolveIds.has(solve.id)) { skipped++; return false; }
+                        existingSolveIds.add(solve.id);
+                        return true;
+                    });
+                    if (!uniqueSolves.length) continue;
+
+                    uniqueSolves.sort((a, b) => b.timestamp - a.timestamp);
+                    importedSolves += uniqueSolves.length;
                     skipped += ps.skipped || 0;
 
                     const fullName = `${timerLabel}: ${ps.name}`;
@@ -7028,13 +7044,13 @@
                     this.sessions[id] = {
                         id,
                         name: fullName,
-                        solves: ps.solves,
+                        solves: uniqueSolves,
                         isDefault: false,
                         discipline: ps.discipline || '3x3',
                         createdAt: Date.now()
                     };
                     newSessionIds.push(id);
-                    sessionBreakdown.push({ name: fullName, count: ps.solves.length });
+                    sessionBreakdown.push({ name: fullName, count: uniqueSolves.length });
 
                     if (ps.unmapped) {
                         const t = this._ieT();
@@ -7054,6 +7070,7 @@
                 this.saveSessions();
                 this.updateUI();
                 this.updateSessionDropdown();
+                window.AppSync?.pushImportedSessions?.(newSessionIds.map(id => ({ sessionId: id, solves: this.sessions[id].solves })));
 
                 this._showImportResult({ timerLabel, imported: importedSolves, skipped, sessions: sessionBreakdown, warnings });
             }

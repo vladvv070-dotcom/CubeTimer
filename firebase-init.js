@@ -266,6 +266,21 @@ window.CubeSync = {
     await setDoc(doc(db, "users", user.uid, "solves", solve.id), { ...cleanSolve, sessionId, cloudUpdatedAt: serverTimestamp() });
   },
 
+  // Recovery/import path: Firestore batches are limited to 500 writes.
+  saveSolvesBatch: async (sessionId, solves) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Пользователь не авторизован");
+    for (let offset = 0; offset < solves.length; offset += 450) {
+      const batch = writeBatch(db);
+      for (const solve of solves.slice(offset, offset + 450)) {
+        if (!solve?.id) continue;
+        const { cloudUpdatedAt, ...cleanSolve } = solve;
+        batch.set(doc(db, "users", user.uid, "solves", solve.id), { ...cleanSolve, sessionId, cloudUpdatedAt: serverTimestamp() });
+      }
+      await batch.commit();
+    }
+  },
+
   // Ровно 1 write: точечное изменение полей существующего solve
   // (DNF/+2/ручное редактирование времени). Не трогает остальные
   // документы и не перезаписывает solve целиком.
