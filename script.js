@@ -713,6 +713,7 @@
                         btn.classList.remove('active');
                     }
                 });
+                window.dispatchEvent(new CustomEvent('languagechange', { detail: { language: lang } }));
             }
 
             loadSettings() {

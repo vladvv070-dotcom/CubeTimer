@@ -137,6 +137,13 @@ window.CubeAuth = {
 
   getCurrentUser: () => auth.currentUser,
 
+  // Short-lived Firebase ID token for authenticated custom backends
+  // (for example the Cloudflare Worker used by the leaderboard).
+  getIdToken: (forceRefresh = false) => {
+    if (!auth.currentUser) throw new Error("Пользователь не авторизован");
+    return auth.currentUser.getIdToken(forceRefresh);
+  },
+
   onAuthChange: (callback) => onAuthStateChanged(auth, callback),
 
   // Сменить ник у уже вошедшего пользователя. Резервирует новый ник,

@@ -12,13 +12,17 @@
     <meta property="og:site_name" content="Next Cube Pro">
     <meta property="og:title" content="Next Cube Pro — онлайн-таймер для спидкубинга с ботом-комментатором">
     <meta property="og:description" content="Бесплатный таймер для кубика Рубика 3x3, 2x2, 4x4, 5x5 и других головоломок: скрамблы WCA, тренажёр OLL/PLL, статистика Ao5/Ao12/Ao100, боты-комментаторы.">
-    <meta property="og:url" content="https://vladvv070-dotcom.github.io/NextCubePro/">
-    <meta property="og:image" content="https://vladvv070-dotcom.github.io/NextCubePro/images/avatar.png">
+    <meta property="og:url" content="https://nextcubepro.com/">
+    <meta property="og:image" content="https://nextcubepro.com/images/android-chrome-512x512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
     <meta property="og:locale" content="ru_RU">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Next Cube Pro — онлайн-таймер для спидкубинга">
     <meta name="twitter:description" content="Бесплатный таймер для кубика Рубика: скрамблы WCA, тренажёр OLL/PLL, статистика Ao5/Ao12/Ao100, боты-комментаторы.">
-    <meta name="twitter:image" content="https://vladvv070-dotcom.github.io/NextCubePro/images/avatar.png">
+    <meta property="twitter:url" content="https://nextcubepro.com/">
+    <meta name="twitter:image" content="https://nextcubepro.com/images/android-chrome-512x512.png">
+    <link rel="canonical" href="https://nextcubepro.com/">
     
     <title>Next Cube Pro — Онлайн таймер для спидкубинга с ботом-комментатором</title>
     
@@ -41,14 +45,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700;900&family=Cinzel:wght@900&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=2.9.2">
+    <link rel="stylesheet" href="styles.css?v=2.10.1">
+    <link rel="stylesheet" href="leaderboard.css?v=2.10.1">
 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Next Cube Pro",
-      "url": "https://vladvv070-dotcom.github.io/NextCubePro/",
+      "url": "https://nextcubepro.com/",
       "applicationCategory": "BrowserApplication",
       "operatingSystem": "All",
       "description": "Бесплатный онлайн-таймер для спидкубинга: кубик Рубика 3x3, 2x2, 4x4, 5x5, пираминкс, скьюб и другие головоломки WCA. Генератор официальных скрамблов, тренажёр алгоритмов OLL/PLL, статистика Ao5/Ao12/Ao100 и уникальная система комментирования сборок ботами.",
@@ -114,30 +119,33 @@
                     <div class="fire-menu" id="fireMenu">
                         <button class="fire-menu-btn more-btn" id="fireMenuBtn" aria-haspopup="true" aria-expanded="false">More</button>
                         <div class="fire-menu-dropdown" id="fireMenuDropdown">
-                        <button class="fire-menu-item target-time-btn" id="targetTimeBtn">
-                            <span>🎯</span><span id="targetTimeBtnLabel">Target Time</span>
-                        </button>
-                        <button class="fire-menu-item honest-mode-btn" id="honestModeBtn">
-                            <span>🟢</span><span id="honestModeBtnLabel">Honest Mode</span>
-                        </button>
-                        <button class="fire-menu-item" id="fireMenuDailyChallenge">
-                            <span>📅</span><span id="dailyChallengeMenuLabel" data-i18n="fireMenuDailyChallenge">Daily Scramble</span>
-                        </button>
-                        <button class="fire-menu-item" id="fireMenuAchievements">
-                            <span>🏆</span><span id="achievementsMenuLabel">Achievements</span>
-                        </button>
-                        <button class="fire-menu-item" id="fireMenuShop">
-                            <span>🛒</span><span id="shopMenuLabel">Shop</span>
-                        </button>
-                        <div class="fire-menu-divider"></div>
-                        <button class="fire-menu-item" id="fireMenuAlgsTrainer">
-                            <span>&#129513;</span><span data-i18n="fireMenuAlgsTrainer">Algs Trainer</span>
-                        </button>
-                        <button class="fire-menu-item fire-menu-item-disabled" disabled>
-                            <span>&#128101;</span><span data-i18n="fireMenuMultiplayer">Multiplayer</span>
-                            <span class="fire-menu-soon" data-i18n="fireMenuSoon">Soon</span>
-                        </button>
-                    </div>
+                            <button class="fire-menu-item target-time-btn" id="targetTimeBtn">
+                                <span>🎯</span><span id="targetTimeBtnLabel">Target Time</span>
+                            </button>
+                            <button class="fire-menu-item honest-mode-btn" id="honestModeBtn">
+                                <span>🟢</span><span id="honestModeBtnLabel">Honest Mode</span>
+                            </button>
+                            <button class="fire-menu-item" id="fireMenuDailyChallenge">
+                                <span>📅</span><span id="dailyChallengeMenuLabel" data-i18n="fireMenuDailyChallenge">Daily Scramble</span>
+                            </button>
+                            <button class="fire-menu-item" id="fireMenuAchievements">
+                                <span>🏆</span><span id="achievementsMenuLabel">Achievements</span>
+                            </button>
+                            <button class="fire-menu-item" id="fireMenuShop">
+                                <span>🛒</span><span id="shopMenuLabel">Shop</span>
+                            </button>
+                            <button class="fire-menu-item" id="fireMenuLeaderboard">
+                                <span>🏆</span><span id="leaderboardMenuLabel">Leaderboard</span>
+                            </button>
+                            <div class="fire-menu-divider"></div>
+                            <button class="fire-menu-item" id="fireMenuAlgsTrainer">
+                                <span>&#129513;</span><span data-i18n="fireMenuAlgsTrainer">Algs Trainer</span>
+                            </button>
+                            <button class="fire-menu-item fire-menu-item-disabled" disabled>
+                                <span>&#128101;</span><span data-i18n="fireMenuMultiplayer">Multiplayer</span>
+                                <span class="fire-menu-soon" data-i18n="fireMenuSoon">Soon</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -925,6 +933,34 @@
         </div>
     </div>
 
+    <!-- Global leaderboard -->
+    <div class="new-session-overlay" id="leaderboardOverlay">
+        <section class="leaderboard-modal" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+            <header class="leaderboard-header">
+                <div>
+                    <span class="leaderboard-eyebrow">NEXT CUBE PRO</span>
+                    <h2 id="leaderboardTitle">Leaderboard</h2>
+                </div>
+                <button class="leaderboard-close" id="leaderboardClose" type="button" aria-label="Close">×</button>
+            </header>
+            <div class="leaderboard-filters">
+                <label><span id="leaderboardGroupLabel">Rating</span><select id="leaderboardGroup"></select></label>
+                <label id="leaderboardPuzzleField"><span id="leaderboardPuzzleLabel">Puzzle</span><select id="leaderboardPuzzle"></select></label>
+                <label id="leaderboardAverageField"><span id="leaderboardAverageLabel">Average</span><select id="leaderboardAverage"></select></label>
+                <label id="leaderboardDateField"><span id="leaderboardDateLabel">Date</span><select id="leaderboardDate"></select></label>
+            </div>
+            <div class="leaderboard-context" id="leaderboardContext"></div>
+            <div class="leaderboard-table-head"><span>#</span><span id="leaderboardPlayerLabel">Player</span><span id="leaderboardResultLabel">Result</span></div>
+            <div class="leaderboard-list" id="leaderboardList"></div>
+            <div class="leaderboard-status hidden" id="leaderboardStatus"></div>
+            <footer class="leaderboard-footer">
+                <button id="leaderboardPrev" type="button">←</button>
+                <span id="leaderboardPage">1</span>
+                <button id="leaderboardNext" type="button">→</button>
+            </footer>
+        </section>
+    </div>
+
     <!-- Statistics Modal -->
     <div class="statistics-overlay" id="statisticsOverlay">
         <div class="statistics-modal">
@@ -1473,7 +1509,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.9.2</div>
+    <div class="version-display">2.10.1</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1592,21 +1628,22 @@
     </div>
 
     <script type="module">
-        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.9.2');
+        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.10.1');
     </script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
-    <script defer src="sync.js?v=2.9.2"></script>
+    <script defer src="sync.js?v=2.10.1"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js?v=2.9.2"></script>
-    <script defer src="progression-data.js?v=2.9.2"></script>
-    <script defer src="titles-data.js?v=2.9.2"></script>
-    <script defer src="progression-system.js?v=2.9.2"></script>
+    <script defer src="translations.js?v=2.10.1"></script>
+    <script defer src="progression-data.js?v=2.10.1"></script>
+    <script defer src="titles-data.js?v=2.10.1"></script>
+    <script defer src="progression-system.js?v=2.10.1"></script>
+    <script defer src="leaderboard.js?v=2.10.1"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js?v=2.9.2"></script>
+    <script defer src="script.js?v=2.10.1"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">
