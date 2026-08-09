@@ -41,7 +41,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700;900&family=Cinzel:wght@900&family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;600;700&family=Orbitron:wght@400;600;700;900&family=Bebas+Neue&family=Playfair+Display:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link rel="stylesheet" href="styles.css?v=2.8.4">
+    <link rel="stylesheet" href="styles.css?v=2.9.0">
 
     <script type="application/ld+json">
     {
@@ -1409,7 +1409,8 @@
                 и ненадёжны — вы можете периодически терять их при очистке кэша браузера.
             </p>
             <div class="new-session-actions">
-                <button class="new-session-btn cancel" id="authWarningCloseBtn" style="width:100%;">Закрыть</button>
+                <button class="new-session-btn cancel" id="authWarningCloseBtn">Закрыть</button>
+                <button class="new-session-btn primary" id="authWarningLoginBtn">Войти</button>
             </div>
         </div>
     </div>
@@ -1472,7 +1473,7 @@
     </div>
 
     <!-- Version Display -->
-    <div class="version-display">2.8.4</div>
+    <div class="version-display">2.9.0</div>
 
     <!-- Solve History Context Menu -->
     <div class="sh-context-menu" id="shContextMenu">
@@ -1591,21 +1592,21 @@
     </div>
 
     <script type="module">
-        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.8.4');
+        if (location.protocol !== 'file:') import('./firebase-init.js?v=2.9.0');
     </script>
     <script defer src="cube-engine.js"></script>
     <script defer src="storage.js"></script>
-    <script defer src="sync.js?v=2.8.4"></script>
+    <script defer src="sync.js?v=2.9.0"></script>
     <script defer src="dom-cache.js"></script>
     <script defer src="commentary-data.js"></script>
-    <script defer src="translations.js?v=2.8.4"></script>
-    <script defer src="progression-data.js?v=2.8.4"></script>
-    <script defer src="titles-data.js?v=2.8.4"></script>
-    <script defer src="progression-system.js?v=2.8.4"></script>
+    <script defer src="translations.js?v=2.9.0"></script>
+    <script defer src="progression-data.js?v=2.9.0"></script>
+    <script defer src="titles-data.js?v=2.9.0"></script>
+    <script defer src="progression-system.js?v=2.9.0"></script>
     <script defer src="algs-database.js"></script>
     <script defer src="lang-utils.js"></script>
     <script defer src="algs-i18n.js"></script>
-    <script defer src="script.js?v=2.8.4"></script>
+    <script defer src="script.js?v=2.9.0"></script>
 <!-- Algs Trainer Modal -->
 <div class="algs-overlay" id="algsOverlay">
     <div class="algs-modal">

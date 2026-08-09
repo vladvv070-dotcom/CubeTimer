@@ -3171,6 +3171,13 @@
                         DOM('authWarningOverlay').classList.remove('visible');
                     });
                 }
+                const authWarningLoginBtn = document.getElementById('authWarningLoginBtn');
+                if (authWarningLoginBtn) {
+                    authWarningLoginBtn.addEventListener('click', () => {
+                        DOM('authWarningOverlay')?.classList.remove('visible');
+                        DOM('authOverlay')?.classList.add('visible');
+                    });
+                }
                 // Not-logged-in nudge disabled: it was confusing for first-time
                 // visitors (shows a red warning before they understand the app).
 
@@ -3384,7 +3391,6 @@
                     this.timerContainer.classList.remove('ready');
                     this.timerContainer.classList.add('holding');
                 }
-
                 // Set timeout for ready state
                 this.holdTimeout = setTimeout(() => {
                     this.isReady = true;

@@ -8,7 +8,8 @@
         amateur: { order: 4, name: { ru: 'Любитель', en: 'Amateur' } },
         pro: { order: 5, name: { ru: 'Профессионал', en: 'Professional' } },
         world: { order: 6, name: { ru: 'Мировой класс', en: 'World Class' } },
-        legend: { order: 7, name: { ru: 'Легенды куба', en: 'Cube Legends' } }
+        legend: { order: 7, name: { ru: 'Легенды куба', en: 'Cube Legends' } },
+        absolute: { order: 8, name: { ru: 'Абсолют', en: 'Absolute' } }
     };
     const titles = [
         title('beginner_rookie','beginner',100,'Новичок','Rookie'),
@@ -68,7 +69,8 @@
         title('legend_lord','legend',10000,'Повелитель кубов','Lord of the Cubes'),
         title('legend_commander','legend',10000,'Кубический полководец','Cube Commander'),
         title('legend_president','legend',10000,'Президент спидкубинга','President of Speedcubing'),
-        title('legend_dominator','legend',10000,'Абсолютный доминатор','Absolute Dominator')
+        title('legend_dominator','legend',10000,'Абсолютный доминатор','Absolute Dominator'),
+        title('absolute','absolute',1000000,'Абсолют','Absolute')
     ];
     window.TITLE_CATALOG = { tiers, titles };
 })();

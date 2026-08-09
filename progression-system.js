@@ -83,8 +83,21 @@
         getEquippedTitle() { return this.getTitle(); }
         _titleMarkup(title, className = '') {
             if (!title) return '';
+            if(title.tier==='absolute'){
+                const glyphs=this._absoluteGlyphs();
+                const chars=Array.from({length:9},()=>glyphs[Math.floor(Math.random()*glyphs.length)]);
+                return `<span class="title-absolute-wrapper ${className}"><span class="title-absolute-container title-visual title-absolute">${chars.map(char=>`<span class="title-absolute-char">${char}</span>`).join('')}</span></span>`;
+            }
             const label=this._text(title.name),lengthClass=label.length>26?'title-extra-long':label.length>20?'title-long':'';
             return `<span class="title-visual title-${title.tier} ${lengthClass} ${className}">${label}</span>`;
+        }
+        _absoluteGlyphs(){return Array.from('ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛈᛇᛉᛊᛏᛒᛖᛗᛘᛚᛜᛞᛟΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ∀∁∂∃∄∅∆∇∈∉∊∋∌∍∎∏∐∑−∓∔∕∖∗∘∙√∛∜∝∞⟁⟂⟃⟄⟅⟆⟇⟈⟉⟦⟧⟨⟩☤☥☧☨☩☫☬☯☰☱☲☳☴☵☶☷☸₿Ξ₳₲₵₭₮₯₰₱₴₸₹₺₼₽₾0123456789←↑→↓↔↕↖↗↘↙↚↛↜↝↞↟↠↡↢↣↤↥↦↧↨↩↪↫↬↭↮↯XYZNQRkmxzЖФШЩЪЫЭЮЯ');}
+        _startAbsoluteEffects(){
+            if(this._absoluteEffectsStarted)return;this._absoluteEffectsStarted=true;
+            const mutate=()=>{const glyphs=this._absoluteGlyphs();document.querySelectorAll('.title-absolute-char').forEach(char=>{if(Math.random()>.38){char.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];if(Math.random()>.6){char.classList.add('char-pop');setTimeout(()=>char.classList.remove('char-pop'),70);}}});};
+            this._absoluteMutationTimer=setInterval(mutate,100);
+            const overload=()=>{this._absoluteOverloadTimer=setTimeout(()=>{const titles=[...document.querySelectorAll('.title-absolute-container')];titles.forEach(title=>{title.classList.add('overload');const host=title.closest('.shop-title-row,.auth-profile-btn,.auth-warning-modal,.shop-confirm-modal');host?.classList.add('absolute-host-shake');title.querySelectorAll('.title-absolute-char').forEach(char=>{char.textContent=this._absoluteGlyphs()[Math.floor(Math.random()*this._absoluteGlyphs().length)];char.style.transform=`scale(${Math.random()*1.5+.5}) translate(${Math.random()*30-15}px,${Math.random()*30-15}px)`;});});setTimeout(()=>{titles.forEach(title=>{title.classList.remove('overload');title.closest('.shop-title-row,.auth-profile-btn,.auth-warning-modal,.shop-confirm-modal')?.classList.remove('absolute-host-shake');title.querySelectorAll('.title-absolute-char').forEach(char=>char.style.transform='');});overload();},350);},Math.floor(Math.random()*8001));};
+            overload();
         }
         fitTitleElements(scope = document) {
             const run=()=>{
@@ -189,7 +202,7 @@
             window.addEventListener('progressionevent',e=>this.recordEvent(e.detail?.type));
             window.addEventListener('resize',()=>{clearTimeout(this._titleResizeTimer);this._titleResizeTimer=setTimeout(()=>this.fitTitleElements(),80);});
             document.fonts?.ready?.then(()=>this.fitTitleElements());
-            this._bindUI(); this.render(); this._scheduleMidnightReset();
+            this._bindUI(); this.render(); this._startAbsoluteEffects(); this._scheduleMidnightReset();
         }
         _scheduleMidnightReset() {
             clearTimeout(this._midnightTimer);
@@ -333,8 +346,16 @@
         }
         cancelPurchaseConfirmation(){this.pendingPurchaseType=null;this.pendingTitlePurchase=null;DOM('shopConfirmOverlay')?.classList.remove('visible');}
         confirmPurchase(){const type=this.pendingPurchaseType,titleId=this.pendingTitlePurchase;this.cancelPurchaseConfirmation();if(type)this.purchaseItem(type);else if(titleId)this.purchaseTitle(titleId);}
-        open(tab='achievements') { this.ensureDaily();this.activeTab=tab;DOM('progressionOverlay')?.classList.add('visible');this.render(); }
-        openShop(){this.ensureDaily();DOM('shopOverlay')?.classList.add('visible');this.renderShop();}
+        _requireAuth(feature){
+            if(window.CubeAuth?.getCurrentUser?.()?.uid||AppStorage.getJSON('authUser')?.uid)return true;
+            const ru=this._lang()==='ru',isShop=feature==='shop';
+            DOM('authWarningTitle').textContent=ru?'Требуется вход':'Sign in required';
+            DOM('authWarningText').textContent=ru?`${isShop?'Магазин':'Достижения и задачи дня'} доступны только после входа в аккаунт. Войдите, чтобы продолжить и синхронизировать прогресс между устройствами.`:`${isShop?'The shop':'Achievements and daily tasks'} are available only when signed in. Sign in to continue and sync your progress across devices.`;
+            DOM('authWarningCloseBtn').textContent=ru?'Закрыть':'Close';DOM('authWarningLoginBtn').textContent=ru?'Войти':'Log in';
+            DOM('authWarningOverlay')?.classList.add('visible');return false;
+        }
+        open(tab='achievements') { if(!this._requireAuth('progression'))return;this.ensureDaily();this.activeTab=tab;DOM('progressionOverlay')?.classList.add('visible');this.render(); }
+        openShop(){if(!this._requireAuth('shop'))return;this.ensureDaily();DOM('shopOverlay')?.classList.add('visible');this.renderShop();}
         renderShop(){
             const root=DOM('shopOverlay');if(!root)return;const ru=this._lang()==='ru',inv=this.inventory;
             const text=ru?{title:'Магазин',skins:'Скины',effects:'Эффекты',items:'Предметы',titles:'Титулы',soon:'Скоро',owned:'В инвентаре',buy:'Купить',use:'Активировать',active:'Удвоитель активен до',freeze:['Заморозка ударного режима','Автоматически спасает стрик, если пропущен один день. Замороженный день становится синим и не засчитывается в идеальную неделю.'],insurance:['Страховка от DNF','Одноразово позволяет исправить DNF или +2. Сгорает сразу после исправления штрафа.'],booster:['Удвоитель монет','После активации удваивает награды за достижения и задания дня в течение 24 часов.']}:{title:'Shop',skins:'Skins',effects:'Effects',items:'Items',titles:'Titles',soon:'Soon',owned:'In inventory',buy:'Buy',use:'Activate',active:'Coin doubler active until',freeze:['Streak Freeze','Automatically saves your streak after one missed day. The frozen day is blue and prevents a perfect week.'],insurance:['DNF Insurance','Lets you correct one DNF or +2. Consumed immediately when the penalty is corrected.'],booster:['Coin Doubler','After activation, doubles achievement and daily-task rewards for 24 hours.']};
