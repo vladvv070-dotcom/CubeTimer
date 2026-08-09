@@ -6863,7 +6863,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `cube-timer-all-sessions-${Date.now()}.json`;
+                a.download = `next-cube-pro-all-sessions-${Date.now()}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
             }
@@ -7142,7 +7142,7 @@
                 overlay.classList.add('visible');
             }
 
-            // ─── FireCube Timer (JSON) — our own native format ──────────────
+            // Native Next Cube Pro JSON (the legacy internal key remains "firecube" for compatibility).
             _parseFireCubeJson(text) {
                 const data = JSON.parse(text);
                 const parsedSessions = [];
@@ -7747,7 +7747,7 @@
                     }
                 }
 
-                this._downloadFile(`firecube_twistytimer_${Date.now()}.txt`, out, 'text/plain');
+                this._downloadFile(`nextcubepro_twistytimer_${Date.now()}.txt`, out, 'text/plain');
             }
 
             // ─── Import/Export menu wiring ──────────────
@@ -7755,7 +7755,7 @@
                 const t = this._ieT();
 
                 const parsersAndLabels = {
-                    firecube: { label: 'FireCube Timer', parse: (txt, name) => this._parseFireCubeJson(txt) },
+                    firecube: { label: 'Next Cube Pro', parse: (txt, name) => this._parseFireCubeJson(txt) },
                     cstimer: { label: 'csTimer', parse: (txt, name) => this._parseCstimerTxt(txt) },
                     lastcubex: { label: 'Last Cube X', parse: (txt, name) => this._parseLastCubeXCsv(txt) },
                     cubedesk: { label: 'CubeDesk', parse: (txt, name) => this._parseCubeDeskTxt(txt) },
