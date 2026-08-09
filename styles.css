@@ -8239,6 +8239,7 @@ html {
     gap: 1rem;
 }
 .auth-profile-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;text-align:left}.auth-profile-icon{flex:0 0 auto}.auth-profile-copy{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:.05rem}.auth-profile-copy>strong{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:750 .78rem Manrope,sans-serif}.auth-profile-copy>small{display:block;width:180px;max-width:100%;line-height:1}.auth-profile-copy>small.hidden{display:none}.auth-profile-copy .title-visual{display:block;max-width:100%;font-size:.56rem;letter-spacing:.02em;-webkit-text-stroke-width:.35px}
+.bottom-left-buttons{align-items:center}.bottom-left-buttons .export-btn{height:52px;min-height:52px;max-height:52px}.auth-profile-copy .title-absolute-wrapper{width:100%;padding:0}.auth-profile-copy .title-absolute-container{font-size:.56rem;letter-spacing:0}
 .auth-account-identity{text-align:center;margin-bottom:.35rem}.auth-account-identity .new-session-title{font-size:1.1rem}.auth-account-title-preview{display:flex;justify-content:center;min-height:46px;margin:.45rem 0 .2rem;overflow:visible}.auth-account-title-preview.hidden{display:none}.auth-account-title-preview .title-visual{font-size:clamp(1.35rem,4vw,2rem)}
 
 .auth-modal {
