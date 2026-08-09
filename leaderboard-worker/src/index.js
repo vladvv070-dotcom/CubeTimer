@@ -62,7 +62,7 @@ async function getLeaderboard(url,env,cors){
 async function getDates(env,cors){const dates=await redis(env,['ZRANGE',DATES_KEY,0,364,'REV']);return json({dates:dates||[]},200,cors);}
 
 function validatePayload(body){if(!body||typeof body!=='object'||!body.global||!body.puzzles)throw new Error('Invalid payload');}
-function finiteScore(value,key){const n=Number(value);if(!Number.isFinite(n)||n<0)throw new Error(`Invalid ${key}`);const max=key==='coins'?1e12:key==='trainingTime'?1e15:1e9;if(n>max)throw new Error(`Invalid ${key}`);return n;}
+function finiteScore(value){const n=Number(value);return Number.isFinite(n)&&n>=0&&n<=Number.MAX_SAFE_INTEGER?n:0;}
 function validTime(value){const n=Number(value);return Number.isFinite(n)&&n>=0&&n<=86400;}
 function addOptional(commands,key,value,uid){if(validTime(value))commands.push(['ZADD',key,Number(value),uid]);else commands.push(['ZREM',key,uid]);}
 function validDate(value){return /^20\d{2}-(0[1-9]|1[0-2])-([012]\d|3[01])$/.test(String(value));}
