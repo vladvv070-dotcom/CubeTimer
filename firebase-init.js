@@ -268,7 +268,7 @@ window.CubeSync = {
   // Ровно 1 write: новый solve целиком (создание).
   saveSolve: async (sessionId, solve) => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) throw Object.assign(new Error("Пользователь не авторизован"), { code: "auth-required" });
     const { cloudUpdatedAt, ...cleanSolve } = solve;
     await setDoc(doc(db, "users", user.uid, "solves", solve.id), { ...cleanSolve, sessionId, cloudUpdatedAt: serverTimestamp() });
   },
@@ -302,7 +302,7 @@ window.CubeSync = {
   // документы и не перезаписывает solve целиком.
   updateSolve: async (solveId, patch) => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) throw Object.assign(new Error("Пользователь не авторизован"), { code: "auth-required" });
     await updateDoc(doc(db, "users", user.uid, "solves", solveId), { ...patch, cloudUpdatedAt: serverTimestamp() });
   },
 
@@ -311,7 +311,7 @@ window.CubeSync = {
   // и не "воскресили" solve при слиянии.
   deleteSolveRemote: async (solveId) => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) throw Object.assign(new Error("Пользователь не авторизован"), { code: "auth-required" });
     const batch = writeBatch(db);
     batch.delete(doc(db, "users", user.uid, "solves", solveId));
     batch.set(doc(db, "users", user.uid, "tombstones", solveId), { deletedAt: Date.now(), cloudDeletedAt: serverTimestamp() });

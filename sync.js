@@ -101,9 +101,10 @@ const SyncTombstones = {
 // (offline, transient network error, etc.). Now that runSync() no longer
 // re-reads the full remote history on every page load (see loadSolvesSince
 // below), it can't rely on "diff local against full remote list" to catch
-// solves that silently failed to upload. Instead, every push failure gets
-// queued here and retried once at the very start of the next runSync(),
-// regardless of whether that sync ends up being a full or delta pull.
+// solves that silently failed to upload. Every local mutation is therefore
+// queued BEFORE its network request begins and removed only after Firestore
+// confirms the write. This also survives closing the tab while a request is
+// still in flight: localStorage already contains the retry marker.
 const PendingSync = {
     getPendingSolves() {
         return AppStorage.getJSON('pendingSolveIds', []); // [{ sessionId, id }]
@@ -253,7 +254,12 @@ const CloudSync = {
     async pullSolvesDelta(sinceTimestamp) {
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) return { solves: [], tombstones: [] };
         try {
-            return await window.CubeSync.loadSolvesSince(sinceTimestamp);
+            // Firestore server timestamps have millisecond precision. A small
+            // overlap prevents two writes with the same timestamp from falling
+            // exactly on the exclusive `>` cursor boundary. mergeSolves is
+            // idempotent, so re-reading a few recent documents is harmless.
+            const overlapCursor = Math.max(0, Number(sinceTimestamp || 0) - 5000);
+            return await window.CubeSync.loadSolvesSince(overlapCursor);
         } catch (e) {
             console.error('CloudSync.pullSolvesDelta failed:', e);
             throw e;
@@ -266,8 +272,11 @@ const CloudSync = {
     // need to scan the full remote history to notice something never
     // made it up (e.g. the write happened while offline).
     async pushNewSolve(sessionId, solve) {
+        // Persist the outbox entry synchronously before starting any async
+        // work. A browser may terminate an in-flight fetch without ever
+        // running catch/finally, especially on mobile.
+        PendingSync.addPendingSolve(sessionId, solve.id);
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
-            PendingSync.addPendingSolve(sessionId, solve.id);
             return false;
         }
         try {
@@ -276,15 +285,14 @@ const CloudSync = {
             return true;
         } catch (e) {
             console.error('CloudSync.pushNewSolve failed:', e);
-            PendingSync.addPendingSolve(sessionId, solve.id);
             window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-write-failed' } }));
             return false;
         }
     },
     async pushSolveUpdate(solveId, patch) {
+        const sessionId = findSessionIdForSolve(solveId);
+        if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
-            const sessionId = findSessionIdForSolve(solveId);
-            if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
             return false;
         }
         try {
@@ -293,16 +301,14 @@ const CloudSync = {
             return true;
         } catch (e) {
             console.error('CloudSync.pushSolveUpdate failed:', e);
-            const sessionId = findSessionIdForSolve(solveId);
-            if (sessionId) PendingSync.addPendingSolve(sessionId, solveId);
             window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-update-failed' } }));
             return false;
         }
     },
     async pushSolveDelete(solveId) {
+        PendingSync.addPendingDelete(solveId);
+        PendingSync.removePendingSolve(solveId);
         if (!window.CubeAuth || !window.CubeAuth.getCurrentUser()) {
-            PendingSync.addPendingDelete(solveId);
-            PendingSync.removePendingSolve(solveId);
             return false;
         }
         try {
@@ -312,7 +318,6 @@ const CloudSync = {
             return true;
         } catch (e) {
             console.error('CloudSync.pushSolveDelete failed:', e);
-            PendingSync.addPendingDelete(solveId);
             window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: e?.code || 'solve-delete-failed' } }));
             return false;
         }
@@ -346,8 +351,15 @@ let _customPhrasesUnsubscribe = null;
 
 const AppSync = {
     _requestedSync: null,
+    _syncRequestedWhileRunning: false,
     requestSync() {
-        if (this._requestedSync) return this._requestedSync;
+        if (this._requestedSync) {
+            // A solve may be created while a pull/merge is already running.
+            // Do not lose that request behind the deduplication guard.
+            this._syncRequestedWhileRunning = true;
+            return this._requestedSync;
+        }
+        this._syncRequestedWhileRunning = false;
         window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'syncing' } }));
         this._requestedSync = Promise.resolve()
             .then(() => this.runSync())
@@ -356,7 +368,13 @@ const AppSync = {
                 console.error('Automatic sync failed:', error);
                 window.dispatchEvent(new CustomEvent('sync-status', { detail: { state: 'error', code: error?.code || 'unknown' } }));
             })
-            .finally(() => { this._requestedSync = null; });
+            .finally(() => {
+                this._requestedSync = null;
+                if (this._syncRequestedWhileRunning) {
+                    this._syncRequestedWhileRunning = false;
+                    queueMicrotask(() => this.requestSync());
+                }
+            });
         return this._requestedSync;
     },
     // Call this right after a successful login, and once on page load if
@@ -392,7 +410,10 @@ const AppSync = {
 
         // v3 uses Firestore server timestamps. Client clocks can differ by
         // hours without making synchronization one-directional.
-        const syncProtocolVersion = '5';
+        // v6 forces one full union/backfill on every device. Besides installing
+        // the durable outbox above, this recovers solves that are still present
+        // locally but were stranded before the outbox fix reached the device.
+        const syncProtocolVersion = '6';
         if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
