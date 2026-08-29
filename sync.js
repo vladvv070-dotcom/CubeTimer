@@ -397,6 +397,23 @@ const AppSync = {
         const safetyBackup = JSON.parse(JSON.stringify(timer.sessions || {}));
         const safetySolveCount = Object.values(safetyBackup).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0);
         const previousBackupInfo = AppStorage.getJSON('cubeTimerSessionsSafetyBackupInfo', {}) || {};
+
+        // If a previous run left a larger snapshot than the currently loaded
+        // local cache, recover it before doing any cloud merge. This protects
+        // against a browser/app cache being reset or a failed update leaving
+        // an incomplete session map. Only use a snapshot belonging to this
+        // account; never leak another account's local history.
+        const localSolveCount = safetySolveCount;
+        const savedSafety = AppStorage.getJSON('cubeTimerSessionsSafetyBackup', null);
+        const savedSafetyInfo = AppStorage.getJSON('cubeTimerSessionsSafetyBackupInfo', {}) || {};
+        const savedSafetyCount = Object.values(savedSafety || {}).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0);
+        const safetyBelongsToUser = !savedSafetyInfo.uid || savedSafetyInfo.uid === user.uid;
+        if (savedSafety && safetyBelongsToUser && savedSafetyCount > localSolveCount) {
+            timer.sessions = JSON.parse(JSON.stringify(savedSafety));
+            if (!timer.sessions[timer.currentSessionId]) {
+                timer.currentSessionId = Object.keys(timer.sessions)[0] || 'no-session';
+            }
+        }
         if (safetySolveCount >= Number(previousBackupInfo.solveCount || 0)) {
             if (!AppStorage.setJSON('cubeTimerSessionsSafetyBackup', safetyBackup)) {
                 throw Object.assign(new Error('Could not create local safety backup'), { code: 'backup-failed' });
@@ -413,7 +430,7 @@ const AppSync = {
         // v6 forces one full union/backfill on every device. Besides installing
         // the durable outbox above, this recovers solves that are still present
         // locally but were stranded before the outbox fix reached the device.
-        const syncProtocolVersion = '6';
+        const syncProtocolVersion = '7';
         if (AppStorage.getRaw('syncProtocolVersion') !== syncProtocolVersion) {
             AppStorage.setRaw('lastSyncedAt', '');
             AppStorage.setRaw('cloudSyncCursorV3', '');
@@ -463,7 +480,19 @@ const AppSync = {
         await flushPendingSync();
 
         const cloudCursor = Number(AppStorage.getRaw('cloudSyncCursorV3')) || 0;
-        const isFullSync = AppStorage.getRaw('cloudSyncInitializedV3') !== '1';
+        const localCountKey = `syncLocalSolveCount:${user.uid}`;
+        const previousLocalSolveCount = Number(AppStorage.getRaw(localCountKey, ''));
+        // A missing per-account baseline means this device may have a stale
+        // global cursor from an older build. Read the complete cloud history
+        // once so an empty/new browser can never skip existing solves.
+        const missingAccountBaseline = AppStorage.getRaw(localCountKey, null) === null;
+        const localCountDropped = Number.isFinite(previousLocalSolveCount) && previousLocalSolveCount > 0
+            && Object.values(timer.sessions || {}).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0) < previousLocalSolveCount;
+        const isFullSync = AppStorage.getRaw('cloudSyncInitializedV3') !== '1' || missingAccountBaseline || localCountDropped;
+        if (localCountDropped) {
+            AppStorage.setRaw('lastSyncedAt', '');
+            AppStorage.setRaw('cloudSyncCursorV3', '');
+        }
 
         const [remoteMeta, remoteHistory] = await Promise.all([
             CloudSync.pullMeta(),
@@ -605,6 +634,7 @@ const AppSync = {
         AppStorage.setRaw('cloudSyncCursorV3', String(Math.max(cloudCursor, newestSolveCursor, newestDeleteCursor)));
         AppStorage.setRaw('cloudSyncInitializedV3', '1');
         AppStorage.setRaw('syncProtocolVersion', syncProtocolVersion);
+        AppStorage.setRaw(localCountKey, String(Object.values(timer.sessions || {}).reduce((sum, session) => sum + (Array.isArray(session?.solves) ? session.solves.length : 0), 0)));
 
         // Push metadata once if it changed, and (full sync only) backfill
         // any solves that were created locally but never reached Firestore
