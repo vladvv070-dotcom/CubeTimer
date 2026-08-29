@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Next Cube Pro — local",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "http://127.0.0.1:4173/index.html",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Start Next Cube Pro local server"
+        }
+    ]
+}

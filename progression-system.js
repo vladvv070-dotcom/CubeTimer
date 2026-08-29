@@ -15,7 +15,7 @@
         }
 
         _defaultState() {
-            return { version: 1, rewardLedger: {}, inventoryLedger: {}, unlocked: {}, events: {}, frozenDays: {}, activeBoostUntil: 0, ownedTitles: {}, equippedTitle: null, titleUpdatedAt: 0, daily: null, updatedAt: 0 };
+            return { version: 1, rewardLedger: {}, inventoryLedger: {}, unlocked: {}, events: {}, frozenDays: {}, freezeCancelledDays: {}, activeBoostUntil: 0, ownedTitles: {}, equippedTitle: null, titleUpdatedAt: 0, daily: null, updatedAt: 0 };
         }
         _load() { return { ...this._defaultState(), ...(AppStorage.getJSON(STORAGE_KEY, {}) || {}) }; }
         _save(push = true) {
@@ -36,6 +36,7 @@
             merged.unlocked = { ...(remote.unlocked || {}), ...(local.unlocked || {}) };
             merged.events = { ...(remote.events || {}), ...(local.events || {}) };
             merged.frozenDays = { ...(remote.frozenDays || {}), ...(local.frozenDays || {}) };
+            merged.freezeCancelledDays = { ...(remote.freezeCancelledDays || {}), ...(local.freezeCancelledDays || {}) };
             merged.ownedTitles = { ...(remote.ownedTitles || {}), ...(local.ownedTitles || {}) };
             if (Number(remote.titleUpdatedAt || 0) > Number(local.titleUpdatedAt || 0)) {
                 merged.equippedTitle = remote.equippedTitle || null;
@@ -70,7 +71,10 @@
             Object.values(this.state.inventoryLedger || {}).forEach(x => { if (x.type in out) out[x.type] += Number(x.amount || 0); });
             return out;
         }
-        getFrozenDays() { return new Set(Object.keys(this.state.frozenDays || {})); }
+        getFrozenDays() {
+            const cancelled = this.state.freezeCancelledDays || {};
+            return new Set(Object.keys(this.state.frozenDays || {}).filter(day => !cancelled[day]));
+        }
         isBoostActive() { return Number(this.state.activeBoostUntil) > Date.now(); }
         _rewardAmount(amount) { return Number(amount) * (this.isBoostActive() ? 2 : 1); }
         _lang() { return getLang() === 'ru' ? 'ru' : 'en'; }
@@ -150,7 +154,7 @@
         _metrics() {
             const solves=this._allSolves(), byDisc=this._byDiscipline(solves), valid=solves.filter(s=>Number.isFinite(s.effective));
             const dayCounts={}; solves.forEach(s=>dayCounts[this._dateKey(new Date(s.timestamp))]=(dayCounts[this._dateKey(new Date(s.timestamp))]||0)+1);
-            const active=[...new Set([...Object.keys(dayCounts),...Object.keys(this.state.frozenDays||{})])].sort(); let streak=0,bestStreak=0,run=0,prev=null;
+            const active=[...new Set([...Object.keys(dayCounts),...this.getFrozenDays()])].sort(); let streak=0,bestStreak=0,run=0,prev=null;
             active.forEach(k=>{const d=new Date(`${k}T12:00:00`);run=prev&&Math.round((d-prev)/DAY_MS)===1?run+1:1;bestStreak=Math.max(bestStreak,run);prev=d;});
             const streakDays=new Set(active);let cursor=new Date();cursor.setHours(12,0,0,0);if(!streakDays.has(this._dateKey(cursor)))cursor.setDate(cursor.getDate()-1);while(streakDays.has(this._dateKey(cursor))){streak++;cursor.setDate(cursor.getDate()-1);}
             const counts=Object.fromEntries(Object.entries(byDisc).map(([k,v])=>[k,v.length]));
@@ -176,7 +180,6 @@
         _seeded(seed) { let h=2166136261;for(const c of seed){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return()=>((h=Math.imul(h^(h>>>15),1|h))>>>0)/4294967296; }
         ensureDaily() {
             const date=this._dateKey(),uid=this._identity(); if(this.state.daily?.date===date&&this.state.daily?.ownerId===uid)return;
-            this._maybeUseStreakFreeze(date);
             const snapshot=this._snapshot(), eligible=this.catalog.daily.filter(x=>this._eligible(x,snapshot));
             const rnd=this._seeded(`${uid}:${date}`), pool=[...eligible]; for(let i=pool.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
             this.state.daily={date,ownerId:uid,ids:pool.slice(0,3).map(x=>x.id),snapshot,completed:{},rewarded:{},bonusClaimed:false,firstSolveAt:null,openSessionStart:Date.now(),deletedCount:0,updatedAt:Date.now()};
@@ -187,12 +190,31 @@
             const today=this._dateFromKey(todayKey),yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
             const before=new Date(yesterday);before.setDate(before.getDate()-1);
             const yesterdayKey=this._dateKey(yesterday),beforeKey=this._dateKey(before),activity=this._metrics().dayCounts;
-            if(activity[yesterdayKey]||this.state.frozenDays?.[yesterdayKey]||(!activity[beforeKey]&&!this.state.frozenDays?.[beforeKey]))return false;
+            const validFrozenDays=this.getFrozenDays();
+            if(activity[yesterdayKey]||this.state.frozenDays?.[yesterdayKey]||(!activity[beforeKey]&&!validFrozenDays.has(beforeKey)))return false;
             this.state.frozenDays={...(this.state.frozenDays||{}),[yesterdayKey]:Date.now()};
             this._grantInventory(`freezeUsed:${yesterdayKey}`,'freezes',-1);
             this.state.events.freezeUsed=Date.now();
             this._toast(this._lang()==='ru'?'❄️ Заморозка автоматически спасла стрик':'❄️ A freeze automatically saved your streak');
             return true;
+        }
+        _reconcileInvalidFreezes() {
+            const activity=this._metrics().dayCounts;
+            let changed=false;
+            Object.keys(this.state.frozenDays||{}).forEach(day=>{
+                if(!activity[day]||this.state.freezeCancelledDays?.[day])return;
+                this.state.freezeCancelledDays={...(this.state.freezeCancelledDays||{}),[day]:Date.now()};
+                this._grantInventory(`freezeRefund:${day}`,'freezes',1);
+                changed=true;
+            });
+            return changed;
+        }
+        _checkStreakFreezeAfterSync() {
+            // Cloud history must be merged first. Otherwise a solve made on a
+            // different device can look like a missed day and spend a freeze.
+            let changed=this._reconcileInvalidFreezes();
+            changed=this._maybeUseStreakFreeze(this._dateKey())||changed;
+            if(changed)this._save();
         }
         _dateFromKey(key){const [y,m,d]=key.split('-').map(Number);return new Date(y,m-1,d);}
 
@@ -200,6 +222,7 @@
             this.ensureDaily(); this.evaluate(true);
             window.addEventListener('timerdatachange',e=>{if(e.detail?.type==='delete'&&this.state.daily)this.state.daily.deletedCount++;this.scheduleEvaluation(e.detail?.type||'data');});
             window.addEventListener('progressionevent',e=>this.recordEvent(e.detail?.type));
+            window.addEventListener('sync-status',e=>{if(e.detail?.state==='synced'&&window.CubeAuth?.getCurrentUser?.())this._checkStreakFreezeAfterSync();});
             window.addEventListener('resize',()=>{clearTimeout(this._titleResizeTimer);this._titleResizeTimer=setTimeout(()=>this.fitTitleElements(),80);});
             document.fonts?.ready?.then(()=>this.fitTitleElements());
             this._bindUI(); this.render(); this._startAbsoluteEffects(); this._scheduleMidnightReset();

@@ -9,13 +9,13 @@
                 this.lastCommentary = '';
                 this.commentaryElement = document.getElementById('commentaryText');
                 this.currentMood = 'friend'; // default mood
-                
+
                 // Load saved mood from localStorage
                 const savedMood = AppStorage.getRaw('timerMood');
                 if (savedMood) {
                     this.currentMood = savedMood;
                 }
-                
+
                 // Database of commentaries by mood and category
                 this.moods = COMMENTARY_MOODS; // moved to commentary-data.js
                 this.moodsEn = window.moodsEn; // English phrase banks (commentary-data.js)
@@ -34,7 +34,7 @@
 
             getCommentary(context) {
                 let category = 'neutral';
-                
+
                 // Determine category based on context
                 if (context.isDelete) {
                     category = 'delete';
@@ -71,11 +71,11 @@
                 const customComments = this.customPhrases?.[this.currentMood]?.[category] || [];
                 const categoryComments = [...defaultComments, ...customComments];
                 let comment;
-                
+
                 do {
                     comment = categoryComments[Math.floor(Math.random() * categoryComments.length)];
                 } while (comment === this.lastCommentary && categoryComments.length > 1);
-                
+
                 this.lastCommentary = comment;
                 return comment;
             }
@@ -247,7 +247,7 @@
                     voiceInspectionEnabled: false, // speaks "8 seconds"/"12 seconds" during inspection, like a WCA judge
                     commentaryLanguage: null // null = follow UI language; 'ru'/'en' = pinned independent of it
                 };
-                
+
                 this.loadSettings();
                 this._lastThemeSignature = JSON.stringify([this.settings.darkTheme, this.settings.accentColor, this.settings.customFont, this.settings.customBg]);
                 this.applySettings();
@@ -258,7 +258,7 @@
             applyTranslations() {
                 const lang = this.settings.language;
                 const t = translations[lang];
-                
+
                 // Header buttons (только текст, не иконки)
                 const statsBtn = document.querySelector('#statisticsBtn span:last-child');
                 const sessionsBtn = document.querySelector('#sessionsBtn span:last-child');
@@ -314,7 +314,7 @@
                 if (streakClose) streakClose.setAttribute('aria-label', t.close);
                 DOM('streakPrevMonth')?.setAttribute('aria-label', t.streakPreviousMonth);
                 DOM('streakNextMonth')?.setAttribute('aria-label', t.streakNextMonth);
-                
+
                 // Timer hint (reflects Mouse Start setting / touch devices)
                 const timerHint = document.querySelector('.timer-hint');
                 if (timerHint) {
@@ -323,7 +323,7 @@
                         ? t.timerHintMouse
                         : (isTouch ? (t.timerHintTouch || t.timerHintMouse) : t.timerHint);
                 }
-                
+
                 // Control buttons
                 const dnfBtn = document.querySelector('#dnfBtn');
                 const plusTwoBtn = document.querySelector('#plusTwoBtn');
@@ -333,7 +333,7 @@
                 if (plusTwoBtn) plusTwoBtn.textContent = t.plusTwo;
                 if (deleteBtn) deleteBtn.textContent = t.delete;
                 if (editBtn) editBtn.textContent = t.edit;
-                
+
                 // Export buttons
                 const exportJsonBtn = document.querySelector('#exportJsonBtn');
                 const exportCsvBtn = document.querySelector('#exportCsvBtn');
@@ -427,11 +427,11 @@
                 const honestModeCloseActive = DOM('honestModeCloseActive');
                 if (honestModeCloseActive) honestModeCloseActive.textContent = t.hmCloseLabel;
                 if (window.timer && window.timer._updateHonestModeBtn) window.timer._updateHonestModeBtn();
-                
+
                 // Left column
                 const lastSolvesTitle = document.querySelector('.left-column .card-title');
                 if (lastSolvesTitle) lastSolvesTitle.textContent = t.lastSolves;
-                
+
                 // Right column
                 const rightColumnTitles = document.querySelectorAll('.right-column .card-title');
                 if (rightColumnTitles[0]) rightColumnTitles[0].textContent = t.bestTimes;
@@ -447,11 +447,11 @@
                 if (averageLabels[0]) averageLabels[0].textContent = t.ao5;
                 if (averageLabels[1]) averageLabels[1].textContent = t.ao12;
                 if (averageLabels[2]) averageLabels[2].textContent = t.ao100;
-                
+
                 // Settings modal
                 const settingsTitle = document.querySelector('#settingsOverlay .settings-title');
                 if (settingsTitle) settingsTitle.textContent = t.settingsTitle;
-                
+
                 const settingsSections = document.querySelectorAll('#settingsOverlay .settings-section-title');
                 if (settingsSections[0]) settingsSections[0].textContent = t.timerSettings;
                 if (settingsSections[1]) settingsSections[1].textContent = t.theme;
@@ -461,11 +461,11 @@
                 if (settingsSections[5]) settingsSections[5].textContent = t.timerMode;
                 if (settingsSections[6]) settingsSections[6].textContent = t.timerMood;
                 if (settingsSections[7]) settingsSections[7].textContent = t.dataManagement;
-                
+
                 const settingsSubtitles = document.querySelectorAll('#settingsOverlay .settings-subtitle');
                 if (settingsSubtitles[0]) settingsSubtitles[0].textContent = t.chooseLanguage;
                 if (settingsSubtitles[1]) settingsSubtitles[1].textContent = t.chooseMood;
-                
+
                 const settingsLabels = document.querySelectorAll('#settingsOverlay .settings-label');
                 if (settingsLabels[0]) settingsLabels[0].textContent = t.holdDelay;
                 if (settingsLabels[1]) settingsLabels[1].textContent = t.timerColor;
@@ -475,7 +475,7 @@
                 if (settingsLabels[5]) settingsLabels[5].textContent = t.showAo5;
                 if (settingsLabels[6]) settingsLabels[6].textContent = t.showAo12;
                 if (settingsLabels[7]) settingsLabels[7].textContent = t.showAo100;
-                
+
                 const moodLabels = document.querySelectorAll('.mood-label');
                 if (moodLabels[0]) moodLabels[0].textContent = t.moodFriend;
                 if (moodLabels[1]) moodLabels[1].textContent = t.moodTeaser;
@@ -485,13 +485,13 @@
 
                 const commentaryLangLabel = document.getElementById('commentaryLangLabel');
                 if (commentaryLangLabel) commentaryLangLabel.textContent = t.commentaryLangLabel;
-                
+
                 const settingsButtons = document.querySelectorAll('#settingsOverlay .settings-button');
                 if (settingsButtons[0]) settingsButtons[0].textContent = t.exportJSON;
                 if (settingsButtons[1]) settingsButtons[1].textContent = t.exportCSV;
                 if (settingsButtons[2]) settingsButtons[2].textContent = t.importExport;
                 if (settingsButtons[3]) settingsButtons[3].textContent = t.resetSession;
-                
+
                 // NEW SETTINGS MODAL - Sidebar navigation
                 const settingsNavItems = document.querySelectorAll('.settings-nav-item');
                 if (settingsNavItems[0]) settingsNavItems[0].textContent = t.sidebarTimer;
@@ -502,11 +502,11 @@
                 if (settingsNavItems[5]) settingsNavItems[5].textContent = t.sidebarMood;
                 if (settingsNavItems[6]) settingsNavItems[6].textContent = t.sidebarAnalytics;
                 if (settingsNavItems[7]) settingsNavItems[7].textContent = t.sidebarData;
-                
+
                 // NEW SETTINGS MODAL - Title
                 const settingsTitleNew = document.querySelector('.settings-title-new');
                 if (settingsTitleNew) settingsTitleNew.textContent = t.settings;
-                
+
                 // NEW SETTINGS MODAL - Section titles (addressed by ID, not fragile DOM index)
                 const _st = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
                 _st('st-timer',            t.timerSettingsDelay);
@@ -533,21 +533,21 @@
                 // Statistics — Trend & Heatmap titles
                 _st('st-stat-trend',   t.trendTitle);
                 _st('st-stat-heatmap', t.heatmapTitle);
-                
+
                 // NEW SETTINGS MODAL - Labels
                 const settingLabelNew = document.querySelector('.setting-label-new');
                 if (settingLabelNew) settingLabelNew.textContent = t.soundEffects;
-                
+
                 const checkboxLabels = document.querySelectorAll('.checkbox-label');
                 if (checkboxLabels[0]) checkboxLabels[0].textContent = t.showAo5;
                 if (checkboxLabels[1]) checkboxLabels[1].textContent = t.showAo12;
                 if (checkboxLabels[2]) checkboxLabels[2].textContent = t.showAo100;
-                
+
                 // NEW SETTINGS MODAL - Theme buttons
                 const themeLabels = document.querySelectorAll('.theme-label');
                 if (themeLabels[0]) themeLabels[0].textContent = t.lightTheme;
                 if (themeLabels[1]) themeLabels[1].textContent = t.darkTheme;
-                
+
                 // NEW SETTINGS MODAL - Mood cards
                 const moodCardLabels = document.querySelectorAll('.mood-card-label');
                 if (moodCardLabels[0]) moodCardLabels[0].textContent = t.moodFriend;
@@ -555,13 +555,13 @@
                 if (moodCardLabels[2]) moodCardLabels[2].textContent = t.moodTrainer;
                 if (moodCardLabels[3]) moodCardLabels[3].textContent = t.moodEnemy;
                 if (moodCardLabels[4]) moodCardLabels[4].textContent = t.moodRival;
-                
+
                 // Inspection setting
                 const inspectionLabel = document.getElementById('inspectionLabel');
                 const inspectionDescElem = document.getElementById('inspectionDesc');
                 if (inspectionLabel) inspectionLabel.textContent = t.inspection;
                 if (inspectionDescElem) inspectionDescElem.textContent = t.inspectionDesc;
-                
+
                 // Inspection Mode segmented control labels
                 const inspectionModeLabel = document.getElementById('inspectionModeLabel');
                 const inspModeWcaDesc = document.getElementById('inspModeWcaDesc');
@@ -576,14 +576,14 @@
                 const voiceInspectionDesc = document.getElementById('voiceInspectionDesc');
                 if (voiceInspectionLabel) voiceInspectionLabel.textContent = t.voiceInspectionLabel;
                 if (voiceInspectionDesc) voiceInspectionDesc.textContent = t.voiceInspectionDesc;
-                
+
                 // NEW SETTINGS MODAL - Data buttons
                 const dataBtns = document.querySelectorAll('.data-btn');
                 if (dataBtns[0]) dataBtns[0].textContent = t.exportCSV;
                 if (dataBtns[1]) dataBtns[1].textContent = t.exportJSON;
                 if (dataBtns[2]) dataBtns[2].textContent = t.importExport;
                 if (dataBtns[3]) dataBtns[3].textContent = t.resetSession;
-                
+
                 // Statistics modal
                 const statisticsTitle = document.querySelector('#statisticsOverlay .statistics-title');
                 if (statisticsTitle) statisticsTitle.textContent = t.statisticsTitle;
@@ -645,7 +645,7 @@
                 _st('st-autoExportEveryLabel', t.autoExportEveryLabel);
                 _st('st-autoExportFormatLabel', t.autoExportFormatLabel);
                 _st('st-autoExportFolderDesc', t.autoExportFolderDesc);
-                
+
                 const statCardLabels = document.querySelectorAll('.stat-card-label');
                 if (statCardLabels[0]) statCardLabels[0].textContent = t.bestSingle;
                 if (statCardLabels[1]) statCardLabels[1].textContent = t.bestAo5;
@@ -653,13 +653,13 @@
                 if (statCardLabels[3]) statCardLabels[3].textContent = t.bestAo100;
                 if (statCardLabels[4]) statCardLabels[4].textContent = t.sessionAvg;
                 if (statCardLabels[5]) statCardLabels[5].textContent = t.totalSolves;
-                
+
                 const chartToggles = document.querySelectorAll('.chart-toggle label');
                 if (chartToggles[0]) chartToggles[0].childNodes[1].textContent = ' ' + t.singles;
                 if (chartToggles[1]) chartToggles[1].childNodes[1].textContent = ' Ao5';
                 if (chartToggles[2]) chartToggles[2].childNodes[1].textContent = ' Ao12';
                 if (chartToggles[3]) chartToggles[3].childNodes[1].textContent = ' Ao100';
-                
+
                 const statsRowLabels = document.querySelectorAll('.stats-row-label');
                 if (statsRowLabels[0]) statsRowLabels[0].textContent = t.bestSolve;
                 if (statsRowLabels[1]) statsRowLabels[1].textContent = t.worstSolve;
@@ -667,30 +667,29 @@
                 if (statsRowLabels[3]) statsRowLabels[3].textContent = t.penalties;
                 if (statsRowLabels[4]) statsRowLabels[4].textContent = t.mean;
                 if (statsRowLabels[5]) statsRowLabels[5].textContent = t.stdDev;
-                
+
                 // Sessions modal
                 const sessionsTitle = document.querySelector('#sessionsOverlay .sessions-title');
                 if (sessionsTitle) sessionsTitle.textContent = t.sessionsTitle;
-                
+
                 const newSessionBtn = document.querySelector('#newSessionBtn');
                 const renameSessionBtn = document.querySelector('#renameSessionBtn');
                 const resetSessionBtn = document.querySelector('#resetSessionBtn');
                 const deleteSessionBtn = document.querySelector('#deleteSessionBtn');
                 const exportSessionBtn = document.querySelector('#exportSessionBtn');
-                
+
                 if (newSessionBtn) newSessionBtn.textContent = t.newSession;
                 if (renameSessionBtn) renameSessionBtn.textContent = t.rename;
                 if (resetSessionBtn) resetSessionBtn.textContent = t.resetSession;
                 if (deleteSessionBtn) deleteSessionBtn.textContent = t.deleteSession;
                 if (exportSessionBtn) exportSessionBtn.textContent = t.exportSession;
-                
+
                 const sessionStatLabels = document.querySelectorAll('.session-stat-label');
                 if (sessionStatLabels[0]) sessionStatLabels[0].textContent = t.solves.toUpperCase();
                 if (sessionStatLabels[1]) sessionStatLabels[1].textContent = t.best.toUpperCase();
                 if (sessionStatLabels[2]) sessionStatLabels[2].textContent = 'AO5';
                 if (sessionStatLabels[3]) sessionStatLabels[3].textContent = 'AO12';
                 if (sessionStatLabels[4]) sessionStatLabels[4].textContent = 'AO100';
-                if (sessionStatLabels[5]) sessionStatLabels[5].textContent = 'AVG';
                 if (sessionStatLabels[5]) sessionStatLabels[5].textContent = t.averageShort;
 
                 _st('sessionDetailsTitle', t.noSession);
@@ -704,14 +703,10 @@
                 _st('hotkeyPlusTwoLabel', t.plusTwo);
                 _st('hotkeyDeleteLabel', t.hotkeyDelete);
                 _st('hotkeyEditLabel', t.hotkeyEdit);
-                
+
                 // Update language selector active state
-                document.querySelectorAll('.lang-btn').forEach(btn => {
-                    if (btn.dataset.lang === lang) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
+                document.querySelectorAll('.lang-btn-new, .lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
                 });
                 window.dispatchEvent(new CustomEvent('languagechange', { detail: { language: lang } }));
             }
@@ -753,12 +748,12 @@
                 const holdDelaySlider = DOM('holdDelaySlider');
                 if (holdDelaySlider) {
                     holdDelaySlider.value = this.settings.holdDelay;
-                    DOM('holdDelayValue').textContent = `Hold delay: ${this.settings.holdDelay} ms`;
+                    DOM('holdDelayValue').textContent = `${translations[getLang()].holdDelay}: ${this.settings.holdDelay} ms`;
                 }
-                
+
                 // Update theme buttons
                 document.querySelectorAll('.theme-btn').forEach(btn => {
-                    if ((btn.dataset.theme === 'dark' && this.settings.darkTheme) || 
+                    if ((btn.dataset.theme === 'dark' && this.settings.darkTheme) ||
                         (btn.dataset.theme === 'light' && !this.settings.darkTheme)) {
                         btn.classList.add('active');
                     } else {
@@ -786,7 +781,7 @@
                 const showAo5Checkbox = DOM('showAo5Checkbox');
                 const showAo12Checkbox = DOM('showAo12Checkbox');
                 const showAo100Checkbox = DOM('showAo100Checkbox');
-                
+
                 if (showAo5Checkbox) showAo5Checkbox.checked = this.settings.showAo5;
                 if (showAo12Checkbox) showAo12Checkbox.checked = this.settings.showAo12;
                 if (showAo100Checkbox) showAo100Checkbox.checked = this.settings.showAo100;
@@ -1445,6 +1440,14 @@
                     btn.dataset.bg = id;
                     if (id === (this.settings.customBg || 'none')) btn.classList.add('active');
                     btn.innerHTML = `<span class="bg-btn-label">${label}</span>`;
+
+                    if (window.BACKGROUNDS_DATA && window.BACKGROUNDS_DATA[id]) {
+                        const bgData = window.BACKGROUNDS_DATA[id];
+                        if (bgData.btn || bgData.main) {
+                            btn.style.cssText = bgData.btn || bgData.main;
+                        }
+                    }
+
                     btn.addEventListener('click', () => {
                         this.settings.customBg = id;
                         this.applyCustomization();
@@ -1494,8 +1497,11 @@
                 const bg = customBg || 'none';
                 if (bg === 'none') {
                     delete document.body.dataset.bg;
+                    const styleEl = document.getElementById('dynamic-bg-style');
+                    if (styleEl) styleEl.remove();
                 } else {
                     document.body.dataset.bg = bg;
+                    this._injectDynamicBackground(bg);
                 }
 
                 // Sync UI controls
@@ -1516,6 +1522,41 @@
                     b = parseInt(h.slice(4,6), 16);
                 }
                 return `rgba(${r},${g},${b},${alpha})`;
+            }
+
+            _injectDynamicBackground(bgId) {
+                if (!window.BACKGROUNDS_DATA || !window.BACKGROUNDS_DATA[bgId]) return;
+
+                let styleEl = document.getElementById('dynamic-bg-style');
+                if (!styleEl) {
+                    styleEl = document.createElement('style');
+                    styleEl.id = 'dynamic-bg-style';
+                    document.head.appendChild(styleEl);
+                }
+
+                const data = window.BACKGROUNDS_DATA[bgId];
+                let css = '';
+                const prefix = document.body.classList.contains('light-theme') ? 'body.light-theme' : 'body';
+
+                if (data.main) css += `${prefix}[data-bg="${bgId}"] { ${data.main} }\n`;
+                if (data.before) css += `${prefix}[data-bg="${bgId}"]::before { ${data.before} }\n`;
+                if (data.after) css += `${prefix}[data-bg="${bgId}"]::after { ${data.after} }\n`;
+                if (data.custom) {
+                    const scope = `${prefix}[data-bg="${bgId}"]`;
+                    const scopedCustom = data.custom.replace(
+                        /(^|})(\s*(?:\/\*[\s\S]*?\*\/\s*)*)([^@{}][^{]*)\{/g,
+                        (match, boundary, comments, selectors) => {
+                            const scopedSelectors = selectors
+                                .split(',')
+                                .map(selector => `${scope} ${selector.trim()}`)
+                                .join(',\n');
+                            return `${boundary}${comments}${scopedSelectors} {`;
+                        }
+                    );
+                    css += scopedCustom + '\n';
+                }
+
+                styleEl.textContent = css;
             }
 
             _syncCustomUI() {
@@ -1899,7 +1940,7 @@
                         document.querySelectorAll('.settings-nav-item').forEach(item => item.classList.remove('active'));
                         // Add active to clicked item
                         navItem.classList.add('active');
-                        
+
                         // Hide all sections
                         document.querySelectorAll('.settings-section-content').forEach(section => section.classList.remove('active'));
                         // Show selected section
@@ -1914,7 +1955,7 @@
                     holdDelaySlider.addEventListener('input', (e) => {
                         const value = parseInt(e.target.value);
                         this.settings.holdDelay = value;
-                        DOM('holdDelayValue').textContent = `Hold delay: ${value} ms`;
+                        DOM('holdDelayValue').textContent = `${translations[getLang()].holdDelay}: ${value} ms`;
                         this.saveSettings();
                     });
                 }
@@ -1924,7 +1965,7 @@
                     btn.addEventListener('click', () => {
                         const theme = btn.dataset.theme;
                         this.settings.darkTheme = (theme === 'dark');
-                        
+
                         // Update UI
                         document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
@@ -1933,7 +1974,7 @@
                         this.settings.accentColor = null;
                         this.settings.customFont = 'default';
                         this.settings.customBg = 'none';
-                        
+
                         this.applySettings();
                         this.saveSettings();
 
@@ -2070,7 +2111,7 @@
                 const showAo5Checkbox = DOM('showAo5Checkbox');
                 const showAo12Checkbox = DOM('showAo12Checkbox');
                 const showAo100Checkbox = DOM('showAo100Checkbox');
-                
+
                 if (showAo5Checkbox) {
                     showAo5Checkbox.addEventListener('change', (e) => {
                         this.settings.showAo5 = e.target.checked;
@@ -2078,7 +2119,7 @@
                         this.saveSettings();
                     });
                 }
-                
+
                 if (showAo12Checkbox) {
                     showAo12Checkbox.addEventListener('change', (e) => {
                         this.settings.showAo12 = e.target.checked;
@@ -2086,7 +2127,7 @@
                         this.saveSettings();
                     });
                 }
-                
+
                 if (showAo100Checkbox) {
                     showAo100Checkbox.addEventListener('change', (e) => {
                         this.settings.showAo100 = e.target.checked;
@@ -2100,16 +2141,16 @@
                     card.addEventListener('click', () => {
                         const mood = card.dataset.mood;
                         this.settings.timerMood = mood;
-                        
+
                         // Update UI
                         document.querySelectorAll('.mood-card').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
-                        
+
                         // Update commentary system
                         if (window.commentary) {
                             window.commentary.setMood(mood);
                         }
-                        
+
                         this.saveSettings();
                     });
                 });
@@ -2129,15 +2170,15 @@
                     btn.addEventListener('click', () => {
                         const lang = btn.dataset.lang;
                         this.settings.language = lang;
-                        
+
                         // Update UI
                         document.querySelectorAll('.lang-btn-new').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
-                        
+
                         // Apply translations
                         this.applyTranslations();
                         this._applyCustomPhrasesCopy();
-                        
+
                         this.saveSettings();
                     });
                 });
@@ -2147,15 +2188,15 @@
                     btn.addEventListener('click', () => {
                         const lang = btn.dataset.lang;
                         this.settings.language = lang;
-                        
+
                         // Update UI
                         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
-                        
+
                         // Apply translations
                         this.applyTranslations();
                         this._applyCustomPhrasesCopy();
-                        
+
                         this.saveSettings();
                     });
                 });
@@ -2187,7 +2228,8 @@
 
                 // Reset Data
                 document.getElementById('resetDataBtn').addEventListener('click', () => {
-                    if (confirm('Are you sure? This will delete all solves in the current session.')) {
+                    const t = translations[getLang()];
+                    if (confirm(t.resetConfirm)) {
                         if (window.timer) {
                             window.timer.resetSession();
                         }
@@ -2399,15 +2441,15 @@
 
             playSound(type) {
                 if (!this.settings.sounds) return;
-                
+
                 // Create simple beep sounds using Web Audio API
                 const audioContext = this._getAudioContext();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-                
+
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-                
+
                 if (type === 'start') {
                     oscillator.frequency.value = 800;
                     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
@@ -2417,7 +2459,7 @@
                     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
                 }
-                
+
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
             }
@@ -2529,17 +2571,17 @@
                 this.isReady = false;
                 this.startTime = 0;
                 this.animationFrame = null;
-                
+
                 // Inspection state
                 this.isInspecting = false;
                 this.inspectionTime = 15;
                 this.inspectionInterval = null;
                 this.tapStartTime = 0;
-                
+
                 // Sessions management
                 this.sessions = this.loadSessions();
                 this.currentSessionId = this.loadCurrentSessionId();
-                
+
                 // Track previous bests for comparison
                 // Initialize from existing solves so first new solve doesn't always trigger "New Best"
                 this.previousBest = this.getBestTime();
@@ -2547,7 +2589,7 @@
                 this.previousBestAo12 = this.getBestAverage(12);
                 this.previousBestAo100 = this.getBestAverage(100);
                 this.previousAverageAo5 = null;
-                
+
                 this.timerDisplay = document.getElementById('timerDisplay');
                 this.timerContainer = this.timerDisplay?.closest('.timer-container');
                 this.solvesList = document.getElementById('solvesList');
@@ -2556,7 +2598,7 @@
                 this.activeDailyChallenge = null;
                 this.activeDailyChallengeConsumed = false;
                 this._dailyChallengeCache = null;
-                
+
                 this._scrambleRequestId = 0;
                 this.initEventListeners();
                 this.generateScramble();
@@ -2687,14 +2729,27 @@
             initEventListeners() {
                 // Keyboard control with hold-to-start (desktop)
                 document.addEventListener('keydown', (e) => {
-                    if (e.code === 'Space') {
+                    // Never steal the spacebar from a form control.  The timer
+                    // listener is global, but text fields (including those in
+                    // settings, shop and dialogs) must retain normal editing.
+                    const target = e.target;
+                    const isEditable = target && (
+                        target.closest?.('input, textarea, select, button, [contenteditable="true"]') ||
+                        target.isContentEditable
+                    );
+                    if (e.code === 'Space' && !isEditable) {
                         e.preventDefault();
                         this.handleSpaceDown();
                     }
                 });
 
                 document.addEventListener('keyup', (e) => {
-                    if (e.code === 'Space') {
+                    const target = e.target;
+                    const isEditable = target && (
+                        target.closest?.('input, textarea, select, button, [contenteditable="true"]') ||
+                        target.isContentEditable
+                    );
+                    if (e.code === 'Space' && !isEditable) {
                         e.preventDefault();
                         this.handleSpaceUp();
                     }
@@ -2890,7 +2945,7 @@
                             window.progression?.fitTitleElements?.(titlePreview);
                             DOM('authAccountEmail').textContent = authUser.email || '';
                             DOM('authAccountCloseBtn').textContent = t.authAccountCloseBtn;
-                            DOM('authSyncNowBtn').textContent = getLang() === 'ru' ? 'Синхронизировать сейчас' : 'Sync now';
+                            DOM('authSyncNowBtn').textContent = t.syncNow;
                             DOM('authChangeNicknameBtn').textContent = t.authChangeNicknameBtn;
                             DOM('authLogoutBtn').textContent = t.authLogoutBtn;
                             DOM('authLogoutConfirmTitle').textContent = t.authLogoutConfirm;
@@ -3354,13 +3409,13 @@
             handleSpaceDown() {
                 // Store inspection state before any modifications
                 const wasInspecting = this.isInspecting;
-                
+
                 // During inspection, holding space stops inspection and starts normal timer flow
                 if (this.isInspecting) {
                     this.stopInspection();
                     // Continue to normal hold logic below - inspection was active, so hold is allowed
                 }
-                
+
                 if (this.isRunning) {
                     // Stop timer
                     this.stopTimer();
@@ -3372,7 +3427,7 @@
                 // CRITICAL: Block hold ONLY if inspection is enabled AND was never active
                 // If inspection was just stopped (wasInspecting), allow hold to proceed
                 const inspectionEnabled = window.settingsManager && window.settingsManager.settings.inspection;
-                
+
                 if (inspectionEnabled && !wasInspecting) {
                     // Inspection is ON but was never active - only tap allowed, block hold
                     this.tapStartTime = Date.now();
@@ -3420,14 +3475,14 @@
                     // Check if this was a tap (quick press/release)
                     const holdDuration = Date.now() - this.tapStartTime;
                     const wasTap = holdDuration < 200; // Less than 200ms = tap
-                    
+
                     if (wasTap && window.settingsManager && window.settingsManager.settings.inspection && !this.isInspecting) {
                         // Start inspection
                         this.startInspection();
                     } else {
                         // False start - reset
                         this.timerDisplay.classList.remove('ready');
-                        
+
                         // Reset color properly in light theme
                         this.timerDisplay.style.color = '';
                         if (document.body.classList.contains('light-theme')) {
@@ -3449,7 +3504,7 @@
                 if (this.isInspecting) {
                     this.stopInspection();
                 }
-                
+
                 this.isRunning = true;
                 this.startTime = performance.now();
                 this.timerDisplay.classList.remove('ready');
@@ -3466,7 +3521,7 @@
                 if (window.settingsManager?.settings?.hideUiDuringSolve) {
                     this._setHideUiActive(true);
                 }
-                
+
                 // Apply running timer color
                 if (window.settingsManager && window.settingsManager.settings.timerColor) {
                     const timerColor = window.settingsManager.settings.timerColor;
@@ -3479,11 +3534,11 @@
                         this.timerDisplay.style.color = '';
                     }
                 }
-                
+
                 if (window.settingsManager) {
                     window.settingsManager.playSound('start');
                 }
-                
+
                 this.updateTimer();
             }
 
@@ -3494,7 +3549,7 @@
                 this.timerDisplay.textContent = '15';
                 this.timerDisplay.style.fontSize = '';
                 this.timerDisplay.classList.add('inspection-countdown');
-                
+
                 // Start countdown
                 this.inspectionInterval = setInterval(() => {
                     this.updateInspection();
@@ -3512,7 +3567,7 @@
                 } else if (this.inspectionTime === 3) {
                     window.settingsManager?.speakInspectionWarning(12);
                 }
-                
+
                 // Color changes based on time
                 if (this.inspectionTime > 8) {
                     // 15-9: normal color
@@ -3528,7 +3583,7 @@
                     // 4-0: red
                     this.timerDisplay.style.color = '#ef4444';
                 }
-                
+
                 // Auto-start or DNF based on inspection mode
                 if (this.inspectionTime <= 0) {
                     const mode = window.settingsManager ? window.settingsManager.settings.inspectionMode : 'wca';
@@ -3553,7 +3608,7 @@
                 this.timerDisplay.textContent = '0.00';
                 this.timerDisplay.style.fontSize = '';
                 this.timerDisplay.classList.remove('inspection-countdown');
-                
+
                 // Reset color
                 if (document.body.classList.contains('light-theme')) {
                     this.timerDisplay.style.color = '#222222';
@@ -3574,7 +3629,7 @@
                 if (document.body.classList.contains('light-theme')) {
                     this.timerDisplay.style.color = '#222222';
                 }
-                
+
                 if (this.animationFrame) {
                     cancelAnimationFrame(this.animationFrame);
                 }
@@ -3821,16 +3876,16 @@
                     this.saveSessions();
                     this._maybeAutoExport();
                     if (window.AppSync) window.AppSync.pushNewSolve(this.currentSessionId, solve);
-                    
+
                     // Update solve history if it's open
                     if (window.sessionsManager && DOM('solveHistorySection').style.display === 'flex') {
                         window.sessionsManager.populateSolveHistory();
                     }
                 }
-                
+
                 this.updateUI();
                 this.checkNewRecords(time);
-                
+
                 // Trigger commentary
                 if (window.commentary) {
                     this.triggerCommentary();
@@ -3886,13 +3941,13 @@
 
             checkNewRecords(time) {
                 const messages = [];
-                
+
                 // Check single best - only if ACTUALLY better
                 const currentBest = this.getBestTime();
                 if (currentBest !== null && (this.previousBest === null || currentBest < this.previousBest)) {
                     messages.push('single');
                 }
-                
+
                 // Check Ao5 best - only if we have enough solves and it's better
                 if (this.solves.length >= 5) {
                     const currentBestAo5 = this.getBestAverage(5);
@@ -3900,7 +3955,7 @@
                         messages.push('ao5');
                     }
                 }
-                
+
                 // Check Ao12 best
                 if (this.solves.length >= 12) {
                     const currentBestAo12 = this.getBestAverage(12);
@@ -3908,7 +3963,7 @@
                         messages.push('ao12');
                     }
                 }
-                
+
                 // Check Ao100 best
                 if (this.solves.length >= 100) {
                     const currentBestAo100 = this.getBestAverage(100);
@@ -3916,7 +3971,7 @@
                         messages.push('ao100');
                     }
                 }
-                
+
                 // Show messages sequentially
                 if (messages.length > 0) {
                     this.showNewBestMessages(messages);
@@ -3978,7 +4033,7 @@
 
                 const lastSolve = this.solves[0];
                 const sessionAvg = this.calculateSessionAverage();
-                
+
                 // Build context for commentary
                 const context = {
                     isDelete: false,
@@ -4042,7 +4097,7 @@
             getBestTime() {
                 const validSolves = this.solves.filter(s => !s.dnf);
                 if (validSolves.length === 0) return null;
-                
+
                 const times = validSolves.map(s => s.time + (s.penalty || 0));
                 return Math.min(...times);
             }
@@ -4103,7 +4158,7 @@
 
             renderProgressChart() {
                 const ctx = document.getElementById('progressChartCanvas').getContext('2d');
-                
+
                 // Destroy existing chart if it exists
                 if (window.progressChart && typeof window.progressChart.destroy === 'function') {
                     window.progressChart.destroy();
@@ -4112,7 +4167,7 @@
                 // Prepare data
                 const labels = this.solves.map((_, i) => this.solves.length - i).reverse();
                 const singlesData = this.solves.map(s => s.dnf ? null : s.time + (s.penalty || 0)).reverse();
-                
+
                 // Calculate rolling averages
                 const ao5Data = [];
                 const ao12Data = [];
@@ -4498,7 +4553,7 @@
 
             renderHistogram() {
                 const ctx = document.getElementById('histogramCanvas').getContext('2d');
-                
+
                 // Destroy existing chart if it exists
                 if (window.histogramChart && typeof window.histogramChart.destroy === 'function') {
                     window.histogramChart.destroy();
@@ -4512,7 +4567,7 @@
                 const times = validSolves.map(s => s.time + (s.penalty || 0));
                 const min = Math.floor(Math.min(...times));
                 const max = Math.ceil(Math.max(...times));
-                
+
                 // Create bins with 1 second intervals
                 const binSize = 1;
                 const binCount = Math.min(max - min + 1, 25);
@@ -4944,14 +4999,14 @@
                 document.getElementById('resetSessionBtn').onclick = () => this.resetCurrentSession();
                 DOM('deleteSessionBtn').onclick = () => this.deleteCurrentSession();
                 document.getElementById('exportSessionBtn').onclick = () => this.exportSessionCSV();
-                
+
                 // Setup solve history click handler
                 const solvesElement = DOM('sessionSolves');
                 if (solvesElement) {
                     solvesElement.classList.add('clickable');
                     solvesElement.onclick = () => this.openSolveHistory();
                 }
-                
+
                 // Setup close solve history button
                 const closeSolveHistory = document.getElementById('closeSolveHistory');
                 if (closeSolveHistory) {
@@ -4979,7 +5034,7 @@
             openSolveHistory() {
                 const session = this.sessions[this.currentSessionId];
                 if (!session) return;
-                
+
                 this.populateSolveHistory();
                 DOM('solveHistorySection').style.display = 'flex';
             }
@@ -5769,7 +5824,7 @@
                 this.populateSolveHistory();
                 this.updateSessionDetails();
                 if (window.AppSync) window.AppSync.pushSolveDelete(solve.id);
-                
+
                 // Update main timer display if needed
                 if (window.timer) {
                     window.timer.updateUI();
@@ -5781,11 +5836,11 @@
                 const solve = session.solves[index];
                 const removedPlusTwo = solve.penalty === 2;
                 if (removedPlusTwo && window.progression && !window.progression.useDnfInsurance()) return;
-                
+
                 if (solve.dnf) {
                     solve.dnf = false;
                 }
-                
+
                 solve.penalty = solve.penalty ? null : 2;
                 if (removedPlusTwo && solve.penalty === null) {
                     window.dispatchEvent(new CustomEvent('progressionevent', { detail: { type: 'plusTwoRemoved' } }));
@@ -5801,7 +5856,7 @@
                         updatedAt: solve.updatedAt
                     });
                 }
-                
+
                 if (window.timer) {
                     window.timer.updateUI();
                 }
@@ -5811,13 +5866,13 @@
                 const session = this.sessions[this.currentSessionId];
                 const solve = session.solves[index];
                 if (solve.dnf && window.progression && !window.progression.useDnfInsurance()) return;
-                
+
                 solve.dnf = !solve.dnf;
                 if (solve.dnf) {
                     solve.penalty = null;
                 }
                 solve.updatedAt = Date.now();
-                
+
                 this.saveSessions();
                 this.populateSolveHistory();
                 this.updateSessionDetails();
@@ -5828,7 +5883,7 @@
                         updatedAt: solve.updatedAt
                     });
                 }
-                
+
                 if (window.timer) {
                     window.timer.updateUI();
                 }
@@ -5891,7 +5946,7 @@
                 this.renderSessionsList();
                 this.updateSessionDetails();
                 this.updateUI();
-                
+
                 // Generate scramble for new session's discipline
                 this.generateScramble();
 
@@ -5899,7 +5954,7 @@
                 if (DOM('solveHistorySection').style.display === 'flex') {
                     this.populateSolveHistory();
                 }
-                
+
                 // Update session select in header
                 const sessionSelect = DOM('sessionSelect');
                 if (sessionSelect) {
@@ -5937,7 +5992,7 @@
                 const ao5 = this.calculateAverageForSession(solves, 5);
                 const ao12 = this.calculateAverageForSession(solves, 12);
                 const ao100 = this.calculateAverageForSession(solves, 100);
-                const avg = validSolves.length > 0 ? 
+                const avg = validSolves.length > 0 ?
                     validSolves.reduce((sum, s) => sum + s.time + (s.penalty || 0), 0) / validSolves.length : null;
 
                 DOM('sessionSolves').textContent = solves.length;
@@ -6124,13 +6179,13 @@
                 // Update last 5 solves
                 const last5 = this.solves.slice(0, 5);
                 const solvesHTML = [];
-                
+
                 for (let i = 0; i < 5; i++) {
                     if (i < last5.length) {
                         const solve = last5[i];
                         let timeStr;
                         let classes = '';
-                        
+
                         if (solve.dnf) {
                             timeStr = 'DNF';
                             classes = 'dnf';
@@ -6141,7 +6196,7 @@
                         } else {
                             timeStr = this.formatTime(solve.time);
                         }
-                        
+
                         solvesHTML.push(`
                             <li class="solve-item">
                                 <span class="solve-number">${i + 1}.</span>
@@ -6158,7 +6213,7 @@
                         `);
                     }
                 }
-                
+
                 this.solvesList.innerHTML = solvesHTML.join('');
                 this.updateActivityStreakButton();
 
@@ -6246,7 +6301,7 @@
 
             calculateAverageForSubset(solves) {
                 const count = solves.length;
-                
+
                 // Count DNFs
                 const dnfCount = solves.filter(s => s.dnf).length;
                 if (dnfCount >= 2) return null; // 2+ DNFs = no average
@@ -6259,13 +6314,13 @@
 
                 // Sort to find best and worst
                 const sorted = [...times].sort((a, b) => a - b);
-                
+
                 // Remove best and worst
                 const trimmed = sorted.slice(1, -1);
-                
+
                 // If trimmed has Infinity (DNF), it means DNF was not worst, return null
                 if (trimmed.some(t => t === Infinity)) return null;
-                
+
                 return trimmed.reduce((a, b) => a + b, 0) / trimmed.length;
             }
 
@@ -6280,7 +6335,7 @@
 
             markDNF() {
                 if (this.solves.length === 0) return;
-                
+
                 const currentSession = this.sessions[this.currentSessionId];
                 if (currentSession.solves[0].dnf && window.progression && !window.progression.useDnfInsurance()) return;
                 currentSession.solves[0].dnf = !currentSession.solves[0].dnf;
@@ -6298,7 +6353,7 @@
                         updatedAt: currentSession.solves[0].updatedAt
                     });
                 }
-                
+
                 // Trigger commentary for DNF
                 if (window.commentary && currentSession.solves[0].dnf) {
                     window.commentary.show({ isDNF: true });
@@ -6309,7 +6364,7 @@
                 if (this.solves.length === 0) return;
                 const currentSession = this.sessions[this.currentSessionId];
                 if (currentSession.solves[0].dnf) return;
-                
+
                 const removedPlusTwo = currentSession.solves[0].penalty === 2;
                 if (removedPlusTwo && window.progression && !window.progression.useDnfInsurance()) return;
                 if (removedPlusTwo) {
@@ -6330,7 +6385,7 @@
                         updatedAt: currentSession.solves[0].updatedAt
                     });
                 }
-                
+
                 // Trigger commentary for +2
                 if (window.commentary && currentSession.solves[0].penalty === 2) {
                     window.commentary.show({ isPluTwo: true });
@@ -6353,7 +6408,7 @@
                     this.saveSessions();
                     this.updateUI();
                     if (removed && window.AppSync) window.AppSync.pushSolveDelete(removed.id);
-                    
+
                     // Trigger commentary for delete
                     if (window.commentary) {
                         window.commentary.show({ isDelete: true });
@@ -6473,7 +6528,7 @@
 
             editSolve() {
                 if (this.solves.length === 0) return;
-                
+
                 const currentSession = this.sessions[this.currentSessionId];
                 if (this._isSolveHonestLocked(currentSession, currentSession.solves[0])) {
                     this._honestModeLockedAlert();
@@ -6482,7 +6537,7 @@
 
                 const currentTime = currentSession.solves[0].dnf ? 'DNF' : this.formatTime(currentSession.solves[0].time);
                 const newTime = prompt('Enter new time (e.g. 15.68, 1:02.36, or just 1568) or DNF:', currentTime);
-                
+
                 if (newTime !== null) {
                     const parsed = this._parseTimeInput(newTime);
                     if (!parsed) {
@@ -6784,7 +6839,7 @@
             drawChart() {
                 const canvas = document.getElementById('progressChart');
                 const ctx = canvas.getContext('2d');
-                
+
                 // Set canvas size
                 canvas.width = canvas.offsetWidth * 2;
                 canvas.height = canvas.offsetHeight * 2;
@@ -6819,7 +6874,7 @@
                 // Draw grid lines
                 ctx.strokeStyle = 'rgba(74, 158, 255, 0.1)';
                 ctx.lineWidth = 1;
-                
+
                 for (let i = 0; i <= 4; i++) {
                     const y = (height / 4) * i;
                     ctx.beginPath();
@@ -6833,12 +6888,12 @@
                 ctx.lineWidth = 2;
                 ctx.lineJoin = 'round';
                 ctx.lineCap = 'round';
-                
+
                 ctx.beginPath();
                 validSolves.forEach((value, index) => {
                     const x = (width / (validSolves.length - 1)) * index;
                     const y = height - ((value - min) / range) * height * 0.8 - height * 0.1;
-                    
+
                     if (index === 0) {
                         ctx.moveTo(x, y);
                     } else {
@@ -6852,7 +6907,7 @@
                 validSolves.forEach((value, index) => {
                     const x = (width / (validSolves.length - 1)) * index;
                     const y = height - ((value - min) / range) * height * 0.8 - height * 0.1;
-                    
+
                     ctx.beginPath();
                     ctx.arc(x, y, 3, 0, Math.PI * 2);
                     ctx.fill();
@@ -7799,15 +7854,15 @@
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = '.json,application/json';
-                
+
                 input.onchange = (e) => {
                     const file = e.target.files[0];
                     const reader = new FileReader();
-                    
+
                     reader.onload = (event) => {
                         try {
                             const data = JSON.parse(event.target.result);
-                            
+
                             // Check if it's new format (sessions) or old format (single session)
                             if (data.sessions) {
                                 this.sessions = data.sessions;
@@ -7817,7 +7872,7 @@
                                 const currentSession = this.sessions[this.currentSessionId];
                                 currentSession.solves = data.solves;
                             }
-                            
+
                             this.saveSessions();
                             this.updateUI();
                             this.updateSessionDropdown();
@@ -7826,10 +7881,10 @@
                             alert('Error importing data: ' + error.message);
                         }
                     };
-                    
+
                     reader.readAsText(file);
                 };
-                
+
                 input.click();
             }
         }
@@ -8727,7 +8782,7 @@
             window.settingsManager = settingsManager;
             const timer = new CubeTimer();
             const hotkeyManager = new HotkeyManager();
-            
+
             // Make globally accessible
             window.commentary = commentary;
             window.timer = timer;
@@ -9404,6 +9459,8 @@ const AlgsDiagram = (function() {
 
         function onKeyDown(e) {
             if (!practiceActive || e.code !== 'Space') return;
+            const target = e.target;
+            if (target && (target.closest?.('input, textarea, select, button, [contenteditable="true"]') || target.isContentEditable)) return;
             if (phase2El.classList.contains('algs-step-hidden')) return; // only active during Phase 2
             e.preventDefault();
             e.stopPropagation();
